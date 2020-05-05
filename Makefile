@@ -14,7 +14,7 @@ install: setup
 
 .PHONY: ping
 ping:
-	curl -vvv "localhost:3000/ping"
+	curl -vvv "localhost:5000/ping"
 
 
 .PHONY: help
