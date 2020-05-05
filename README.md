@@ -27,3 +27,12 @@ Para verificar que el server este levantado, en otra consola podemos hacer:
 o simplemente:
 
 	make ping
+
+### Tests
+
+Los tests se corren haciendo:
+
+	make test
+
+Tener en cuenta que puede que requiera tener el `mongo service` starteado. \
+El comando llama a `pytest`, sin calculo de coverage. 

@@ -12,6 +12,10 @@ install: setup
 	echo ">>>>>> Install requirements <<<<<<"
 	. env/bin/activate && pip3 install -r requirements.txt
 
+.PHONY: test
+test:
+	pytest -v
+
 .PHONY: ping
 ping:
 	curl -vvv "localhost:5000/ping"
