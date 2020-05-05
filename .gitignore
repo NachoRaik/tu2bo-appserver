@@ -1,1 +1,6 @@
 env/
+.idea/
+migrations/
+__pycache__/
+database/__pycache__/
+database/models/__pycache__/
