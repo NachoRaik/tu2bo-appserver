@@ -5,7 +5,7 @@ class Config(object):
     TESTING = False
     MONGODB_SETTINGS = {
 	    'db': 'appserver-db',
-	    'host': 'mongodb://localhost/appserver-db'
+	    'host': 'mongodb://appserver-db:27017/appserver-db'
     }
 
 class ProductionConfig(Config):
