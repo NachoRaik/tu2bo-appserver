@@ -24,6 +24,9 @@ Para verificar que el server este levantado, en otra consola podemos hacer:
 
 	curl -vvv "127.0.0.1:5000"
 
+O simplemente:
+
+	make ping
 
 ### Tests
 
