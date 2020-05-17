@@ -18,11 +18,12 @@ def create_app(config=DevelopmentConfig()):
     db = initialize_db(app)
 
     # -- Routes registration
-    from routes import auth, users, monitoring
+    from routes import auth, monitoring, users, videos
 
     app.register_blueprint(auth.bp_auth)
-    app.register_blueprint(users.bp_users)
     app.register_blueprint(monitoring.bp_monitor)
+    app.register_blueprint(users.bp_users)
+    app.register_blueprint(videos.bp_videos)
 
     # -- Unassigned endpoints
     @app.route('/')

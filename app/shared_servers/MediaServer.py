@@ -27,6 +27,11 @@ class MockMediaServer(MediaServer):
 
     def __init__(self):
         super().__init__()
+        self.data = {}
+        with open('shared_servers/example_videos.json') as json_file:
+            self.data = json.load(json_file)
+        
+        print(self.data)
         self.videos = {}
         self.videos['1'] = { 
             'videoId1': { 'title': 'AsdfMovie1', 'description': 'Random Video', 'url': 'someurl.com' },
@@ -43,13 +48,16 @@ class MockMediaServer(MediaServer):
 
     def getVideos(self):
         response_data = {k:v for x in self.videos.values() for k,v in x.items()}
-        return flask.Response(json.dumps(response_data), status=200)
+        videos = {'videos': [v for x in self.data['data'] for v in x['videos']]}
+        print(videos)
+        return flask.Response(json.dumps(videos), status=200)
 
     def getUserVideos(self, userId):
         if userId not in self.videos:
             return flask.Response(json.dumps({'reason': 'User not found'}), status=404)
 
-        return flask.Response(json.dumps(self.videos[userId]), status=200)
+        videos = {'videos': [v for x in self.data['data'] if x['userId']==int(userId) for v in x['videos']]}
+        return flask.Response(json.dumps(videos), status=200)
 
     def deleteVideo(self, userId, videoId):
         if userId not in self.videos or videoId not in self.videos[userId]:
