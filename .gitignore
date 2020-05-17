@@ -2,4 +2,4 @@ env/
 .idea/
 migrations/
 *__pycache__/
-
+*.pytest_cache/
