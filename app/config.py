@@ -13,3 +13,11 @@ class ProductionConfig(Config):
 
 class DevelopmentConfig(Config):
     TESTING = True
+
+class TestingConfig(object):
+    DEBUG = False
+    TESTING = True
+    MONGODB_SETTINGS = {
+     'db': 'appserver-db-test',
+     'host': 'mongomock://localhost'
+    }

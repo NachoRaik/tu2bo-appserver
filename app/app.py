@@ -10,7 +10,7 @@ JSON_TYPE = "application/json"
 # -- App creation
 
 def create_app(config=DevelopmentConfig()):
-    app = Flask(__name__)
+    app = Flask(name)
     app.config.from_object(config)
     db = initialize_db(app)
 
@@ -29,11 +29,3 @@ def create_app(config=DevelopmentConfig()):
         return "This endpoint will work for sending invites"
 
     return app
-
-
-app = create_app()
-
-# -- Run
-
-if __name__ == '__main__':
-    app.run(host="0.0.0.0", port="5000")
