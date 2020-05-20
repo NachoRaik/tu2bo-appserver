@@ -10,7 +10,7 @@ JSON_TYPE = "application/json"
 # -- App creation
 
 def create_app(config=DevelopmentConfig()):
-    app = Flask(name)
+    app = Flask(__name__)
     app.config.from_object(config)
     db = initialize_db(app)
 

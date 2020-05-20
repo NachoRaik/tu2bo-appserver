@@ -2,9 +2,12 @@ import os
 import tempfile
 import pytest
 
-from app import app as fapp
+from config import TestingConfig
+from mongoengine import connect, disconnect
+from app import create_app
 
 @pytest.fixture
 def client():
     """A test client for the app."""
-    return fapp.test_client()
+    app = create_app(TestingConfig)
+    return app.test_client()

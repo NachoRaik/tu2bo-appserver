@@ -13,3 +13,15 @@ def test_ping(client):
 
     res = client.get('/ping')
     assert b'AppServer is ~app~ up!' in res.data
+
+
+def test_(client):
+    """ POST /users
+    Should: return 200 and correct message """
+    userId = '1'
+    res = client.post('/users/', json={
+        'user_id': userId,
+        'username': 'userExample'
+    })
+    assert res.json.get('id') == 1
+    assert res.status_code == 200
