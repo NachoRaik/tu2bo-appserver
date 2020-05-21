@@ -1,6 +1,7 @@
 import pytest
 from mongoengine import connect, disconnect
 from mongoengine.connection import _get_db
+from tests.utils import add_user, get_users
 
 class TestUser:
     def setup_method(self, method):
@@ -20,12 +21,17 @@ class TestUser:
     def test_add_user(self, client):
         """ POST /users
         Should: return 200 and the correct id in the body"""
-        userId = '1'
-        res = client.post('/users/', json={
-            'username': 'userExample'
-        })
-        assert res.json.get('id') == 1
+        res = add_user(client, 'aUsername')
         assert res.status_code == 200
+
+    def test_add_same_user_twice(self, client):
+        """ POST /users
+        Should: return 400 and correct message"""
+        add_user(client, 'aUsername')
+        res = add_user(client, 'aUsername')
+        print(res.get_json())
+        assert res.status_code == 400
+        assert b'Invalid request' in res.data
 
     def test_add_invalid_user(self, client):
         """ POST /users
@@ -34,11 +40,21 @@ class TestUser:
         assert res.status_code == 400
         assert b'Invalid request' in res.data
 
-    def test_get_users(self, client):
-        """ POST /gets
+    def test_get_no_users(self, client):
+        """ GET /users
         Should: return 200 and empty body"""
-        res = client.get('/users/')
+        res = get_users(client)
         user_info = res.get_json() 
         assert res.status_code == 200
         assert len(user_info) == 0
+    
+    def test_get_users(self, client):
+        """ GET /users
+        Should: return 200 and all users posted"""
+        add_user(client, 'aUsername')
+        add_user(client, 'anotherUserName')
+        res = get_users(client)
+        user_info = res.get_json() 
+        assert res.status_code == 200
+        assert len(user_info) == 2
     
