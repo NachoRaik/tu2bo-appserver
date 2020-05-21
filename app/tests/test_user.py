@@ -36,7 +36,6 @@ class TestUser:
         Should: return 200 and the correct id in the body"""
         userId = '1'
         res = client.post('/users/', json={
-            'user_id': userId,
             'username': 'userExample'
         })
         assert res.json.get('id') == 1
@@ -45,9 +44,7 @@ class TestUser:
     def test_add_invalid_user(self, client):
         """ POST /users
         Should: return 400 and correct message"""
-        res = client.post('/users/', json={
-            'user_id': '1'
-        })
+        res = client.post('/users/', json={})
         assert res.status_code == 400
         assert b'Invalid request' in res.data
 
@@ -59,10 +56,3 @@ class TestUser:
         assert res.status_code == 200
         assert len(user_info) == 0
     
-    def test_get_users(self, client):
-        """ POST /gets
-        Should: return 200 and empty body"""
-        res = client.get('/users/')
-        user_info = res.get_json() 
-        assert res.status_code == 200
-        assert len(user_info) == 0
