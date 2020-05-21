@@ -1,4 +1,4 @@
-from flask import Blueprint, request, jsonify
+from flask import Blueprint, request, jsonify, make_response
 from flask import current_app as app
 from werkzeug.utils import secure_filename
 
@@ -17,13 +17,15 @@ def get_users():
 
 @bp_users.route('/', methods=['POST'], strict_slashes=False)
 def add_users():
-    body = request.get_json()
-    user = User(**body).save()
-    id = user.id
-    response = jsonify({'id': id})
-    response.status_code = 200
-    return response
-
+    try: 
+        body = request.get_json()
+        user = User(**body).save()
+        id = user.id
+        response = jsonify({'id': id})
+        response.status_code = 200
+        return response
+    except:
+        return make_response("Invalid request", 400)
 
 @bp_users.route('/<userId>', methods=['GET'])
 def get_user_profile(userId):
