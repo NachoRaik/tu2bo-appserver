@@ -48,11 +48,8 @@ class MockAuthServer(AuthServer):
         return flask.Response(json.dumps(response_data), status=200)
     
     def generate_id(self):
-        ids = []
-        for value in self.db.values():
-            id = value['id']
-            ids.append(id)
-        return max(ids)
+        ids = list(map(lambda user: int(user['id']), self.db.values()))
+        return max(ids) + 1
 
     def register(self, data):
         parsed_data = json.loads(data)
