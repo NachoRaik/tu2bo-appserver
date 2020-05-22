@@ -95,4 +95,10 @@ class TestMockAuthServer:
         response = self.mock_auth_server.get_users()
         json = loads(response.get_data())
         assert response.status_code == 200
-        assert len(json) == 4
+        id = 1
+        for user in json:
+            assert user['id'] == str(id)
+            assert user['email'] == 'email' + str(id)
+            assert user['username'] == 'user' + str(id)
+            id += 1
+
