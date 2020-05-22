@@ -1,7 +1,6 @@
 from datetime import datetime, timedelta
-import flask
-import json
-import requests
+from flask import make_response, jsonify
+from utils_auth import init_db, hash, get_token, get_email, check_password_hash, get_fields, validate
 
 class AuthServer():
 
@@ -32,20 +31,46 @@ class MockAuthServer(AuthServer):
 
     def __init__(self):
         super().__init__()
-        self.active_sessions['token1'] = { 'username': 'user1', 'ttl': datetime.now() + timedelta(days=3) }
-        self.active_sessions['token2'] = { 'username': 'user2', 'ttl': datetime.now() + timedelta(days=3) }
-        self.active_sessions['token3'] = { 'username': 'user3', 'ttl': datetime.now() + timedelta(days=3) }
+        self.db = {}
+        init_db(self.db)
 
-    def login(self, credentials, password):
-        for k, v in self.active_sessions.items():
-            if v['username'] == credentials:
-                response_data = { 'userId': '1', 'token': k }
-                return flask.Response(json.dumps(response_data), status=200)
+    def login(self, data):
+        email = data['email']
+        password = data['password']
+        if email not in self.db:
+            return make_response('Could not find user', 401)
+        if not check_password_hash(password, db[email]['password']):
+            return make_response('Password incorrect', 401)
+        
+        user = self.db[email]
+        return jsonify({'token': get_token(email), 'status': 'OK', 'user': get_fields(user)})
+    
+    def generate_id(self):
+        ids = []
+        for value in self.db.values():
+            id = value['id']
+            ids.append(id)
+        return max(ids)
 
-        return flask.Response('', status=400)
+    def register(self, data):
+        email = data['email'] 
+        username = data['username'] 
+        password = data['password']
+        hashed_password = hash(password)
+        if email in self.db:
+            return make_response('User already registered', 409)
+        if not validate(email):
+            return make_response('Invalid email address', 400)
+        self.db[email] = {'id': self.generate_id(), 'email': email, 'password': hashed_password, 'username': username}
+        return jsonify({'id': self.generate_id()})
 
-    def register(self, registration_data):
-        return flask.Response('User registered', status=201)
+    def get_users(self):
+        return jsonify(list(map(lambda user: get_fields(user), self.db.values())))
 
-    def validate_token(self, token):
-        return token_active(token)
+    def authorize_user(self, data):
+        token = data['token']
+        email = get_email(token)
+        if email not in self.db:
+            return make_response("Invalid Token", 401, {'message':'Unauthorized'})
+        user = self.db[email]
+        return jsonify({'status':'OK', "user": get_fields(user)})
