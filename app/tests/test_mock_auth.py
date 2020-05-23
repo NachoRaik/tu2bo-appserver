@@ -14,6 +14,8 @@ class TestMockAuthServer:
 
         registration_data = dumps({'email': 'email@gmail.com', 'username': 'theboss', 'password': '123'})
         response = self.mock_auth_server.register(registration_data)
+        json = loads(response.get_data())
+        assert json['id'] == 5
         assert response.status_code == 200
 
     def test_register_failure_invalid_email(self):

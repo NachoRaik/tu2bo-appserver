@@ -1,7 +1,7 @@
 from datetime import datetime, timedelta
 import json
 import flask
-from shared_servers.utils_auth import init_db, get_hash, get_token, get_email, get_fields, validate, check_password_hash
+from shared_servers.utils_auth import *
 
 class AuthServer():
 
@@ -9,22 +9,18 @@ class AuthServer():
         self.url = "some_url"
         self.active_sessions = {}
 
-    def login(self, credentials, password):
+    def login(self, data):
         raise Exception('Not implemented yet')
 
-    def register(self, registration_parsed_data):
+    def register(self, data):
         raise Exception('Not implemented yet')
 
-    def validate_token(self, token):
-        if self.token_active(token):
-            return True
-        
-        # Should request Auth Server to check if it's still valid
+    def get_users(self):
         raise Exception('Not implemented yet')
 
-    def token_active(self, token):
-        return token in self.active_sessions and self.active_sessions[token]["ttl"] > datetime.now()
-
+    def authorize_user(self, data):
+        # Should request Auth Server to check if token is still valid
+        raise Exception('Not implemented yet')
 
 # --- Mocks
 
@@ -33,6 +29,7 @@ class MockAuthServer(AuthServer):
         super().__init__()
         self.db = {}
         init_db(self.db)
+        self.id = 1
 
     def login(self, data):
         parsed_data = json.loads(data)
@@ -57,13 +54,13 @@ class MockAuthServer(AuthServer):
         username = parsed_data['username'] 
         password = parsed_data['password']
         hashed_password = get_hash(password)
-        usernames = list(map(lambda user: user['username'], self.db.values()))
-        if email in self.db or username in usernames:
+        id = self.generate_id()
+        if email in self.db or any(user['username'] == username for user in self.db.values()):
             return flask.Response('User already registered', status=409)
         if not validate(email):
             return flask.Response('Invalid email address', status=400)
-        self.db[email] = {'id': self.generate_id(), 'email': email, 'password': hashed_password, 'username': username}
-        response_data = {'id': self.generate_id()}
+        self.db[email] = {'id': id, 'email': email, 'password': hashed_password, 'username': username}
+        response_data = {'id': id}
         return flask.Response(json.dumps(response_data), status=200)
 
     def get_users(self):
