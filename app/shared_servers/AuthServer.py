@@ -29,7 +29,7 @@ class MockAuthServer(AuthServer):
         super().__init__()
         self.db = {}
         init_db(self.db)
-        self.next_id = 0
+        self.next_id = len(self.db)
 
     def login(self, data):
         parsed_data = json.loads(data)
@@ -54,11 +54,11 @@ class MockAuthServer(AuthServer):
         username = parsed_data['username'] 
         password = parsed_data['password']
         hashed_password = get_hash(password)
-        id = self.generate_id()
         if email in self.db or any(user['username'] == username for user in self.db.values()):
             return flask.Response('User already registered', status=409)
         if not validate(email):
             return flask.Response('Invalid email address', status=400)
+        id = self.generate_id()
         self.db[email] = {'id': id, 'email': email, 'password': hashed_password, 'username': username}
         response_data = {'id': id}
         return flask.Response(json.dumps(response_data), status=200)
