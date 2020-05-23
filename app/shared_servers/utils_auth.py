@@ -21,4 +21,4 @@ def get_fields(user):
     return {'id': user['id'], 'email': user['email'], 'username': user['username']}
     
 def validate(email):
-    return '@' in email and '.' in email and '.com' in email 
+    return '@' in email and '.' in email
