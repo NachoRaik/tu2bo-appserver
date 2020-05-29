@@ -73,6 +73,7 @@ class TestMockMediaServer:
         author, title, description, date, visibility, url, thumb = 'anAuthor', 'aTitle', 'aDescription', '09/19/18 13:55:26', 'public', 'anUrl', 'aThumb'
         video_data = dumps({'author': author, 'title': title, 'description': description, 'date': date, 'visibility': visibility, 'url': url, 'thumb': thumb})
         self.mock_media_server.add_video(video_data)
+
         response = self.mock_media_server.get_videos()
         json = loads(response.get_data())
         assert len(json) == 5
@@ -84,3 +85,25 @@ class TestMockMediaServer:
         assert any(video['visibility'] == visibility for video in json)
         assert any(video['url'] == url for video in json)
         assert any(video['thumb'] == thumb for video in json)
+
+    def test_get_videos_from_author(self):
+        """ Get all videos from an existent author should return 200 """
+
+        author = 'anAuthor'
+        video_data = dumps({'author': author, 'title': 'aTitle', 'date': '09/19/18 13:55:26', 'visibility': 'public', 
+        'url': 'anUrl', 'thumb': 'aThumb'})
+        self.mock_media_server.add_video(video_data)
+
+        author_json = dumps({'author': author})
+        response = self.mock_media_server.get_author_videos(author_json)
+        json = loads(response.get_data())
+        assert len(json) == 1
+        assert response.status_code == 200
+
+    def test_get_videos_from_inexistent_author(self):
+        """ Get all videos from an existent author should return 404 """
+
+        author = dumps({'author': 'anAuthor'})
+        response = self.mock_media_server.get_author_videos(author)
+        assert b'Author not found' in response.get_data()
+        assert response.status_code == 404
