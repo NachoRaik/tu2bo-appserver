@@ -54,5 +54,5 @@ class MockMediaServer(MediaServer):
         return flask.Response(json.dumps(response_data), status=200)
 
     def get_videos(self):
-        response_data = {v for v in self.db.values()}
+        response_data = list(map(lambda video: get_fields(video), self.db.values()))
         return flask.Response(json.dumps(response_data), status=200)

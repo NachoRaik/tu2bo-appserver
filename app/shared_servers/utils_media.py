@@ -31,4 +31,8 @@ def init_db(db):
             "thumb": "http://commondatastorage.googleapis.com/gtv-videos-bucket/sample/images/ForBiggerEscapes.jpg"}
 
 def validate_visibility(visibility):
-    return visibility == 'public' or visibility == 'private'
+    return visibility == "public" or visibility == "private"
+
+def get_fields(video):
+    return {"author": video["author"], "title": video["title"], "description": video["description"],
+     "date": datetime.strftime(video["date"], '%m/%d/%y %H:%M:%S'), "visibility": video["visibility"], "url": video["url"], "thumb": video["thumb"]}
