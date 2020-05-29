@@ -14,7 +14,7 @@ class MediaServer():
     def get_videos(self):
         raise Exception('Not implemented yet')
 
-    def get_user_videos(self, data):
+    def get_author_videos(self, data):
         raise Exception('Not implemented yet')
 
     def delete_video(self, data):
