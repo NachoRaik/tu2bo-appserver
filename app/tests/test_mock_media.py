@@ -39,6 +39,25 @@ class TestMockMediaServer:
         json = loads(response.get_data())
         assert json['id'] == 5
         assert response.status_code == 200
+    
+    def test_add_video_with_same_url_twice(self):
+        """ Add a video already uploaded should return 409 """
+
+        video_data = dumps({'author': 'anAuthor', 'title': 'aTitle', 'date': '09/19/18 13:55:26', 'visibility': 'public', 
+        'url': 'anUrl', 'thumb': 'aThumb'})
+        self.mock_media_server.add_video(video_data)
+        response = self.mock_media_server.add_video(video_data)
+        assert b'Video already uploaded' in response.get_data()
+        assert response.status_code == 409
+
+    def test_add_video_with_invalid_date(self):
+        """ Add a video with invalid date should return 400 """
+
+        video_data = dumps({'author': 'anAuthor', 'title': 'aTitle', 'date': '09/19/20 13:55:26', 'visibility': 'public', 
+        'url': 'anUrl', 'thumb': 'aThumb'})
+        response = self.mock_media_server.add_video(video_data)
+        assert b'Invalid date' in response.get_data()
+        assert response.status_code == 400
 
     def test_get_videos_success(self):
         """ Get all videos should return 200 """
