@@ -41,7 +41,7 @@ class MockAuthServer(AuthServer):
             return flask.Response('Password incorrect', status=401)
         
         user = self.db[email]
-        response_data = {'token': get_token(email), 'status': 'OK', 'user': get_fields(user)}
+        response_data = {'token': get_token(email), 'user': get_fields(user)}
         return flask.Response(json.dumps(response_data), status=200)
     
     def generate_id(self):
@@ -74,6 +74,6 @@ class MockAuthServer(AuthServer):
         if email not in self.db:
             return flask.Response("Invalid Token", status=401)
         user = self.db[email]
-        response_data = {'status':'OK', 'user': get_fields(user)}
+        response_data = {'user': get_fields(user)}
         return flask.Response(json.dumps(response_data), status=200)
 
