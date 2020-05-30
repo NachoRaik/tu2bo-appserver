@@ -70,3 +70,13 @@ class MockMediaServer(MediaServer):
             if video['author'] == author:
                 response_data.append(get_fields(video))  
         return flask.Response(json.dumps(response_data), status=200)
+
+    def delete_video(self, data):
+        parsed_data = json.loads(data)
+        url = parsed_data['url']
+        
+        if not any(video['url'] == url for video in self.db.values()):
+            return flask.Response('Video not found', status=404)
+                
+        self.db = {id:video for id, video in self.db.items() if video['url'] != url}
+        return flask.Response('', status=200)

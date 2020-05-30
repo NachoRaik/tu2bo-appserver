@@ -101,9 +101,35 @@ class TestMockMediaServer:
         assert response.status_code == 200
 
     def test_get_videos_from_inexistent_author(self):
-        """ Get all videos from an existent author should return 404 """
+        """ Get all videos from an unexistent author should return 404 """
 
         author = dumps({'author': 'anAuthor'})
         response = self.mock_media_server.get_author_videos(author)
         assert b'Author not found' in response.get_data()
+        assert response.status_code == 404
+
+    def test_delete_video_success(self):
+        """ Delete an existent video should return 200 """
+
+        url = 'anUrl'
+        video_data = dumps({'author': 'anAuthor', 'title': 'aTitle', 'date': '09/19/18 13:55:26', 'visibility': 'public', 
+        'url': url, 'thumb': 'aThumb'})
+        self.mock_media_server.add_video(video_data)
+
+        url = dumps({'url': url})
+        response = self.mock_media_server.delete_video(url)
+        assert response.status_code == 200
+
+        response = self.mock_media_server.get_videos()
+        json = loads(response.get_data())
+        assert len(json) == 4
+        assert response.status_code == 200
+        assert not any(video['url'] == url for video in json)   
+
+    def test_delete_unexistent_video(self):
+        """ Delete an unexistent video should return 404 """
+
+        url = dumps({'url': 'anUrl'})
+        response = self.mock_media_server.delete_video(url)
+        assert b'Video not found' in response.get_data()
         assert response.status_code == 404
