@@ -56,7 +56,16 @@ class TestMockMediaServer:
         video_data = dumps({'author': 'anAuthor', 'title': 'aTitle', 'date': '09/19/20 13:55:26', 'visibility': 'public', 
         'url': 'anUrl', 'thumb': 'aThumb'})
         response = self.mock_media_server.add_video(video_data)
-        assert b'Invalid date' in response.get_data()
+        assert b'Invalid request' in response.get_data()
+        assert response.status_code == 400
+    
+    def test_add_video_with_invalid_visibility(self):
+        """ Add a video with invalid visibility should return 400 """
+
+        video_data = dumps({'author': 'anAuthor', 'title': 'aTitle', 'date': '09/19/20 13:55:26', 'visibility': 'invalid', 
+        'url': 'anUrl', 'thumb': 'aThumb'})
+        response = self.mock_media_server.add_video(video_data)
+        assert b'Invalid request' in response.get_data()
         assert response.status_code == 400
 
     def test_get_videos_success(self):
@@ -131,5 +140,46 @@ class TestMockMediaServer:
 
         url = dumps({'url': 'anUrl'})
         response = self.mock_media_server.delete_video(url)
+        assert b'Video not found' in response.get_data()
+        assert response.status_code == 404
+
+    def test_change_visibility_success(self):
+        """ Change visibility of a video should return 200 """
+
+        url = 'anUrl'
+        video_data = dumps({'author': 'anAuthor', 'title': 'aTitle', 'date': '09/19/18 13:55:26', 'visibility': 'public', 
+        'url': url, 'thumb': 'aThumb'})
+        self.mock_media_server.add_video(video_data)
+
+        new_visibility = 'private'
+        request_data = dumps({'url': url, 'visibility': new_visibility})
+        response = self.mock_media_server.change_video_visiblity(request_data)
+        assert response.status_code == 200
+
+        response = self.mock_media_server.get_videos()
+        json = loads(response.get_data())
+        assert any(video['url'] == url for video in json)  
+        for video in json:
+            if video['url'] == url:
+                assert video['visibility'] == new_visibility
+
+    def test_change_visibility_with_invalid_format(self):
+        """ Change visibility of a video with invalid format should return 400 """
+
+        url = 'anUrl'
+        video_data = dumps({'author': 'anAuthor', 'title': 'aTitle', 'date': '09/19/18 13:55:26', 'visibility': 'public', 
+        'url': url, 'thumb': 'aThumb'})
+        self.mock_media_server.add_video(video_data)
+
+        request_data = dumps({'url': url, 'visibility': 'invalid'})
+        response = self.mock_media_server.change_video_visiblity(request_data)
+        assert b'Invalid request' in response.get_data()
+        assert response.status_code == 400
+
+    def test_change_visibility_of_unexistent_video(self):
+        """" Change visibility of an unexistent video should return 404 """
+
+        request_data = dumps({'url': 'anUrl', 'visibility': 'public'})
+        response = self.mock_media_server.change_video_visiblity(request_data)
         assert b'Video not found' in response.get_data()
         assert response.status_code == 404
