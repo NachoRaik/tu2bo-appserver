@@ -47,8 +47,10 @@ class MockMediaServer(MediaServer):
             return flask.Response('Video already uploaded', status=409)
 
         date = datetime.strptime(parsed_data['date'], '%m/%d/%y %H:%M:%S')
-        if date > datetime.now() or not validate_visibility(parsed_data['visibility']):
-            return flask.Response('Invalid request', status=400)
+        if date > datetime.now():
+            return flask.Response('Invalid date', status=400)
+        if not validate_visibility(parsed_data['visibility']):
+            return flask.Response('Invalid visibility', status=400)
 
         id = self.generate_id()
         self.db[id] = {'author': author, 'title': title, 'description': description, 'date': date, 'visibility': visibility, 'url': url, 'thumb': thumb}
@@ -90,7 +92,7 @@ class MockMediaServer(MediaServer):
             return flask.Response('Video not found', status=404)
 
         if not validate_visibility(parsed_data['visibility']):
-            return flask.Response('Invalid request', status=400)
+            return flask.Response('Invalid visibility', status=400)
         
         for video in self.db.values():
             if video['url'] == url:

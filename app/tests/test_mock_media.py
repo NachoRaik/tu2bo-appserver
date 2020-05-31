@@ -56,16 +56,16 @@ class TestMockMediaServer:
         video_data = dumps({'author': 'anAuthor', 'title': 'aTitle', 'date': '09/19/20 13:55:26', 'visibility': 'public', 
         'url': 'anUrl', 'thumb': 'aThumb'})
         response = self.mock_media_server.add_video(video_data)
-        assert b'Invalid request' in response.get_data()
+        assert b'Invalid date' in response.get_data()
         assert response.status_code == 400
     
     def test_add_video_with_invalid_visibility(self):
         """ Add a video with invalid visibility should return 400 """
 
-        video_data = dumps({'author': 'anAuthor', 'title': 'aTitle', 'date': '09/19/20 13:55:26', 'visibility': 'invalid', 
+        video_data = dumps({'author': 'anAuthor', 'title': 'aTitle', 'date': '09/19/19 13:55:26', 'visibility': 'invalid', 
         'url': 'anUrl', 'thumb': 'aThumb'})
         response = self.mock_media_server.add_video(video_data)
-        assert b'Invalid request' in response.get_data()
+        assert b'Invalid visibility' in response.get_data()
         assert response.status_code == 400
 
     def test_get_videos_success(self):
@@ -173,7 +173,7 @@ class TestMockMediaServer:
 
         request_data = dumps({'url': url, 'visibility': 'invalid'})
         response = self.mock_media_server.change_video_visiblity(request_data)
-        assert b'Invalid request' in response.get_data()
+        assert b'Invalid visibility' in response.get_data()
         assert response.status_code == 400
 
     def test_change_visibility_of_unexistent_video(self):
