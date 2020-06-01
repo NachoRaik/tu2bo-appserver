@@ -29,6 +29,6 @@ def user_videos(userId):
         raise Exception("Not implemented yet")
     else:
         media_server = app.config['MEDIA_SERVER']
-        videos = media_server.get_author_videos(userId)
+        videos = media_server.get_user_videos(userId)
         return videos
 
