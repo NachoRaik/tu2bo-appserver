@@ -66,6 +66,13 @@ class MockMediaServer(MediaServer):
         response_data = [get_fields(video_id, video) for video_id, video in self.db.items()]        
         return flask.Response(json.dumps(response_data), status=200)
 
+    def get_video(self, video_id):
+        if not video_id in self.db:
+            return flask.Response('Video not found', status=404)
+        video = self.db[video_id]
+        response_data = [get_fields(video_id, video)]
+        return flask.Response(json.dumps(response_data), status=200)
+
     def get_user_videos(self, user_id):
         if not any(video['user_id'] == user_id for video in self.db.values()):
             return flask.Response('User not found', status=404)

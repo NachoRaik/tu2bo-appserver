@@ -99,6 +99,36 @@ class TestMockMediaServer:
         assert any(video['user_id'] == user_id for video in json)
         assert any(video['id'] == id for video in json)
 
+    def test_get_video_by_id_success(self):
+        """ Get existent video by id should return 200 """
+
+        author, title, description, date, visibility, url, thumb, user_id = 'anAuthor', 'aTitle', 'aDescription', '09/19/18 13:55:26', 'public', 'anUrl', 'aThumb', '4'
+        video_data = dumps({'author': author, 'title': title, 'description': description, 'date': date, 'visibility': visibility, 
+                    'url': url, 'thumb': thumb, 'user_id': user_id})
+        response = self.mock_media_server.add_video(video_data)
+        id = loads(response.get_data())['id']
+
+        response = self.mock_media_server.get_video(id)
+        json = loads(response.get_data())
+        assert len(json) == 1
+        assert response.status_code == 200
+        assert any(video['author'] == author for video in json)
+        assert any(video['title'] == title for video in json)
+        assert any(video['description'] == description for video in json)
+        assert any(video['date'] == date for video in json)
+        assert any(video['visibility'] == visibility for video in json)
+        assert any(video['url'] == url for video in json)
+        assert any(video['thumb'] == thumb for video in json)
+        assert any(video['user_id'] == user_id for video in json)
+        assert any(video['id'] == id for video in json)
+
+    def test_get_unexistent_video(self):
+        """ Get unexistent video by id should return 404 """
+
+        response = self.mock_media_server.get_video('100')
+        assert b'Video not found' in response.get_data()
+        assert response.status_code == 404
+
     def test_get_videos_from_user(self):
         """ Get all videos from an existent user should return 200 """
 
