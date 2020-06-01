@@ -10,9 +10,8 @@ bp_videos = Blueprint("bp_videos", __name__)
 @bp_videos.route('/videos', methods=['GET'])
 def home_videos():
     media_server = app.config['MEDIA_SERVER']
-    home_page_videos = media_server.getVideos()
+    home_page_videos = media_server.get_videos()
     return home_page_videos
-
 
 @bp_videos.route('/videos/<videoId>/comments', methods=['GET', 'POST'])
 def video_comments(videoId):
