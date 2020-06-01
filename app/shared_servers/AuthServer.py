@@ -67,9 +67,7 @@ class MockAuthServer(AuthServer):
         response_data = list(map(lambda user: get_fields(user), self.db.values()))
         return flask.Response(json.dumps(response_data), status=200)
 
-    def authorize_user(self, data):
-        parsed_data = json.loads(data)
-        token = parsed_data['token']
+    def authorize_user(self, token):  
         email = get_email(token)
         if email not in self.db:
             return flask.Response("Invalid Token", status=401)

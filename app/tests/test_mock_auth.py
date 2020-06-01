@@ -76,8 +76,7 @@ class TestMockAuthServer:
         response = self.mock_auth_server.login(login_data)        
         json = loads(response.get_data())
         token = json['token']
-        authorize_data = dumps({'token': token})
-        response = self.mock_auth_server.authorize_user(authorize_data)
+        response = self.mock_auth_server.authorize_user(token)
         json = loads(response.get_data())
         assert json['user']['email'] == 'email@gmail.com'
         assert json['user']['username'] == 'theboss'
