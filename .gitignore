@@ -1,6 +1,5 @@
 env/
-migrations/
 .idea/
-*.pytest_cache/
+migrations/
 *__pycache__/
-*.coverage
+*.pytest_cache/
