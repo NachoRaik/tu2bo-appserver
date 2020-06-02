@@ -38,22 +38,21 @@ class MockMediaServer(MediaServer):
         return self.next_id
 
     def add_video(self, data):
-        parsed_data = json.loads(data)
-        url = parsed_data['url']
-        author = parsed_data['author']
-        title = parsed_data['title']
-        visibility = parsed_data['visibility']
-        user_id = parsed_data['user_id']
-        description = parsed_data['description'] if 'description' in data else ''
-        thumb = parsed_data['thumb'] if 'thumb' in data else ''
+        url = data['url']
+        author = data['author']
+        title = data['title']
+        visibility = data['visibility']
+        user_id = data['user_id']
+        description = data['description'] if 'description' in data else ''
+        thumb = data['thumb'] if 'thumb' in data else ''
 
         if any(video['url'] == url for video in self.db.values()):
             return flask.Response('Video already uploaded', status=409)
 
-        date = datetime.strptime(parsed_data['date'], '%m/%d/%y %H:%M:%S')
+        date = datetime.strptime(data['date'], '%m/%d/%y %H:%M:%S')
         if date > datetime.now():
             return flask.Response('Invalid date', status=400)
-        if not validate_visibility(parsed_data['visibility']):
+        if not validate_visibility(data['visibility']):
             return flask.Response('Invalid visibility', status=400)
 
         id = self.generate_id()
@@ -91,14 +90,13 @@ class MockMediaServer(MediaServer):
         return flask.Response('', status=200)
 
     def change_video_visiblity(self, data):
-        parsed_data = json.loads(data)
-        video_id = parsed_data['id']
-        visibility = parsed_data['visibility']
+        video_id = data['id']
+        visibility = data['visibility']
 
         if not video_id in self.db:
             return flask.Response('Video not found', status=404)
 
-        if not validate_visibility(parsed_data['visibility']):
+        if not validate_visibility(data['visibility']):
             return flask.Response('Invalid visibility', status=400)
         
         video = self.db[video_id]

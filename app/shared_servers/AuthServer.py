@@ -32,9 +32,8 @@ class MockAuthServer(AuthServer):
         self.next_id = len(self.db)
 
     def login(self, data):
-        parsed_data = json.loads(data)
-        email = parsed_data['email']
-        password = parsed_data['password']
+        email = data['email']
+        password = data['password']
         if email not in self.db:
             return flask.Response('Could not find user', status=401)
         if not check_password_hash(password, self.db[email]['password']):
@@ -49,10 +48,9 @@ class MockAuthServer(AuthServer):
         return self.next_id
 
     def register(self, data):
-        parsed_data = json.loads(data)
-        email = parsed_data["email"] 
-        username = parsed_data['username'] 
-        password = parsed_data['password']
+        email = data["email"] 
+        username = data['username'] 
+        password = data['password']
         hashed_password = get_hash(password)
         if email in self.db or any(user['username'] == username for user in self.db.values()):
             return flask.Response('User already registered', status=409)

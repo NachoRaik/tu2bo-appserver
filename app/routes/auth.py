@@ -9,8 +9,8 @@ bp_auth = Blueprint("bp_auth", __name__)
 @bp_auth.route('/login', methods=['POST'], strict_slashes=False)
 def login():
     body = request.get_json()
-    if 'username' not in body or 'password' not in body:
-        return Response(json.dumps({'reason':'Username or password is missing'}), status=400)
+    if 'email' not in body or 'password' not in body:
+        return Response(json.dumps({'reason':'Email or password is missing'}), status=400)
 
     auth_server = app.config['AUTH_SERVER']
     response = auth_server.login(body)
