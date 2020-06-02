@@ -2,8 +2,12 @@ version: "3"
 
 services:
   app:
-    build: "./app"
+    build:
+      context: ./app
+      dockerfile: Dockerfile.web
+    environment: 
+      - PORT=5000
     ports:
       - "5000:5000"
-  appserver-db:
+  authserver-db:
     image: mongo:3.6.4
