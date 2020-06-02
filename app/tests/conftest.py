@@ -2,9 +2,11 @@ import os
 import tempfile
 import pytest
 
-from app import app as fapp
+from app import create_app
+from config import DevelopmentConfig
 
 @pytest.fixture
 def client():
     """A test client for the app."""
-    return fapp.test_client()
+    app = create_app(DevelopmentConfig)
+    return app.test_client()
