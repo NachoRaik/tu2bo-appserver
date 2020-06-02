@@ -1,5 +1,6 @@
 env/
-.idea/
 migrations/
-*__pycache__/
+.idea/
 *.pytest_cache/
+*__pycache__/
+*.coverage
