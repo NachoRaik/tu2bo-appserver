@@ -1,6 +1,7 @@
 from flask import Flask, request, Response
 from database.db import initialize_db
 from config import DevelopmentConfig
+import logging
 
 # -- Server setup and config
 
@@ -12,13 +13,18 @@ JSON_TYPE = "application/json"
 def create_app(config=DevelopmentConfig()):
     app = Flask(__name__)
     app.config.from_object(config)
+    app.logger.setLevel(logging.DEBUG)
+
     db = initialize_db(app)
 
-    import users, monitoring
+    # -- Routes registration
+    from routes import auth, monitoring, users, videos
 
-    app.register_blueprint(users.bp_users)
+    app.register_blueprint(auth.bp_auth)
     app.register_blueprint(monitoring.bp_monitor)
-    
+    app.register_blueprint(users.bp_users)
+    app.register_blueprint(videos.bp_videos)
+
     # -- Unassigned endpoints
     @app.route('/')
     def hello():
@@ -29,11 +35,3 @@ def create_app(config=DevelopmentConfig()):
         return "This endpoint will work for sending invites"
 
     return app
-
-
-app = create_app()
-
-# -- Run
-
-if __name__ == '__main__':
-    app.run(host="0.0.0.0", port="5000")
