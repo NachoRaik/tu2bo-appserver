@@ -13,7 +13,7 @@ def login():
         return Response(json.dumps({'reason':'Username or password is missing'}), status=400)
 
     auth_server = app.config['AUTH_SERVER']
-    response = auth_server.login(body['username'], body['password'])
+    response = auth_server.login(body)
     app.logger.debug("/login || Auth Server response %d %s ", response.status_code, response.data)
     return response
 
