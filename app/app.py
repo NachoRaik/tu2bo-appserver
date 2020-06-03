@@ -2,11 +2,29 @@ from flask import Flask, request, Response
 from database.db import initialize_db
 from config import DevelopmentConfig
 import logging
+from flask_swagger_ui import get_swaggerui_blueprint
 
 # -- Server setup and config
 
 ALLOWED_VIDEO_EXTENSIONS = {'mp4', 'wav'}
 JSON_TYPE = "application/json"
+
+# -- Swagger creation
+def setup_swaggerui(app):
+    SWAGGER_URL = '/swagger'
+    API_URL = '/static/swagger.json'
+    SWAGGERUI_BLUEPRINT = get_swaggerui_blueprint(
+        SWAGGER_URL,
+        API_URL,
+        config={
+            'app_name': "App Server"
+        }
+    )
+    app.register_blueprint(SWAGGERUI_BLUEPRINT, url_prefix=SWAGGER_URL)
+
+
+
+
 
 # -- App creation
 
@@ -24,8 +42,14 @@ def create_app(config=DevelopmentConfig()):
     app.register_blueprint(monitoring.bp_monitor)
     app.register_blueprint(users.bp_users)
     app.register_blueprint(videos.bp_videos)
+    setup_swaggerui(app)
 
     # -- Unassigned endpoints
+
+    @app.route('/static/<path:path>')
+    def send_static(path):
+        return send_from_directory('static', path)
+
     @app.route('/')
     def hello():
         return "This is the Application Server!"

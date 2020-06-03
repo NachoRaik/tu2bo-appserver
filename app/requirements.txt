@@ -10,3 +10,4 @@ mongoengine
 mongomock
 pytest
 coverage
+flask_swagger_ui
