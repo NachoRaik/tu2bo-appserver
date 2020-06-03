@@ -1,5 +1,5 @@
 ENVDIR := env
-HEROKU_APP_NAME := tutubo-auth-server
+HEROKU_APP_NAME := tu2bo-appserver
 
 
 # -- Run scripts
