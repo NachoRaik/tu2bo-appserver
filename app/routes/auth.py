@@ -14,7 +14,7 @@ def login():
 
     auth_server = app.config['AUTH_SERVER']
     response = auth_server.login(body)
-    app.logger.debug("/login || Auth Server response %d %s ", response.status_code, response.data)
+    #app.logger.debug("/login || Auth Server response %d %s ", response.status_code, response.data)
     return response
 
 
@@ -26,5 +26,5 @@ def register():
 
     auth_server = app.config['AUTH_SERVER']
     response = auth_server.register(body)
-    app.logger.debug("/register || Auth Server response %d %s ", response.status_code, response.data)
+    #app.logger.debug("/register || Auth Server response %d %s ", response.status_code, response.data)
     return response
