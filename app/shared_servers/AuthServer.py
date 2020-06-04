@@ -11,15 +11,15 @@ class AuthServer():
 
     def login(self, body):
         response = requests.post(self.url + '/users/login', json=body)
-        return flask.Response(json.dumps(response.text), status=response.status_code)
+        return make_flask_response(response)
 
     def register(self, body):
         response = requests.post(self.url + '/users/register', json=body)
-        return flask.Response(json.dumps(response.text), status=response.status_code)
+        return make_flask_response(response)
 
     def get_users(self):
         response = requests.get(self.url + '/users')
-        return flask.Response(json.dumps(response.text), status=response.status_code)
+        return make_flask_response(response)
 
     def authorize_user(self, body):
         # Should request Auth Server to check if token is still valid

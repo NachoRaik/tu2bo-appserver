@@ -16,6 +16,7 @@ class Config(object):
 class ProductionConfig(Config):
     DATABASE_URI = 'mysql://user@localhost/foo'
     AUTH_SERVER = AuthServer()
+    MEDIA_SERVER = MockMediaServer()
 
 class DevelopmentConfig(Config):
     TESTING = True
