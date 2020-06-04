@@ -21,11 +21,7 @@ def setup_swaggerui(app):
         }
     )
     app.register_blueprint(SWAGGERUI_BLUEPRINT, url_prefix=SWAGGER_URL)
-
-
-
-
-
+    
 # -- App creation
 
 def create_app(config=DevelopmentConfig()):

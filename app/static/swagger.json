@@ -18,7 +18,7 @@
           "auth"
         ],
         "summary": "User login",
-        "operationId": "createUser",
+        "operationId": "userLogin",
         "requestBody": {
           "description": "Credentials user object",
           "required": true,
@@ -42,7 +42,7 @@
         },
         "responses": {
           "200": {
-            "description": "User loged in",
+            "description": "User logged in",
             "content": {
               "application/json": {
                 "schema": {
@@ -75,7 +75,10 @@
             }
           },
           "400": {
-            "description": "Could not find user or Invalid password"
+            "description": "Email or password is missing"
+          },
+          "401":{
+            "description": "Password incorrect"
           }
         }
       }
@@ -114,7 +117,7 @@
           }
         },
         "responses": {
-          "200": {
+          "201": {
             "description": "Register complete",
             "content": {
               "application/json": {
@@ -139,7 +142,7 @@
       }
     },
     "/videos": {
-      "post": {
+      "get": {
         "tags": [
           "videos"
         ],
@@ -314,7 +317,7 @@
               }
             }
           },
-          "401": {
+          "404": {
             "description": "Could not find user"
           }
         }
