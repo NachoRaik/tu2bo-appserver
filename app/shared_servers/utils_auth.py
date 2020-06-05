@@ -1,4 +1,4 @@
-import flask
+from flask import Response
 import json
 
 def init_db(db):
@@ -27,4 +27,6 @@ def validate(email):
     return '@' in email and '.' in email
 
 def make_flask_response(response):
-    return flask.Response(json.dumps(response.json()), status=response.status_code)
+    headers = dict(response.raw.headers)
+    return Response(response.content, status=response.status_code, headers=headers)
+    
