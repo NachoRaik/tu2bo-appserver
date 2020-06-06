@@ -1,3 +1,6 @@
+from flask import Response
+import json
+
 def init_db(db):
     db['email1'] = {'id': '1', 'email': 'email1', 'password': 'hash_password1', 'username': 'user1'}
     db['email2'] = {'id': '2', 'email': 'email2', 'password': 'hash_password2', 'username': 'user2'}
@@ -22,3 +25,8 @@ def get_fields(user):
     
 def validate(email):
     return '@' in email and '.' in email
+
+def make_flask_response(response):
+    headers = dict(response.raw.headers)
+    return Response(response.content, status=response.status_code, headers=headers)
+    

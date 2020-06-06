@@ -1,24 +1,27 @@
 from datetime import datetime, timedelta
 import json
 import flask
+import requests
 from shared_servers.utils_auth import *
 
 class AuthServer():
 
-    def __init__(self, url = "localhost:3000"):
-        self.url = "some_url"
-        self.active_sessions = {}
+    def __init__(self, url = ''):
+        self.url = url
 
-    def login(self, data):
-        raise Exception('Not implemented yet')
+    def login(self, body):
+        response = requests.post(self.url + '/users/login', json=body)
+        return make_flask_response(response)
 
-    def register(self, data):
-        raise Exception('Not implemented yet')
+    def register(self, body):
+        response = requests.post(self.url + '/users/register', json=body)
+        return make_flask_response(response)
 
     def get_users(self):
-        raise Exception('Not implemented yet')
+        response = requests.get(self.url + '/users')
+        return make_flask_response(response)
 
-    def authorize_user(self, data):
+    def authorize_user(self, body):
         # Should request Auth Server to check if token is still valid
         raise Exception('Not implemented yet')
 

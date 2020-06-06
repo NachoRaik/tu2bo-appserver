@@ -27,7 +27,7 @@
               "schema": {
                 "type": "object",
                 "properties": {
-                  "username": {
+                  "email": {
                     "type": "string",
                     "example": "matiscakosky@hostname.com"
                   },
