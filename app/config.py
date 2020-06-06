@@ -15,7 +15,7 @@ class Config(object):
 
 class ProductionConfig(Config):
     DATABASE_URI = 'mysql://user@localhost/foo'
-    AUTH_SERVER = AuthServer()
+    AUTH_SERVER = AuthServer(url = os.getenv('AUTH_URI', 'localhost:5000'))
     MEDIA_SERVER = MockMediaServer()
 
 class DevelopmentConfig(Config):

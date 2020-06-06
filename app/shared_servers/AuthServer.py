@@ -6,7 +6,7 @@ from shared_servers.utils_auth import *
 
 class AuthServer():
 
-    def __init__(self, url = "https://tutubo-auth-server.herokuapp.com"):
+    def __init__(self, url = ''):
         self.url = url
 
     def login(self, body):
