@@ -7,12 +7,14 @@ from database.models.user import User
 
 bp_users = Blueprint("bp_users", __name__)
 
+required_post_video_fields = ['url', 'author', 'title', 'visibility', 'user_id']
+
 # -- Endpoints
 
-@bp_users.route('/users/<userId>', methods=['GET'])
-def get_user_profile(userId):
+@bp_users.route('/users/<user_id>', methods=['GET'])
+def get_user_profile(user_id):
     userdata = {
-        'id': userId,
+        'id': user_id,
         'username': 'exampleUser123',
         'videos': []
     }
@@ -22,13 +24,19 @@ def get_user_profile(userId):
     return user_profile
 
 
-@bp_users.route('/users/<userId>/videos', methods=['GET', 'POST'])
-def user_videos(userId):
+@bp_users.route('/users/<user_id>/videos', methods=['GET', 'POST'])
+def user_videos(user_id):
+    media_server = app.config['MEDIA_SERVER']
     if request.method == 'POST':
-        # TODO: add call to mock
-        raise Exception("Not implemented yet")
+        body = request.get_json()
+        body['user_id'] = user_id
+        for r in required_post_video_fields:
+            if r not in body:
+                return Response(json.dumps({'reason':'Fields are incomplete'}), status=400) 
+        
+        response = media_server.add_video(body)
+        return response
     else:
-        media_server = app.config['MEDIA_SERVER']
         videos = media_server.get_user_videos(userId)
         return videos
 
