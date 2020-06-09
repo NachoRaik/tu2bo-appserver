@@ -23,6 +23,9 @@ class MediaServer():
     def change_video_visiblity(self, data):
         raise Exception('Not implemented yet')
 
+    def __str__(self):
+        return "url => {}".format(self.url)
+
 
 # --- Mocks
 

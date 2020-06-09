@@ -6,7 +6,7 @@ from shared_servers.utils_auth import *
 
 class AuthServer():
 
-    def __init__(self, url = ''):
+    def __init__(self, url = 'no-host'):
         self.url = url
 
     def login(self, body):
@@ -24,6 +24,9 @@ class AuthServer():
     def authorize_user(self, body):
         # Should request Auth Server to check if token is still valid
         raise Exception('Not implemented yet')
+
+    def __str__(self):
+        return "url => {}".format(self.url)
 
 # --- Mocks
 

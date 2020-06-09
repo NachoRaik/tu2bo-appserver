@@ -1,8 +1,8 @@
 from flask import Flask, request, Response
 from database.db import initialize_db
 from config import DevelopmentConfig
-import logging
 from flask_swagger_ui import get_swaggerui_blueprint
+import logging
 
 # -- Server setup and config
 
