@@ -62,7 +62,7 @@ class MockMediaServer(MediaServer):
         self.db[id] = {'author': author, 'title': title, 'description': description, 'date': date, 'visibility': visibility, 
         'url': url, 'thumb': thumb, 'user_id': user_id}
         response_data = {'id': id}
-        return flask.Response(json.dumps(response_data), status=200)
+        return flask.Response(json.dumps(response_data), status=201)
 
     def get_videos(self):
         response_data = [get_fields(video_id, video) for video_id, video in self.db.items()]        
