@@ -65,7 +65,7 @@ paths:
     post:
       tags:
         - auth
-      summary: Register user into the system]
+      summary: Register user into the system
       operationId: registerUser
       requestBody:
         description: Register credentials
