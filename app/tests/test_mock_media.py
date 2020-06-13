@@ -18,7 +18,7 @@ class TestMockMediaServer:
         response = self.mock_media_server.add_video(video_data)
         json = loads(response.get_data())
         assert json['id'] == 5
-        assert response.status_code == 200
+        assert response.status_code == 201
     
     def test_add_video_without_thumb_success(self):
         """ Add a video should return 200 """
@@ -28,7 +28,7 @@ class TestMockMediaServer:
         response = self.mock_media_server.add_video(video_data)
         json = loads(response.get_data())
         assert json['id'] == 5
-        assert response.status_code == 200
+        assert response.status_code == 201
 
     def test_add_video_without_description_success(self):
         """ Add a video should return 200 """
@@ -38,7 +38,7 @@ class TestMockMediaServer:
         response = self.mock_media_server.add_video(video_data)
         json = loads(response.get_data())
         assert json['id'] == 5
-        assert response.status_code == 200
+        assert response.status_code == 201
     
     def test_add_video_with_same_url_twice(self):
         """ Add a video already uploaded should return 409 """
