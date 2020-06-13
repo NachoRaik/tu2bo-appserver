@@ -66,7 +66,6 @@ paths:
       tags:
         - auth
       summary: Register user into the system
-      description: ''
       operationId: registerUser
       requestBody:
         description: Register credentials
@@ -105,7 +104,6 @@ paths:
       tags:
         - videos
       summary: Get home videos
-      description: ''
       operationId: homeVideos
       responses:
         '200':
@@ -122,7 +120,6 @@ paths:
       tags:
         - users
       summary: Get user by id
-      description: ''
       operationId: getUserById
       parameters:
         - in: path
@@ -157,7 +154,6 @@ paths:
         - users
         - videos
       summary: Get videos from user by id
-      description: ''
       operationId: userVideos
       parameters:
         - in: path
@@ -175,14 +171,13 @@ paths:
                 type: array
                 items:
                   $ref: '#/components/schemas/Video'
-                  
         '404':
           description: User not found
     post:
       tags:
         - users
+        - videos
       summary: Post a video to the user account
-      description: ''
       operationId: userAddVideo
       parameters:
         - in: path
@@ -215,6 +210,91 @@ paths:
         '409':
           description: Video already uploaded
 
+  /videos/{video_id}/comments:
+    get:
+      tags:
+        - videos
+      summary: Get comments for video matching video_id
+      operationId: videoComments
+      parameters:
+        - in: path
+          name: video_id
+          required: true
+          schema:
+            type: integer
+            minimum: 1
+      responses:
+        '200':
+          description: Video comments
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Comment'
+        '404':
+          description: Video not found
+    post:
+      tags:
+        - videos
+      summary: Add comment to a video
+      operationId: addComment
+      parameters:
+        - in: path
+          name: video_id
+          required: true
+          schema:
+            type: integer
+            minimum: 1
+      requestBody:
+        description: Comment data
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CommentUpload'
+      responses:
+        '201':
+          description: Comment created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Comment'
+        '400':
+          description: Fields are incomplete or wrong
+        '404':
+          description: Video not found
+
+  /videos/{video_id}/likes:
+    put:
+      tags:
+        - videos
+      summary: Like a video
+      operationId: addLike
+      parameters:
+        - in: path
+          name: video_id
+          required: true
+          schema:
+            type: integer
+            minimum: 1
+      requestBody:
+        description: Has liked
+        required: true
+        content:
+          application/json:
+            schema:
+              properties:
+                liked:
+                  type: boolean
+                  example: true
+      responses:
+        '200':
+          description: Like updated
+        '400':
+          description: Fields are incomplete or wrong
+        '404':
+          description: Video not found
 
 components:
   schemas:
@@ -244,7 +324,7 @@ components:
         - author
         - title
         - visibility
-    
+
     Video:
       type: object
       properties:
@@ -272,3 +352,44 @@ components:
         thumb:
           type: string
           example: 'www.host.com/thumb.jpg'
+        likes:
+          type: integer
+          example: 100000
+        user_related_info:
+          type: object
+          properties:
+            is_liked:
+              type: boolean
+              example: false
+
+    CommentUpload:
+      type: object
+      properties:
+        author:
+          type: string
+          example: 'author'
+        content:
+          type: string
+          example: 'Great video!! Specially at minute {{14:05}}'
+        timestamp:
+          type: string
+          example: '2019-01-02 10:14:50'
+
+    Comment:
+      type: object
+      properties:
+        comment_id:
+          type: integer
+          example: 1
+        user_id:
+          type: integer
+          example: 1
+        author:
+          type: string
+          example: 'author'
+        content:
+          type: string
+          example: 'Great video!! Specially at minute {{14:05}}'
+        timestamp:
+          type: string
+          example: '2019-01-02 10:14:50'
