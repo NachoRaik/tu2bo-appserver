@@ -1,0 +1,395 @@
+openapi: 3.0.0
+info:
+  description: Application server for Tutubo
+  version: 1.0.0
+  title: App Server
+
+tags:
+  - name: auth
+    description: Operations related to authentication
+  - name: users
+    description: Operations about users
+  - name: videos
+    description: Operations for video interaction
+
+paths:
+  /login:
+    post:
+      tags:
+        - auth
+      summary: User login
+      operationId: userLogin
+      requestBody:
+        description: Credentials user object
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                email:
+                  type: string
+                  example: matiscakosky@hostname.com
+                password:
+                  type: string
+                  example: '123457'
+      responses:
+        '200':
+          description: User logged in
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  token:
+                    type: string
+                    example: n21IvyUVYTVyt76VuvYNIA0iababZWQsff
+                  user:
+                    type: object
+                    properties:
+                      id:
+                        type: integer
+                        example: 1
+                      username:
+                        type: string
+                        example: matias2202
+                      email:
+                        type: string
+                        example: matiscakosky@hostame.com
+        '400':
+          description: Email or password is missing
+        '401':
+          description: Password incorrect
+  
+  /register:
+    post:
+      tags:
+        - auth
+      summary: Register user into the system
+      operationId: registerUser
+      requestBody:
+        description: Register credentials
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                email:
+                  type: string
+                  example: matiscakosky@hostname.com
+                password:
+                  type: string
+                  example: '123457'
+                username:
+                  type: string
+                  example: matiscako
+      responses:
+        '201':
+          description: Register complete
+          content:
+            application/json:
+              schema:
+                properties:
+                  id:
+                    type: integer
+                    example: 1
+        '400':
+          description: Invalid email address
+        '409':
+          description: User already registered
+  
+  /videos:
+    get:
+      tags:
+        - videos
+      summary: Get home videos
+      operationId: homeVideos
+      responses:
+        '200':
+          description: Home videos
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Video'
+  
+  /users/{id}:
+    get:
+      tags:
+        - users
+      summary: Get user by id
+      operationId: getUserById
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: integer
+            minimum: 1
+      responses:
+        '200':
+          description: User Profile
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  id:
+                    type: integer
+                    example: 1
+                  username:
+                    type: string
+                    example: olifer97
+                  videos:
+                    type: string
+                    example: []
+        '404':
+          description: Could not find user
+
+  /users/{id}/videos:
+    get:
+      tags:
+        - users
+        - videos
+      summary: Get videos from user by id
+      operationId: userVideos
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: integer
+            minimum: 1
+      responses:
+        '200':
+          description: User videos
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Video'
+        '404':
+          description: User not found
+    post:
+      tags:
+        - users
+        - videos
+      summary: Post a video to the user account
+      operationId: userAddVideo
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: integer
+            minimum: 1
+      requestBody:
+        description: Video data
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/VideoUpload'
+      responses:
+        '201':
+          description: Video created
+          content:
+            application/json:
+              schema:
+                properties:
+                  id:
+                    type: integer
+                    example: 1
+        '400':
+          description: Fields are incomplete or wrong
+        '404':
+          description: User not found
+        '409':
+          description: Video already uploaded
+
+  /videos/{video_id}/comments:
+    get:
+      tags:
+        - videos
+      summary: Get comments for video matching video_id
+      operationId: videoComments
+      parameters:
+        - in: path
+          name: video_id
+          required: true
+          schema:
+            type: integer
+            minimum: 1
+      responses:
+        '200':
+          description: Video comments
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Comment'
+        '404':
+          description: Video not found
+    post:
+      tags:
+        - videos
+      summary: Add comment to a video
+      operationId: addComment
+      parameters:
+        - in: path
+          name: video_id
+          required: true
+          schema:
+            type: integer
+            minimum: 1
+      requestBody:
+        description: Comment data
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CommentUpload'
+      responses:
+        '201':
+          description: Comment created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Comment'
+        '400':
+          description: Fields are incomplete or wrong
+        '404':
+          description: Video not found
+
+  /videos/{video_id}/likes:
+    put:
+      tags:
+        - videos
+      summary: Like a video
+      operationId: addLike
+      parameters:
+        - in: path
+          name: video_id
+          required: true
+          schema:
+            type: integer
+            minimum: 1
+      requestBody:
+        description: Has liked
+        required: true
+        content:
+          application/json:
+            schema:
+              properties:
+                liked:
+                  type: boolean
+                  example: true
+      responses:
+        '200':
+          description: Like updated
+        '400':
+          description: Fields are incomplete or wrong
+        '404':
+          description: Video not found
+
+components:
+  schemas:
+    VideoUpload:
+      type: object
+      properties:
+        url:
+          type: string
+          example: 'tutubo-storage-wequedecia.com/videos/sauiAHBDKlK12'
+        author:
+          type: string
+          example: 'someOtherIndieArtist'
+        title:
+          type: string
+          example: 'My First Video'
+        visibility:
+          type: string
+          example: 'public'
+        description:
+          type: string
+          example: 'This is my first video in TuTuBo - woohoo!'
+        thumb:
+          type: string
+          example: 'tutubo-storage-wequedecia.com/images/YRJkshnka61yH'
+      required: 
+        - url
+        - author
+        - title
+        - visibility
+
+    Video:
+      type: object
+      properties:
+        author:
+          type: string
+          example: 'author 1'
+        user_id:
+          type: integer
+          example: 1
+        title:
+          type: string
+          example: 'a title'
+        description:
+          type: string
+          example: 'a descrption'
+        date:
+          type: string
+          example: '2019-01-02'
+        visibility:
+          type: string
+          example: 'private'
+        url:
+          type: string
+          example: 'www.host.com/video.mp4'
+        thumb:
+          type: string
+          example: 'www.host.com/thumb.jpg'
+        likes:
+          type: integer
+          example: 100000
+        user_related_info:
+          type: object
+          properties:
+            is_liked:
+              type: boolean
+              example: false
+
+    CommentUpload:
+      type: object
+      properties:
+        author:
+          type: string
+          example: 'author'
+        content:
+          type: string
+          example: 'Great video!! Specially at minute {{14:05}}'
+        timestamp:
+          type: string
+          example: '2019-01-02 10:14:50'
+
+    Comment:
+      type: object
+      properties:
+        comment_id:
+          type: integer
+          example: 1
+        user_id:
+          type: integer
+          example: 1
+        author:
+          type: string
+          example: 'author'
+        content:
+          type: string
+          example: 'Great video!! Specially at minute {{14:05}}'
+        timestamp:
+          type: string
+          example: '2019-01-02 10:14:50'

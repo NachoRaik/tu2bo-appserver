@@ -13,8 +13,16 @@ class Config(object):
 	    'host': 'mongodb://appserver-db:27017/appserver-db'
     }
 
+    def __repr__(self):
+        printable_fields = ['DEBUG', 'AUTH_SERVER', 'MEDIA_SERVER']
+        fields = self.__class__.__dict__
+        output = ""
+        for x in printable_fields: 
+            output+="\n\t{} = {}".format(x, fields.get(x, "Not setted"))
+        return output 
+
 class ProductionConfig(Config):
-    DATABASE_URI = 'mysql://user@localhost/foo'
+    DEBUG = False
     AUTH_SERVER = AuthServer(url = os.getenv('AUTH_URI', 'localhost:5000'))
     MEDIA_SERVER = MockMediaServer()
 
