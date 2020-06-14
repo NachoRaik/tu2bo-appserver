@@ -19,7 +19,6 @@ def home_videos():
     return home_page_videos
 
 def add_comment_to_video(request, video_id):
-    video_id = int(video_id)
     media_server = app.config['MEDIA_SERVER']
     body = request.get_json()
     
@@ -43,7 +42,6 @@ def add_comment_to_video(request, video_id):
     return Response(json.dumps(result), status=200) 
 
 def get_comment_from_video(request, video_id):
-    video_id = int(video_id)
     media_server = app.config['MEDIA_SERVER']
     response = media_server.get_video(video_id)
     if response.status_code == 404:
@@ -59,16 +57,14 @@ def get_comment_from_video(request, video_id):
         'content': comment.content, 'timestamp': comment.timestamp})
     return Response(json.dumps(result), status=200) 
 
-@bp_videos.route('/videos/<video_id>/comments', methods=['GET', 'POST'])
+@bp_videos.route('/videos/<int:video_id>/comments', methods=['GET', 'POST'])
 def video_comments(video_id):
-    video_id = int(video_id)    
     if request.method == 'POST':
         return add_comment_to_video(request, video_id)
     return get_comment_from_video(request, video_id)
 
-@bp_videos.route('/videos/<video_id>/likes', methods=['PUT'])
+@bp_videos.route('/videos/<int:video_id>/likes', methods=['PUT'])
 def video_likes(video_id):
-    video_id = int(video_id)
     media_server = app.config['MEDIA_SERVER']
     body = request.get_json()
     
