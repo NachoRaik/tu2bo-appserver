@@ -2,6 +2,7 @@ import json
 from flask import Blueprint, request, jsonify
 from flask import current_app as app
 from werkzeug.utils import secure_filename
+from security.security import token_required
 
 from database.models.user import User
 
@@ -12,6 +13,7 @@ required_post_video_fields = ['url', 'author', 'title', 'visibility', 'user_id']
 # -- Endpoints
 
 @bp_users.route('/users/<user_id>', methods=['GET'])
+@token_required
 def get_user_profile(user_id):
     userdata = {
         'id': user_id,
@@ -25,6 +27,7 @@ def get_user_profile(user_id):
 
 
 @bp_users.route('/users/<user_id>/videos', methods=['GET', 'POST'])
+@token_required
 def user_videos(user_id):
     media_server = app.config['MEDIA_SERVER']
     if request.method == 'POST':
@@ -32,11 +35,10 @@ def user_videos(user_id):
         body['user_id'] = user_id
         for r in required_post_video_fields:
             if r not in body:
-                return Response(json.dumps({'reason':'Fields are incomplete'}), status=400) 
-        
+                return Response(json.dumps({'reason':'Fields are incomplete'}), status=400)
+
         response = media_server.add_video(body)
         return response
     else:
         videos = media_server.get_user_videos(userId)
         return videos
-
