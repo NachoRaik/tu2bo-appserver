@@ -1,7 +1,8 @@
 import json
-from flask import Blueprint, request, jsonify
+from flask import Blueprint, request, jsonify, Response
 from flask import current_app as app
 from werkzeug.utils import secure_filename
+from database.models.video_info import VideoInfo
 
 bp_users = Blueprint("bp_users", __name__)
 
@@ -24,9 +25,10 @@ def user_videos(user_id):
                 return Response(json.dumps({'reason':'Fields are incomplete'}), status=400) 
         
         response = media_server.add_video(body)
-        response_data = loads(response.get_data())
-        video_id = response_data['id']
+        response_data = json.loads(response.get_data())
+        video_id = int(response_data['id'])
         video_info = VideoInfo(video_id=video_id).save()
+
         return response
     else:
         videos = media_server.get_user_videos(userId)

@@ -41,12 +41,3 @@ class TestVideoInfo:
         assert comment.content == content
         assert comment.timestamp == timestamp
 
-    def test_get_other_video_info_throws_exception(self):
-        """ Create video_info in db
-        Should: return save video_info in db """
-
-        try: 
-            added_video_info = VideoInfo.objects.get(video_id=1)
-        except VideoInfo.DoesNotExist:
-            return
-        assert False

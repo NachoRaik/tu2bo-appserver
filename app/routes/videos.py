@@ -1,5 +1,5 @@
 import json
-from flask import Blueprint, request
+from flask import Blueprint, request, Response
 from flask import current_app as app
 from werkzeug.utils import secure_filename
 from database.models.video_info import VideoInfo
@@ -19,13 +19,15 @@ def home_videos():
     return home_page_videos
 
 def add_comment_to_video(request, video_id):
+    video_id = int(video_id)
+    media_server = app.config['MEDIA_SERVER']
     body = request.get_json()
     
     if any(r not in body for r in required_post_comment_fields):
         return Response(json.dumps({'reason':'Fields are incomplete'}), status=400) 
 
     response = media_server.get_video(video_id)
-    if response.status == 404:
+    if response.status_code == 404:
         return Response(json.dumps({'reason':'Video not found'}), status=404) 
 
     #TODO: add user_id obtained by the auth server. For now it is harcoded
@@ -41,8 +43,9 @@ def add_comment_to_video(request, video_id):
     return Response(json.dumps(result), status=200) 
 
 def get_comment_from_video(request, video_id):
+    video_id = int(video_id)
     response = media_server.get_video(video_id)
-    if response.status == 404:
+    if response.status_code == 404:
         return Response(json.dumps({'reason':'Video not found'}), status=404) 
 
     body = request.get_json()
@@ -57,21 +60,20 @@ def get_comment_from_video(request, video_id):
 
 @bp_videos.route('/videos/<video_id>/comments', methods=['GET', 'POST'])
 def video_comments(video_id):
-    auth_server = app.config['AUTH_SERVER']
-    media_server = app.config['AUTH_SERVER']
-
+    video_id = int(video_id)    
     if request.method == 'POST':
         return add_comment_to_video(request, video_id)
     return get_comment_from_video(request, video_id)
 
 @bp_videos.route('/videos/<video_id>/likes', methods=['PUT'])
 def video_likes(video_id):
-    media_server = app.config['AUTH_SERVER']
+    video_id = int(video_id)
+    media_server = app.config['MEDIA_SERVER']
     if required_put_likes_field not in body:
         return Response(json.dumps({'reason':'Fields are incomplete'}), status=400) 
 
     response = media_server.get_video(video_id)
-    if response.status == 404:
+    if response.status_code == 404:
         return Response(json.dumps({'reason':'Video not found'}), status=404) 
 
     liked = body['liked']
@@ -81,5 +83,9 @@ def video_likes(video_id):
 
     video_info = VideoInfo.objects.get(video_id=video_id)
     likes = video_info.likes
-    likes.append(user_id) if liked else likes.remove(user_id)
+
+    if not liked and user_id in likes:
+        likes.remove(user_id)
+    if liked:
+        likes.append(user_id) 
     return Response(json.dumps({'result':'Like updated'}), status=200) 
