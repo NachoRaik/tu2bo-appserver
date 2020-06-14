@@ -9,7 +9,6 @@ class TestVideoController:
         """ setup any state tied to the execution of the given method in a
         class.  setup_method is invoked for every test method of a class.
         """
-
         connect('appserver-db-test', host='mongomock://localhost', alias='test')
 
     def teardown_method(self, method):
@@ -24,7 +23,7 @@ class TestVideoController:
         """ POST /users/user_id/videos
         Should: return 201 with video id """
 
-        res = add_video(client, 1, 'someUrl','someAuthor', 'someTitle', 'public', '06/14/20 16:39:33')
+        res = add_video(client, 1, 'url1', 'someAuthor', 'someTitle', 'public', '06/14/20 16:39:33')
         res_json = json.loads(res.get_data())
         assert res_json['id'] == 5
         assert res.status_code == 201
@@ -33,7 +32,7 @@ class TestVideoController:
         """ POST /videos/video_id/comments
         Should: return 200"""
         
-        res = add_video(client, 1, 'anotherUrl','someAuthor', 'someTitle', 'public', '06/14/20 16:39:33')
+        res = add_video(client, 1, 'url2', 'someAuthor', 'someTitle', 'public', '06/14/20 16:39:33')
         assert res.status_code == 201
         res_json = json.loads(res.get_data())
         video_id = int(res_json['id'])
@@ -48,7 +47,6 @@ class TestVideoController:
         assert res_json['author'] == author
         assert res_json['content'] == content
         assert res_json['timestamp'] == timestamp
-        
 
     def test_add_comment_to_inexistent_video(self, client):
         """ POST /videos/video_id/comments
@@ -59,5 +57,104 @@ class TestVideoController:
         assert res.status_code == 404
         res_json = json.loads(res.get_data())
         assert res_json['reason'] == 'Video not found'
-     
 
+    def test_add_comment_with_not_enough_fields(self, client):
+        """ POST /videos/video_id/comments
+        Should: return 400"""
+
+        res = add_video(client, 1, 'url3','someAuthor', 'someTitle', 'public', '06/14/20 16:39:33')
+        assert res.status_code == 201
+        res_json = json.loads(res.get_data())
+        video_id = int(res_json['id'])
+
+        res =  client.post('/videos/{}/comments'.format(video_id), json={
+            'author': 'author',
+            'content': 'content'
+        })
+        assert res.status_code == 400
+
+        res =  client.post('/videos/{}/comments'.format(video_id), json={
+            'author': 'author',
+            'timestamp': '06/18/20 10:39:33'
+        })
+        assert res.status_code == 400
+
+        res =  client.post('/videos/{}/comments'.format(video_id), json={
+            'timestamp': '06/18/20 10:39:33',
+            'content': 'content'
+        })
+        assert res.status_code == 400
+
+    def test_get_comment_from_video_successful(self, client):
+        """ GET /videos/video_id/comments
+        Should: return 200"""
+        
+        res = add_video(client, 1, 'url4','someAuthor', 'someTitle', 'public', '06/14/20 16:39:33')
+        assert res.status_code == 201
+        res_json = json.loads(res.get_data())
+        video_id = int(res_json['id'])
+
+        author, content, timestamp = 'anotherAuthor', 'this video sucks', '06/18/20 10:39:33'
+        res = add_comment_to_video(client, video_id, author, content, timestamp)
+        assert res.status_code == 200
+
+        res = get_comments_from_video(client, video_id)
+        res_json = json.loads(res.get_data())[0]
+        
+        #TODO: change this harcoded number
+        assert res_json['user_id'] == 1
+        assert res_json['author'] == author
+        assert res_json['content'] == content
+        assert res_json['timestamp'] == timestamp
+
+    def test_get_comment_from_video_successful(self, client):
+        """ GET /videos/video_id/comments
+        Should: return 200"""
+        
+        res = add_video(client, 1, 'url5','someAuthor', 'someTitle', 'public', '06/14/20 16:39:33')
+        assert res.status_code == 201
+        res_json = json.loads(res.get_data())
+        video_id = int(res_json['id'])
+
+        author, content, timestamp = 'anotherAuthor', 'this video sucks', '06/18/20 10:39:33'
+        res = add_comment_to_video(client, video_id, author, content, timestamp)
+        assert res.status_code == 200
+
+        res = get_comments_from_video(client, video_id)
+        res_json = json.loads(res.get_data())[0]
+        
+        #TODO: change this harcoded number
+        assert res_json['user_id'] == 1
+        assert res_json['author'] == author
+        assert res_json['content'] == content
+        assert res_json['timestamp'] == timestamp
+
+    def test_get_comments_from_video_successful(self, client):
+        """ GET /videos/video_id/comments
+        Should: return 200"""
+        
+        res = add_video(client, 1, 'url6','someAuthor', 'someTitle', 'public', '06/14/20 16:39:33')
+        assert res.status_code == 201
+        res_json = json.loads(res.get_data())
+        video_id = int(res_json['id'])
+
+        author, content, timestamp = 'anotherAuthor', 'this video sucks', '06/18/20 10:39:33'
+        res = add_comment_to_video(client, video_id, author, content, timestamp)
+        assert res.status_code == 200
+
+        otherAuthor, otherContent, otherTimestamp = 'otherAuthor', 'this video rocks', '06/20/20 10:39:33'
+        res = add_comment_to_video(client, video_id, otherAuthor, otherContent, otherTimestamp)
+        assert res.status_code == 200
+
+        res = get_comments_from_video(client, video_id)
+        res_json = json.loads(res.get_data())
+
+        #TODO: change this harcoded number
+        assert any(comment['user_id'] == 1 for comment in res_json)
+        assert any(comment['author'] == author for comment in res_json)
+        assert any(comment['author'] == otherAuthor for comment in res_json)
+        assert any(comment['content'] == content for comment in res_json)
+        assert any(comment['content'] == otherContent for comment in res_json)
+        assert any(comment['timestamp'] == timestamp for comment in res_json)
+        assert any(comment['timestamp'] == otherTimestamp for comment in res_json)
+        

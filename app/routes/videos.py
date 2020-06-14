@@ -44,6 +44,7 @@ def add_comment_to_video(request, video_id):
 
 def get_comment_from_video(request, video_id):
     video_id = int(video_id)
+    media_server = app.config['MEDIA_SERVER']
     response = media_server.get_video(video_id)
     if response.status_code == 404:
         return Response(json.dumps({'reason':'Video not found'}), status=404) 
