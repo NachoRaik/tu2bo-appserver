@@ -3,8 +3,6 @@ from flask import Blueprint, request, jsonify
 from flask import current_app as app
 from werkzeug.utils import secure_filename
 
-from database.models.user import User
-
 bp_users = Blueprint("bp_users", __name__)
 
 required_post_video_fields = ['url', 'author', 'title', 'visibility', 'user_id']
@@ -13,16 +11,7 @@ required_post_video_fields = ['url', 'author', 'title', 'visibility', 'user_id']
 
 @bp_users.route('/users/<user_id>', methods=['GET'])
 def get_user_profile(user_id):
-    userdata = {
-        'id': user_id,
-        'username': 'exampleUser123',
-        'videos': []
-    }
-
-    user_profile = jsonify(userdata)
-    user_profile.status_code = 200
-    return user_profile
-
+    raise Exception('Not implemented yet')
 
 @bp_users.route('/users/<user_id>/videos', methods=['GET', 'POST'])
 def user_videos(user_id):
@@ -39,4 +28,3 @@ def user_videos(user_id):
     else:
         videos = media_server.get_user_videos(userId)
         return videos
-
