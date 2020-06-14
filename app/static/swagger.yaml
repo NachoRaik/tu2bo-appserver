@@ -392,4 +392,4 @@ components:
           example: 'Great video!! Specially at minute {{14:05}}'
         timestamp:
           type: string
-          example: '2019-01-02 10:14:50'
+          example: '06/18/20 10:39:33'
