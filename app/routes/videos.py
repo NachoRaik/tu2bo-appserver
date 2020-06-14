@@ -70,6 +70,8 @@ def video_comments(video_id):
 def video_likes(video_id):
     video_id = int(video_id)
     media_server = app.config['MEDIA_SERVER']
+    body = request.get_json()
+    
     if required_put_likes_field not in body:
         return Response(json.dumps({'reason':'Fields are incomplete'}), status=400) 
 

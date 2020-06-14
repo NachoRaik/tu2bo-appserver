@@ -62,7 +62,7 @@ class TestVideoController:
         """ POST /videos/video_id/comments
         Should: return 400"""
 
-        res = add_video(client, 1, 'url3','someAuthor', 'someTitle', 'public', '06/14/20 16:39:33')
+        res = add_video(client, 1, 'url3', 'someAuthor', 'someTitle', 'public', '06/14/20 16:39:33')
         assert res.status_code == 201
         res_json = json.loads(res.get_data())
         video_id = int(res_json['id'])
@@ -89,7 +89,7 @@ class TestVideoController:
         """ GET /videos/video_id/comments
         Should: return 200"""
         
-        res = add_video(client, 1, 'url4','someAuthor', 'someTitle', 'public', '06/14/20 16:39:33')
+        res = add_video(client, 1, 'url4', 'someAuthor', 'someTitle', 'public', '06/14/20 16:39:33')
         assert res.status_code == 201
         res_json = json.loads(res.get_data())
         video_id = int(res_json['id'])
@@ -111,7 +111,7 @@ class TestVideoController:
         """ GET /videos/video_id/comments
         Should: return 200"""
         
-        res = add_video(client, 1, 'url5','someAuthor', 'someTitle', 'public', '06/14/20 16:39:33')
+        res = add_video(client, 1, 'url5', 'someAuthor', 'someTitle', 'public', '06/14/20 16:39:33')
         assert res.status_code == 201
         res_json = json.loads(res.get_data())
         video_id = int(res_json['id'])
@@ -133,7 +133,7 @@ class TestVideoController:
         """ GET /videos/video_id/comments
         Should: return 200"""
         
-        res = add_video(client, 1, 'url6','someAuthor', 'someTitle', 'public', '06/14/20 16:39:33')
+        res = add_video(client, 1, 'url6', 'someAuthor', 'someTitle', 'public', '06/14/20 16:39:33')
         assert res.status_code == 201
         res_json = json.loads(res.get_data())
         video_id = int(res_json['id'])
@@ -157,4 +157,77 @@ class TestVideoController:
         assert any(comment['content'] == otherContent for comment in res_json)
         assert any(comment['timestamp'] == timestamp for comment in res_json)
         assert any(comment['timestamp'] == otherTimestamp for comment in res_json)
+
+    def test_get_comment_from_inexistent_video(self, client):
+        """ GET /videos/video_id/comments
+        Should: return 404"""
+
+        res = get_comments_from_video(client, 100)
+        assert res.status_code == 404
+        res_json = json.loads(res.get_data())
+        assert res_json['reason'] == 'Video not found'        
         
+    def test_like_video_successfully(self, client):
+        """ PUT /videos/video_id/likes
+        Should: return 200"""
+
+        res = add_video(client, 1, 'url7', 'someAuthor', 'someTitle', 'public', '06/14/20 16:39:33')
+        assert res.status_code == 201
+        res_json = json.loads(res.get_data())
+        video_id = int(res_json['id'])
+
+        liked = True
+        res = like_video(client, video_id, liked)
+        assert res.status_code == 200
+
+    def test_dislike_video_successfully(self, client):
+        """ PUT /videos/video_id/likes
+        Should: return 200"""
+
+        res = add_video(client, 1, 'url8', 'someAuthor', 'someTitle', 'public', '06/14/20 16:39:33')
+        assert res.status_code == 201
+        res_json = json.loads(res.get_data())
+        video_id = int(res_json['id'])
+
+        liked = True
+        res = like_video(client, video_id, liked)
+
+        liked = False
+        res = like_video(client, video_id, liked)
+        assert res.status_code == 200
+    
+    def test_dislike_video_not_liked_doesnt_return_error(self, client):
+        """ PUT /videos/video_id/likes
+        Should: return 200"""
+
+        res = add_video(client, 1, 'url9', 'someAuthor', 'someTitle', 'public', '06/14/20 16:39:33')
+        assert res.status_code == 201
+        res_json = json.loads(res.get_data())
+        video_id = int(res_json['id'])
+
+        liked = False
+        res = like_video(client, video_id, liked)
+        assert res.status_code == 200
+
+    def test_like_inexistent_video(self, client):
+        """ PUT /videos/video_id/likes
+        Should: return 404"""
+
+        liked = True
+        res = like_video(client, 100, liked)
+        assert res.status_code == 404
+        res_json = json.loads(res.get_data())
+        assert res_json['reason'] == 'Video not found'
+
+    def test_add_like_with_not_enough_fields(self, client):
+        """ PUT /videos/video_id/likes
+        Should: return 404"""
+
+        res = add_video(client, 1, 'url10', 'someAuthor', 'someTitle', 'public', '06/14/20 16:39:33')
+        assert res.status_code == 201
+        res_json = json.loads(res.get_data())
+        video_id = int(res_json['id'])
+
+        res = client.put('/videos/{}/likes'.format(video_id), json={})
+        assert res.status_code == 400
+
