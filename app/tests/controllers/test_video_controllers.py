@@ -129,7 +129,7 @@ class TestVideoController:
         assert res_json['content'] == content
         assert res_json['timestamp'] == timestamp
 
-    def test_get_comments_from_video_successful(self, client):
+    def test_get_multiple_comments_from_video_successful(self, client):
         """ GET /videos/video_id/comments
         Should: return 200"""
         
@@ -231,4 +231,3 @@ class TestVideoController:
 
         res = client.put('/videos/{}/likes'.format(video_id), json={})
         assert res.status_code == 400
-
