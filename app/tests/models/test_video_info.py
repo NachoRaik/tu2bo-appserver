@@ -9,7 +9,6 @@ class TestVideoInfo:
         """ setup any state tied to the execution of the given method in a
         class. setup_method is invoked for every test method of a class.
         """
-        connect()
         connect('appserver-db-test', host='mongomock://localhost', alias='test_video')
 
     def teardown_method(self, method):
