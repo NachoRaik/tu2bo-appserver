@@ -31,3 +31,13 @@ class DevelopmentConfig(Config):
     AUTH_SERVER = MockAuthServer()
     MEDIA_SERVER = MockMediaServer()
 
+class TestingConfig(Config):
+    TESTING = True
+    AUTH_SERVER = MockAuthServer()
+    MEDIA_SERVER = MockMediaServer()
+    MONGODB_SETTINGS = {
+	    'db': 'appserver-db-test',
+	    'host': 'mongomock://localhost',
+        'connect': False
+    }
+
