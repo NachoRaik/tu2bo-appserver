@@ -107,29 +107,6 @@ class TestVideoController:
         assert res_json['content'] == content
         assert res_json['timestamp'] == timestamp
 
-    def test_get_comment_from_video_successful(self, client):
-        """ GET /videos/video_id/comments
-        Should: return 200"""
-        
-        res = add_video(client, 1, 'url5', 'someAuthor', 'someTitle', 'public', '06/14/20 16:39:33')
-        assert res.status_code == 201
-        res_json = json.loads(res.get_data())
-        video_id = int(res_json['id'])
-
-        author, content, timestamp = 'anotherAuthor', 'this video sucks', '06/18/20 10:39:33'
-        res = add_comment_to_video(client, video_id, author, content, timestamp)
-        assert res.status_code == 201
-
-        res = get_comments_from_video(client, video_id)
-        assert res.status_code == 200
-        res_json = json.loads(res.get_data())[0]
-        
-        #TODO: change this harcoded number
-        assert res_json['user_id'] == 1
-        assert res_json['author'] == author
-        assert res_json['content'] == content
-        assert res_json['timestamp'] == timestamp
-
     def test_get_multiple_comments_from_video_successful(self, client):
         """ GET /videos/video_id/comments
         Should: return 200"""
