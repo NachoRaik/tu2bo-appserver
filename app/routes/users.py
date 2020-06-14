@@ -14,7 +14,7 @@ required_post_video_fields = ['url', 'author', 'title', 'visibility', 'user_id']
 def get_user_profile(user_id):
     raise Exception('Not implemented yet')
 
-@bp_users.route('/users/<user_id>/videos', methods=['GET', 'POST'])
+@bp_users.route('/users/<int:user_id>/videos', methods=['GET', 'POST'])
 def user_videos(user_id):
     media_server = app.config['MEDIA_SERVER']
     if request.method == 'POST':
