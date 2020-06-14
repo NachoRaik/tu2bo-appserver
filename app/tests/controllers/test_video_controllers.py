@@ -138,25 +138,26 @@ class TestVideoController:
         res_json = json.loads(res.get_data())
         video_id = int(res_json['id'])
 
-        author, content, timestamp = 'anotherAuthor', 'this video sucks', '06/18/20 10:39:33'
-        res = add_comment_to_video(client, video_id, author, content, timestamp)
+        second_author, second_content, second_timestamp = 'anotherAuthor', 'this video sucks', '06/20/20 10:39:33'
+        res = add_comment_to_video(client, video_id, second_author, second_content, second_timestamp)
         assert res.status_code == 200
 
-        otherAuthor, otherContent, otherTimestamp = 'otherAuthor', 'this video rocks', '06/20/20 10:39:33'
-        res = add_comment_to_video(client, video_id, otherAuthor, otherContent, otherTimestamp)
+        first_author, first_content, first_timestamp = 'otherAuthor', 'this video rocks', '06/18/20 10:39:33'
+        res = add_comment_to_video(client, video_id, first_author, first_content, first_timestamp)
         assert res.status_code == 200
 
         res = get_comments_from_video(client, video_id)
         res_json = json.loads(res.get_data())
 
-        #TODO: change this harcoded number
-        assert any(comment['user_id'] == 1 for comment in res_json)
-        assert any(comment['author'] == author for comment in res_json)
-        assert any(comment['author'] == otherAuthor for comment in res_json)
-        assert any(comment['content'] == content for comment in res_json)
-        assert any(comment['content'] == otherContent for comment in res_json)
-        assert any(comment['timestamp'] == timestamp for comment in res_json)
-        assert any(comment['timestamp'] == otherTimestamp for comment in res_json)
+        first_comment = res_json[0]
+        assert first_comment['author'] == first_author
+        assert first_comment['content'] == first_content
+        assert first_comment['timestamp'] == first_timestamp
+
+        second_comment = res_json[1]
+        assert second_comment['author'] == second_author
+        assert second_comment['content'] == second_content
+        assert second_comment['timestamp'] == second_timestamp
 
     def test_get_comment_from_inexistent_video(self, client):
         """ GET /videos/video_id/comments

@@ -26,7 +26,7 @@ def user_videos(user_id):
         
         response = media_server.add_video(body)
         response_data = json.loads(response.get_data())
-        video_id = int(response_data['id'])
+        video_id = response_data['id']
         video_info = VideoInfo(video_id=video_id).save()
 
         return response
