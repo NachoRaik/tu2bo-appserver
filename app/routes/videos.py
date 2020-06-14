@@ -39,7 +39,7 @@ def add_comment_to_video(request, video_id):
     video_info.save()
 
     result = {'comment_id': comment.comment_id, 'user_id': user_id, 'author': author, 'content': content, 'timestamp': timestamp}
-    return Response(json.dumps(result), status=200) 
+    return Response(json.dumps(result), status=201) 
 
 def get_comment_from_video(request, video_id):
     video = VideoInfo.objects.with_id(video_id)

@@ -39,7 +39,7 @@ class TestVideoController:
 
         author, content, timestamp = 'anotherAuthor', 'this video sucks', '06/18/20 10:39:33'
         res = add_comment_to_video(client, video_id, author, content, timestamp)
-        assert res.status_code == 200
+        assert res.status_code == 201
         res_json = json.loads(res.get_data())
 
         #TODO: change this harcoded number
@@ -96,7 +96,7 @@ class TestVideoController:
 
         author, content, timestamp = 'anotherAuthor', 'this video sucks', '06/18/20 10:39:33'
         res = add_comment_to_video(client, video_id, author, content, timestamp)
-        assert res.status_code == 200
+        assert res.status_code == 201
 
         res = get_comments_from_video(client, video_id)
         res_json = json.loads(res.get_data())[0]
@@ -118,9 +118,10 @@ class TestVideoController:
 
         author, content, timestamp = 'anotherAuthor', 'this video sucks', '06/18/20 10:39:33'
         res = add_comment_to_video(client, video_id, author, content, timestamp)
-        assert res.status_code == 200
+        assert res.status_code == 201
 
         res = get_comments_from_video(client, video_id)
+        assert res.status_code == 200
         res_json = json.loads(res.get_data())[0]
         
         #TODO: change this harcoded number
@@ -140,13 +141,14 @@ class TestVideoController:
 
         second_author, second_content, second_timestamp = 'anotherAuthor', 'this video sucks', '06/20/20 10:39:33'
         res = add_comment_to_video(client, video_id, second_author, second_content, second_timestamp)
-        assert res.status_code == 200
+        assert res.status_code == 201
 
         first_author, first_content, first_timestamp = 'otherAuthor', 'this video rocks', '06/18/20 10:39:33'
         res = add_comment_to_video(client, video_id, first_author, first_content, first_timestamp)
-        assert res.status_code == 200
+        assert res.status_code == 201
 
         res = get_comments_from_video(client, video_id)
+        assert res.status_code == 200
         res_json = json.loads(res.get_data())
 
         first_comment = res_json[0]
