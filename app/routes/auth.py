@@ -13,7 +13,7 @@ def login():
         return Response(json.dumps({'reason':'Email or password is missing'}), status=400)
 
     auth_server = app.config['AUTH_SERVER']
-    app.logger.debug("/register || Sending request to AuthServer %s ", str(body))
+    app.logger.debug("/login || Sending request to AuthServer %s ", str(body))
     response = auth_server.login(body)
     app.logger.debug("/login || Auth Server response %d %s ", response.status_code, response.data)
     return response
