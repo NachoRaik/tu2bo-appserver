@@ -21,9 +21,10 @@ class AuthServer():
         response = requests.get(self.url + '/users')
         return make_flask_response(response)
 
-    def authorize_user(self, body):
-        # Should request Auth Server to check if token is still valid
-        raise Exception('Not implemented yet')
+    def authorize_user(self, token):
+        headers = {'access-token': token}
+        response = requests.post(self.url + '/authorize', headers=headers)
+        return make_flask_response(response)
 
     def __str__(self):
         return "url => {}".format(self.url)
