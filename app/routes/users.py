@@ -14,7 +14,7 @@ required_post_video_fields = ['url', 'author', 'title', 'visibility', 'user_id']
 
 @bp_users.route('/users/<user_id>', methods=['GET'])
 @token_required
-def get_user_profile(user_id):
+def get_user_profile(user_info,user_id):
     userdata = {
         'id': user_id,
         'username': 'exampleUser123',
@@ -28,7 +28,7 @@ def get_user_profile(user_id):
 
 @bp_users.route('/users/<user_id>/videos', methods=['GET', 'POST'])
 @token_required
-def user_videos(user_id):
+def user_videos(user_info,user_id):
     media_server = app.config['MEDIA_SERVER']
     if request.method == 'POST':
         body = request.get_json()

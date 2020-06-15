@@ -1,6 +1,7 @@
 from flask import Blueprint, Response, request, jsonify, make_response
 from flask import current_app as app
 from functools import wraps
+import ast
 
 HEADER_ACCESS_TOKEN = 'access-token'
 
@@ -14,8 +15,8 @@ def token_required(f):
         app.logger.debug("/authorize || Sending request to AuthServer %s ")
         response = auth_server.authorize_user(token)
         app.logger.debug("/authorize || Auth Server response %d %s ", response.status_code, response.data)
-
+        user_info = ast.literal_eval(response.data.decode("UTF-8"))
         if (response.status_code == 401):
             return make_response("Invalid Token",401,{'message':'Unauthorized'})
-        return f(*args, **kwargs)
+        return f(user_info,*args, **kwargs)
     return decorated
