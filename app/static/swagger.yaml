@@ -60,7 +60,7 @@ paths:
           description: Email or password is missing
         '401':
           description: Password incorrect
-  
+
   /register:
     post:
       tags:
@@ -98,7 +98,7 @@ paths:
           description: Invalid email address
         '409':
           description: User already registered
-  
+
   /videos:
     get:
       tags:
@@ -114,7 +114,7 @@ paths:
                 type: array
                 items:
                   $ref: '#/components/schemas/Video'
-  
+
   /videos/{video_id}:
     get:
       tags:
@@ -140,7 +140,7 @@ paths:
                   - $ref: '#/components/schemas/Video'
         '404':
           description: Video not found
-  
+
   /users/{id}:
     get:
       tags:
@@ -154,6 +154,11 @@ paths:
           schema:
             type: integer
             minimum: 1
+        - in: header
+          name: access-token
+          required: true
+          schema:
+            type: string
       responses:
         '200':
           description: User Profile
@@ -188,6 +193,11 @@ paths:
           schema:
             type: integer
             minimum: 1
+        - in: header
+          name: access-token
+          required: true
+          schema:
+            type: string
       responses:
         '200':
           description: User videos
@@ -212,6 +222,11 @@ paths:
           schema:
             type: integer
             minimum: 1
+        - in: header
+          name: access-token
+          required: true
+          schema:
+            type: string
       requestBody:
         description: Video data
         required: true
@@ -348,7 +363,7 @@ components:
         thumb:
           type: string
           example: 'tutubo-storage-wequedecia.com/images/YRJkshnka61yH'
-      required: 
+      required:
         - url
         - author
         - title
