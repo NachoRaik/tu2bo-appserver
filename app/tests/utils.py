@@ -28,3 +28,6 @@ def like_video(client, video_id, liked):
 
 def get_videos(client):
     return client.get('/videos')    
+
+def get_video(client, video_id):
+    return client.get('/videos/{}'.format(video_id)) 
