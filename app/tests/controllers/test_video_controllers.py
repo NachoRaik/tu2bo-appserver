@@ -29,7 +29,7 @@ class TestVideoController:
         video_id = int(res_json['id'])
 
         author, content, timestamp = 'anotherAuthor', 'this video sucks', '06/18/20 10:39:33'
-        res = add_comment_to_video(client, video_id, author, content, timestamp)
+        res = add_comment_to_video(client, video_id, author=author, content=content, timestamp=timestamp)
         assert res.status_code == 201
         res_json = json.loads(res.get_data())
 
@@ -44,7 +44,7 @@ class TestVideoController:
         Should: return 404"""
 
         author, content, timestamp, inexistent_video_id = 'anotherAuthor', 'this video sucks', '06/18/20 10:39:33', 1000
-        res = add_comment_to_video(client, inexistent_video_id, author, content, timestamp)
+        res = add_comment_to_video(client, inexistent_video_id, author=author, content=content, timestamp=timestamp)
         assert res.status_code == 404
         res_json = json.loads(res.get_data())
         assert res_json['reason'] == 'Video not found'
@@ -58,22 +58,27 @@ class TestVideoController:
         res_json = json.loads(res.get_data())
         video_id = int(res_json['id'])
 
-        res =  client.post('/videos/{}/comments'.format(video_id), json={
-            'author': 'author',
-            'content': 'content'
-        })
+        author, content, timestamp = 'someAuthor', 'content', '06/14/20 16:39:33'
+
+        res = add_comment_to_video(client, video_id, author=author, content=content)
         assert res.status_code == 400
 
-        res =  client.post('/videos/{}/comments'.format(video_id), json={
-            'author': 'author',
-            'timestamp': '06/18/20 10:39:33'
-        })
+        res = add_comment_to_video(client, video_id, author=author, timestamp=timestamp)
         assert res.status_code == 400
 
-        res =  client.post('/videos/{}/comments'.format(video_id), json={
-            'timestamp': '06/18/20 10:39:33',
-            'content': 'content'
-        })
+        res = add_comment_to_video(client, video_id, content=content, timestamp=timestamp)
+        assert res.status_code == 400
+
+        res = add_comment_to_video(client, video_id, author=author)
+        assert res.status_code == 400
+
+        res = add_comment_to_video(client, video_id, content=content)
+        assert res.status_code == 400
+
+        res = add_comment_to_video(client, video_id, timestamp=timestamp)
+        assert res.status_code == 400
+
+        res = add_comment_to_video(client, video_id)
         assert res.status_code == 400
 
     def test_get_comment_from_video_successful(self, client):
@@ -86,7 +91,7 @@ class TestVideoController:
         video_id = int(res_json['id'])
 
         author, content, timestamp = 'anotherAuthor', 'this video sucks', '06/18/20 10:39:33'
-        res = add_comment_to_video(client, video_id, author, content, timestamp)
+        res = add_comment_to_video(client, video_id, author=author, content=content, timestamp=timestamp)
         assert res.status_code == 201
 
         res = get_comments_from_video(client, video_id)
@@ -108,11 +113,11 @@ class TestVideoController:
         video_id = int(res_json['id'])
 
         second_author, second_content, second_timestamp = 'anotherAuthor', 'this video sucks', '06/20/20 10:39:33'
-        res = add_comment_to_video(client, video_id, second_author, second_content, second_timestamp)
+        res = add_comment_to_video(client, video_id, author=second_author, content=second_content, timestamp=second_timestamp)
         assert res.status_code == 201
 
         first_author, first_content, first_timestamp = 'otherAuthor', 'this video rocks', '06/18/20 10:39:33'
-        res = add_comment_to_video(client, video_id, first_author, first_content, first_timestamp)
+        res = add_comment_to_video(client, video_id, author=first_author, content=first_content, timestamp=first_timestamp)
         assert res.status_code == 201
 
         res = get_comments_from_video(client, video_id)

@@ -7,12 +7,16 @@ def add_video(client, user_id, url, author, title, visibility, date):
         'date': date
     })
 
-def add_comment_to_video(client, video_id, author, content, timestamp):
-    return client.post('/videos/{}/comments'.format(video_id), json={
-        'author': author,
-        'content': content,
-        'timestamp': timestamp
-    })
+def add_comment_to_video(client, video_id, author=None, content=None, timestamp=None):
+    request = {}
+    if author != None:
+        request['author'] = author
+    if content != None:
+        request['content'] = content
+    if timestamp != None:
+        request['timestamp'] = timestamp
+
+    return client.post('/videos/{}/comments'.format(video_id), json=request)
 
 def get_comments_from_video(client, video_id):
     return client.get('/videos/{}/comments'.format(video_id))
