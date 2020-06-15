@@ -115,6 +115,32 @@ paths:
                 items:
                   $ref: '#/components/schemas/Video'
   
+  /videos/{video_id}:
+    get:
+      tags:
+        - videos
+      summary: Get video by id
+      description: ''
+      operationId: getVideoById
+      parameters:
+        - in: path
+          name: video_id
+          required: true
+          schema:
+            type: integer
+            minimum: 1
+      responses:
+        '200':
+          description: Video uploaded in Media Server
+          content:
+            application/json:
+              schema:
+                type: object
+                allOf:
+                  - $ref: '#/components/schemas/Video'
+        '404':
+          description: Video not found
+  
   /users/{id}:
     get:
       tags:
