@@ -13,7 +13,7 @@ def login(client,email,password):
         'password': password
     })
 
-def login_and_token(client):
+def login_and_token_user1(client):
     response = login(client,"email1","password1")
     response = ast.literal_eval(response.data.decode("UTF-8"))
     return response["token"]

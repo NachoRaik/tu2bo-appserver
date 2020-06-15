@@ -23,7 +23,7 @@ class TestUsersController:
         """ POST /users/user_id/videos
         Should: return 201 with video id """
 
-        token = login_and_token(client)
+        token = login_and_token_user1(client)
         res = add_video(client, token, 1, 'url', 'someAuthor', 'someTitle', 'public', '06/14/20 16:39:33')
         res_json = json.loads(res.get_data())
         assert res.status_code == 201
@@ -33,7 +33,7 @@ class TestUsersController:
         """ POST /users/user_id/videos
         Should: return 409 """
 
-        token = login_and_token(client)
+        token = login_and_token_user1(client)
         res = add_video(client, token, 1, 'url', 'someAuthor', 'someTitle', 'public', '06/14/20 16:39:33')
         assert res.status_code == 201
         res = add_video(client, token, 1, 'url', 'someAuthor', 'someTitle', 'public', '06/14/20 16:39:33')
@@ -43,7 +43,7 @@ class TestUsersController:
         """ POST /users/user_id/videos
         Should: return 400 """
 
-        token = login_and_token(client)
+        token = login_and_token_user1(client)
         res = add_video(client, token, 1, 'url', 'someAuthor', 'someTitle', 'public', '09/19/50 13:55:26')
         assert b'Invalid date' in res.get_data()
         assert res.status_code == 400
@@ -51,8 +51,8 @@ class TestUsersController:
     def test_add_video_with_invalid_visibility(self, client):
         """ POST /users/user_id/videos
         Should: return 400 """
-        
-        token = login_and_token(client)
+
+        token = login_and_token_user1(client)
         res = add_video(client, token, 1, 'url', 'someAuthor', 'someTitle', 'invalidVisibility', '09/19/18 13:55:26')
         assert b'Invalid visibility' in res.get_data()
         assert res.status_code == 400

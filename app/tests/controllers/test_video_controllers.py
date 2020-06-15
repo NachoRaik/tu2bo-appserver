@@ -23,7 +23,7 @@ class TestVideoController:
         """ POST /videos/video_id/comments
         Should: return 200"""
 
-        token = login_and_token(client)
+        token = login_and_token_user1(client)
         res = add_video(client, token, 1, 'url', 'someAuthor', 'someTitle', 'public', '06/14/20 16:39:33')
         assert res.status_code == 201
         res_json = json.loads(res.get_data())
@@ -43,7 +43,7 @@ class TestVideoController:
         """ POST /videos/video_id/comments
         Should: return 404"""
 
-        token = login_and_token(client)
+        token = login_and_token_user1(client)
         author, content, timestamp, inexistent_video_id = 'anotherAuthor', 'this video sucks', '06/18/20 10:39:33', 1000
         res = add_comment_to_video(client, token, inexistent_video_id, author=author, content=content, timestamp=timestamp)
         assert res.status_code == 404
@@ -54,7 +54,7 @@ class TestVideoController:
         """ POST /videos/video_id/comments
         Should: return 400"""
 
-        token = login_and_token(client)
+        token = login_and_token_user1(client)
         res = add_video(client, token, 1, 'url', 'someAuthor', 'someTitle', 'public', '06/14/20 16:39:33')
         assert res.status_code == 201
         res_json = json.loads(res.get_data())
@@ -87,7 +87,7 @@ class TestVideoController:
         """ GET /videos/video_id/comments
         Should: return 200"""
 
-        token = login_and_token(client)
+        token = login_and_token_user1(client)
         res = add_video(client, token, 1, 'url', 'someAuthor', 'someTitle', 'public', '06/14/20 16:39:33')
         assert res.status_code == 201
         res_json = json.loads(res.get_data())
@@ -110,7 +110,7 @@ class TestVideoController:
         """ GET /videos/video_id/comments
         Should: return 200"""
 
-        token = login_and_token(client)
+        token = login_and_token_user1(client)
         res = add_video(client, token, 1, 'url', 'someAuthor', 'someTitle', 'public', '06/14/20 16:39:33')
         assert res.status_code == 201
         res_json = json.loads(res.get_data())
@@ -142,7 +142,7 @@ class TestVideoController:
         """ GET /videos/video_id/comments
         Should: return 404"""
 
-        token = login_and_token(client)
+        token = login_and_token_user1(client)
         res = get_comments_from_video(client, token, 100)
         assert res.status_code == 404
         res_json = json.loads(res.get_data())
@@ -152,7 +152,7 @@ class TestVideoController:
         """ PUT /videos/video_id/likes
         Should: return 200"""
 
-        token = login_and_token(client)
+        token = login_and_token_user1(client)
         res = add_video(client, token, 1, 'url', 'someAuthor', 'someTitle', 'public', '06/14/20 16:39:33')
         assert res.status_code == 201
         res_json = json.loads(res.get_data())
@@ -166,7 +166,7 @@ class TestVideoController:
         """ PUT /videos/video_id/likes
         Should: return 200"""
 
-        token = login_and_token(client)
+        token = login_and_token_user1(client)
         res = add_video(client, token, 1, 'url', 'someAuthor', 'someTitle', 'public', '06/14/20 16:39:33')
         assert res.status_code == 201
         res_json = json.loads(res.get_data())
@@ -183,7 +183,7 @@ class TestVideoController:
         """ PUT /videos/video_id/likes
         Should: return 200"""
 
-        token = login_and_token(client)
+        token = login_and_token_user1(client)
         res = add_video(client, token, 1, 'url', 'someAuthor', 'someTitle', 'public', '06/14/20 16:39:33')
         assert res.status_code == 201
         res_json = json.loads(res.get_data())
@@ -197,7 +197,7 @@ class TestVideoController:
         """ PUT /videos/video_id/likes
         Should: return 404"""
 
-        token = login_and_token(client)
+        token = login_and_token_user1(client)
         liked = True
         res = like_video(client, token, 100, liked)
         assert res.status_code == 404
@@ -208,7 +208,7 @@ class TestVideoController:
         """ PUT /videos/video_id/likes
         Should: return 404"""
 
-        token = login_and_token(client)
+        token = login_and_token_user1(client)
         res = add_video(client, token, 1, 'url', 'someAuthor', 'someTitle', 'public', '06/14/20 16:39:33')
         assert res.status_code == 201
         res_json = json.loads(res.get_data())
@@ -221,7 +221,7 @@ class TestVideoController:
         """ GET /videos
         Should: return 200"""
 
-        token = login_and_token(client)
+        token = login_and_token_user1(client)
         user_id, url, author, title, visibility, timestamp = 1, 'url', 'someAuthor', 'someTitle', 'public', '06/14/20 16:39:33'
         res = add_video(client, token, user_id, url, author, title, visibility, timestamp)
         assert res.status_code == 201
@@ -235,7 +235,7 @@ class TestVideoController:
         """ GET /videos
         Should: return 200"""
 
-        token = login_and_token(client)
+        token = login_and_token_user1(client)
         user_id, url, author, title, visibility, timestamp = 1, 'url', 'someAuthor', 'someTitle', 'public', '06/14/20 16:39:33'
         res = add_video(client, token, user_id, url, author, title, visibility, timestamp)
         assert res.status_code == 201
@@ -255,7 +255,7 @@ class TestVideoController:
         """ GET /videos
         Should: return 200"""
 
-        token = login_and_token(client)
+        token = login_and_token_user1(client)
         user_id, url, author, title, visibility, timestamp = 1, 'url', 'someAuthor', 'someTitle', 'public', '06/14/20 16:39:33'
         res = add_video(client, token, user_id, url, author, title, visibility, timestamp)
         assert res.status_code == 201
@@ -284,7 +284,7 @@ class TestVideoController:
         """ GET /videos/video_id
         Should: return 404"""
 
-        token = login_and_token(client)
+        token = login_and_token_user1(client)
         res = get_video(client, token, 100)
         assert res.status_code == 404
         assert b'Video not found' in res.get_data()
@@ -293,7 +293,7 @@ class TestVideoController:
         """ GET /videos/video_id
         Should: return 200"""
 
-        token = login_and_token(client)
+        token = login_and_token_user1(client)
         user_id, url, author, title, visibility, timestamp = 1, 'url', 'someAuthor', 'someTitle', 'public', '06/14/20 16:39:33'
         res = add_video(client, token, user_id, url, author, title, visibility, timestamp)
         assert res.status_code == 201
@@ -309,7 +309,7 @@ class TestVideoController:
         """ GET /videos
         Should: return 200"""
 
-        token = login_and_token(client)
+        token = login_and_token_user1(client)
         user_id, url, author, title, visibility, timestamp = 1, 'url', 'someAuthor', 'someTitle', 'public', '06/14/20 16:39:33'
         res = add_video(client, token, user_id, url, author, title, visibility, timestamp)
         assert res.status_code == 201
@@ -329,7 +329,7 @@ class TestVideoController:
         """ GET /videos
         Should: return 200"""
 
-        token = login_and_token(client)
+        token = login_and_token_user1(client)
         user_id, url, author, title, visibility, timestamp = 1, 'url', 'someAuthor', 'someTitle', 'public', '06/14/20 16:39:33'
         res = add_video(client, token, user_id, url, author, title, visibility, timestamp)
         assert res.status_code == 201
