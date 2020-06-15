@@ -15,8 +15,8 @@ def token_required(f):
         app.logger.debug("/authorize || Sending request to AuthServer %s ")
         response = auth_server.authorize_user(token)
         app.logger.debug("/authorize || Auth Server response %d %s ", response.status_code, response.data)
-        user_info = ast.literal_eval(response.data.decode("UTF-8"))
         if (response.status_code == 401):
             return make_response("Invalid Token",401,{'message':'Unauthorized'})
+        user_info = ast.literal_eval(response.data.decode("UTF-8"))
         return f(user_info,*args, **kwargs)
     return decorated
