@@ -27,7 +27,11 @@ class ProductionConfig(Config):
         self.DEBUG = False
         self.AUTH_SERVER = AuthServer(url = os.getenv('AUTH_URI', 'localhost:5000'))
         self.MEDIA_SERVER = MockMediaServer()
-
+        self.MONGODB_SETTINGS = {
+	        'db': 'appserver-db',
+	        'host': 'mongodb://appserver-db:27017/appserver-db'
+        }
+        
 class DevelopmentConfig(Config):
     def __init__(self):
         self.TESTING = True
