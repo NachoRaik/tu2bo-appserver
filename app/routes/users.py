@@ -1,9 +1,8 @@
 import json
-from flask import Blueprint, request, jsonify
+from flask import Blueprint, request, jsonify, Response
 from flask import current_app as app
 from werkzeug.utils import secure_filename
-
-from database.models.user import User
+from database.models.video_info import VideoInfo
 
 bp_users = Blueprint("bp_users", __name__)
 
@@ -13,18 +12,9 @@ required_post_video_fields = ['url', 'author', 'title', 'visibility', 'user_id']
 
 @bp_users.route('/users/<user_id>', methods=['GET'])
 def get_user_profile(user_id):
-    userdata = {
-        'id': user_id,
-        'username': 'exampleUser123',
-        'videos': []
-    }
+    raise Exception('Not implemented yet')
 
-    user_profile = jsonify(userdata)
-    user_profile.status_code = 200
-    return user_profile
-
-
-@bp_users.route('/users/<user_id>/videos', methods=['GET', 'POST'])
+@bp_users.route('/users/<int:user_id>/videos', methods=['GET', 'POST'])
 def user_videos(user_id):
     media_server = app.config['MEDIA_SERVER']
     if request.method == 'POST':
@@ -35,8 +25,11 @@ def user_videos(user_id):
                 return Response(json.dumps({'reason':'Fields are incomplete'}), status=400) 
         
         response = media_server.add_video(body)
+        if response.status_code == 201:
+            response_data = json.loads(response.get_data())
+            video_id = response_data['id']
+            video_info = VideoInfo(video_id=video_id).save()
         return response
     else:
         videos = media_server.get_user_videos(userId)
         return videos
-
