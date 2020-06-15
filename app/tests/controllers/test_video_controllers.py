@@ -26,7 +26,7 @@ class TestVideoController:
         res = add_video(client, 1, 'url', 'someAuthor', 'someTitle', 'public', '06/14/20 16:39:33')
         assert res.status_code == 201
         res_json = json.loads(res.get_data())
-        video_id = int(res_json['id'])
+        video_id = res_json['id']
 
         author, content, timestamp = 'anotherAuthor', 'this video sucks', '06/18/20 10:39:33'
         res = add_comment_to_video(client, video_id, author=author, content=content, timestamp=timestamp)
@@ -56,7 +56,7 @@ class TestVideoController:
         res = add_video(client, 1, 'url', 'someAuthor', 'someTitle', 'public', '06/14/20 16:39:33')
         assert res.status_code == 201
         res_json = json.loads(res.get_data())
-        video_id = int(res_json['id'])
+        video_id = res_json['id']
 
         author, content, timestamp = 'someAuthor', 'content', '06/14/20 16:39:33'
 
@@ -88,7 +88,7 @@ class TestVideoController:
         res = add_video(client, 1, 'url', 'someAuthor', 'someTitle', 'public', '06/14/20 16:39:33')
         assert res.status_code == 201
         res_json = json.loads(res.get_data())
-        video_id = int(res_json['id'])
+        video_id = res_json['id']
 
         author, content, timestamp = 'anotherAuthor', 'this video sucks', '06/18/20 10:39:33'
         res = add_comment_to_video(client, video_id, author=author, content=content, timestamp=timestamp)
@@ -110,7 +110,7 @@ class TestVideoController:
         res = add_video(client, 1, 'url', 'someAuthor', 'someTitle', 'public', '06/14/20 16:39:33')
         assert res.status_code == 201
         res_json = json.loads(res.get_data())
-        video_id = int(res_json['id'])
+        video_id = res_json['id']
 
         second_author, second_content, second_timestamp = 'anotherAuthor', 'this video sucks', '06/20/20 10:39:33'
         res = add_comment_to_video(client, video_id, author=second_author, content=second_content, timestamp=second_timestamp)
@@ -150,7 +150,7 @@ class TestVideoController:
         res = add_video(client, 1, 'url', 'someAuthor', 'someTitle', 'public', '06/14/20 16:39:33')
         assert res.status_code == 201
         res_json = json.loads(res.get_data())
-        video_id = int(res_json['id'])
+        video_id = res_json['id']
 
         liked = True
         res = like_video(client, video_id, liked)
@@ -163,7 +163,7 @@ class TestVideoController:
         res = add_video(client, 1, 'url', 'someAuthor', 'someTitle', 'public', '06/14/20 16:39:33')
         assert res.status_code == 201
         res_json = json.loads(res.get_data())
-        video_id = int(res_json['id'])
+        video_id = res_json['id']
 
         liked = True
         res = like_video(client, video_id, liked)
@@ -179,7 +179,7 @@ class TestVideoController:
         res = add_video(client, 1, 'url', 'someAuthor', 'someTitle', 'public', '06/14/20 16:39:33')
         assert res.status_code == 201
         res_json = json.loads(res.get_data())
-        video_id = int(res_json['id'])
+        video_id = res_json['id']
 
         liked = False
         res = like_video(client, video_id, liked)
@@ -202,7 +202,7 @@ class TestVideoController:
         res = add_video(client, 1, 'url', 'someAuthor', 'someTitle', 'public', '06/14/20 16:39:33')
         assert res.status_code == 201
         res_json = json.loads(res.get_data())
-        video_id = int(res_json['id'])
+        video_id = res_json['id']
 
         res = client.put('/videos/{}/likes'.format(video_id), json={})
         assert res.status_code == 400
@@ -228,7 +228,7 @@ class TestVideoController:
         res = add_video(client, user_id, url, author, title, visibility, timestamp)
         assert res.status_code == 201
         res_json = json.loads(res.get_data())
-        video_id = int(res_json['id'])
+        video_id = res_json['id']
 
         liked = True
         res = like_video(client, video_id, liked)
@@ -247,7 +247,7 @@ class TestVideoController:
         res = add_video(client, user_id, url, author, title, visibility, timestamp)
         assert res.status_code == 201
         res_json = json.loads(res.get_data())
-        video_id = int(res_json['id'])
+        video_id = res_json['id']
 
         liked = True
         res = like_video(client, video_id, liked)

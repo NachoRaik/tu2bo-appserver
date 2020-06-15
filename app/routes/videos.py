@@ -19,8 +19,8 @@ def home_videos():
     res = media_server.get_videos()
     res_json = json.loads(res.get_data())
     for video in res_json:
-        user_id = int(video['user_id'])
-        video_id = int(video['id'])
+        user_id = video['user_id']
+        video_id = video['id']
         video_info = VideoInfo.objects.get(video_id=video_id)
         video['likes'] = len(video_info.likes)
         video['user_related_info'] = {'is_liked': user_id in video_info.likes}
