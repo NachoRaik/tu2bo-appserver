@@ -33,6 +33,10 @@ class DevelopmentConfig(Config):
         self.TESTING = True
         self.AUTH_SERVER = MockAuthServer()
         self.MEDIA_SERVER = MockMediaServer()
+        self.MONGODB_SETTINGS = {
+	        'db': 'appserver-db',
+	        'host': 'mongodb://appserver-db:27017/appserver-db'
+        }
 
 class TestingConfig(Config):
     def __init__(self):
