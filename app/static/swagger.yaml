@@ -344,7 +344,7 @@ components:
           example: 'This is my first video in TuTuBo - woohoo!'
         date:
           type: string
-          example: '2019-01-02 10:14:50'
+          example: '01/01/19 00:00:00'
         thumb:
           type: string
           example: 'tutubo-storage-wequedecia.com/images/YRJkshnka61yH'
