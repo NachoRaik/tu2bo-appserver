@@ -25,7 +25,7 @@ class TestUsersController:
 
         res = add_video(client, 1, 'url', 'someAuthor', 'someTitle', 'public', '06/14/20 16:39:33')
         res_json = json.loads(res.get_data())
-        assert res_json['id'] == 5
+        assert res_json['id'] == 1
         assert res.status_code == 201
 
     def test_add_video_already_uploaded(self, client):

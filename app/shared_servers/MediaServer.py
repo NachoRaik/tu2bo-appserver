@@ -33,7 +33,6 @@ class MockMediaServer(MediaServer):
     def __init__(self):
         super().__init__()
         self.db = {}
-        init_db(self.db)
         self.next_id = len(self.db)
 
     def generate_id(self):

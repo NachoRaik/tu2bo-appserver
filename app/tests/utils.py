@@ -25,3 +25,6 @@ def like_video(client, video_id, liked):
     return client.put('/videos/{}/likes'.format(video_id), json={
         'liked': liked
     })
+
+def get_videos(client):
+    return client.get('/videos')    

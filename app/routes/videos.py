@@ -16,8 +16,15 @@ required_put_likes_field = 'liked'
 @bp_videos.route('/videos', methods=['GET'])
 def home_videos():
     media_server = app.config['MEDIA_SERVER']
-    home_page_videos = media_server.get_videos()
-    return home_page_videos
+    res = media_server.get_videos()
+    res_json = json.loads(res.get_data())
+    for video in res_json:
+        user_id = int(video['user_id'])
+        video_id = int(video['id'])
+        video_info = VideoInfo.objects.get(video_id=video_id)
+        video['likes'] = len(video_info.likes)
+        video['user_related_info'] = {'is_liked': user_id in video_info.likes}
+    return Response(json.dumps(res_json), status=200) 
 
 def add_comment_to_video(request, video_id):
     body = request.get_json()
@@ -86,4 +93,6 @@ def video_likes(video_id):
         likes.remove(user_id)
     if liked and not user_id in likes:
         likes.append(user_id) 
+    video_info.save()
+
     return Response(json.dumps({'result':'Like updated'}), status=200) 

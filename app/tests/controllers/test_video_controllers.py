@@ -1,7 +1,7 @@
 import pytest
 from mongoengine import connect, disconnect
 from mongoengine.connection import _get_db
-from tests.utils import add_video, add_comment_to_video, get_comments_from_video, like_video
+from tests.utils import add_video, add_comment_to_video, get_comments_from_video, like_video, get_videos
 import json
 
 class TestVideoController:
@@ -206,3 +206,64 @@ class TestVideoController:
 
         res = client.put('/videos/{}/likes'.format(video_id), json={})
         assert res.status_code == 400
+
+    def test_get_video_with_zero_likes(self, client):
+        """ GET /videos
+        Should: return 200"""
+        
+        user_id, url, author, title, visibility, timestamp = 1, 'url', 'someAuthor', 'someTitle', 'public', '06/14/20 16:39:33'
+        res = add_video(client, user_id, url, author, title, visibility, timestamp)
+        assert res.status_code == 201
+        
+        res = get_videos(client)
+        res_json = json.loads(res.get_data())[0]
+        assert res_json['likes'] == 0
+        assert res_json['user_related_info']['is_liked'] == False
+
+    def test_get_video_with_one_like(self, client):
+        """ GET /videos
+        Should: return 200"""
+        
+        user_id, url, author, title, visibility, timestamp = 1, 'url', 'someAuthor', 'someTitle', 'public', '06/14/20 16:39:33'
+        res = add_video(client, user_id, url, author, title, visibility, timestamp)
+        assert res.status_code == 201
+        res_json = json.loads(res.get_data())
+        video_id = int(res_json['id'])
+
+        liked = True
+        res = like_video(client, video_id, liked)
+        assert res.status_code == 200
+        
+        res = get_videos(client)
+        res_json = json.loads(res.get_data())[0]
+        assert res_json['likes'] == 1
+        assert res_json['user_related_info']['is_liked'] == True
+        
+    def test_get_video_with_one_like_and_then_zero(self, client):
+        """ GET /videos
+        Should: return 200"""
+        
+        user_id, url, author, title, visibility, timestamp = 1, 'url', 'someAuthor', 'someTitle', 'public', '06/14/20 16:39:33'
+        res = add_video(client, user_id, url, author, title, visibility, timestamp)
+        assert res.status_code == 201
+        res_json = json.loads(res.get_data())
+        video_id = int(res_json['id'])
+
+        liked = True
+        res = like_video(client, video_id, liked)
+        assert res.status_code == 200
+        
+        res = get_videos(client)
+        res_json = json.loads(res.get_data())[0]
+        assert res_json['likes'] == 1
+        assert res_json['user_related_info']['is_liked'] == True
+
+        liked = False
+        res = like_video(client, video_id, liked)
+        assert res.status_code == 200
+        
+        res = get_videos(client)
+        res_json = json.loads(res.get_data())[0]
+        assert res_json['likes'] == 0
+        assert res_json['user_related_info']['is_liked'] == False
+
