@@ -33,6 +33,7 @@ class TestUsersController:
         Should: return 409 """
 
         res = add_video(client, 1, 'url', 'someAuthor', 'someTitle', 'public', '06/14/20 16:39:33')
+        assert res.status_code == 201
         res = add_video(client, 1, 'url', 'someAuthor', 'someTitle', 'public', '06/14/20 16:39:33')
         assert res.status_code == 409
 
