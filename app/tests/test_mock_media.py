@@ -17,7 +17,7 @@ class TestMockMediaServer:
         'visibility': 'public', 'url': 'anUrl', 'thumb': 'aThumb', 'user_id': '4'}
         response = self.mock_media_server.add_video(video_data)
         json = loads(response.get_data())
-        assert json['id'] == 5
+        assert json['id'] == 1
         assert response.status_code == 201
     
     def test_add_video_without_thumb_success(self):
@@ -27,7 +27,7 @@ class TestMockMediaServer:
         'visibility': 'public', 'url': 'anUrl', 'user_id': '4'}
         response = self.mock_media_server.add_video(video_data)
         json = loads(response.get_data())
-        assert json['id'] == 5
+        assert json['id'] == 1
         assert response.status_code == 201
 
     def test_add_video_without_description_success(self):
@@ -37,7 +37,7 @@ class TestMockMediaServer:
         'url': 'anUrl', 'thumb': 'aThumb', 'user_id': '4'}
         response = self.mock_media_server.add_video(video_data)
         json = loads(response.get_data())
-        assert json['id'] == 5
+        assert json['id'] == 1
         assert response.status_code == 201
     
     def test_add_video_with_same_url_twice(self):
@@ -53,7 +53,7 @@ class TestMockMediaServer:
     def test_add_video_with_invalid_date(self):
         """ Add a video with invalid date should return 400 """
 
-        video_data = {'author': 'anAuthor', 'title': 'aTitle', 'date': '09/19/20 13:55:26', 'visibility': 'public', 
+        video_data = {'author': 'anAuthor', 'title': 'aTitle', 'date': '09/19/50 13:55:26', 'visibility': 'public', 
         'url': 'anUrl', 'thumb': 'aThumb', 'user_id': '4'}
         response = self.mock_media_server.add_video(video_data)
         assert b'Invalid date' in response.get_data()
@@ -73,7 +73,7 @@ class TestMockMediaServer:
 
         response = self.mock_media_server.get_videos()
         json = loads(response.get_data())
-        assert len(json) == 4 
+        assert len(json) == 0
         assert response.status_code == 200
 
     def test_add_and_get_videos(self):
@@ -87,17 +87,18 @@ class TestMockMediaServer:
 
         response = self.mock_media_server.get_videos()
         json = loads(response.get_data())
-        assert len(json) == 5
+        assert len(json) == 1
         assert response.status_code == 200
-        assert any(video['author'] == author for video in json)
-        assert any(video['title'] == title for video in json)
-        assert any(video['description'] == description for video in json)
-        assert any(video['date'] == date for video in json)
-        assert any(video['visibility'] == visibility for video in json)
-        assert any(video['url'] == url for video in json)
-        assert any(video['thumb'] == thumb for video in json)
-        assert any(video['user_id'] == user_id for video in json)
-        assert any(video['id'] == id for video in json)
+        video = json[0]
+        assert video['author'] == author 
+        assert video['title'] == title 
+        assert video['description'] == description 
+        assert video['date'] == date 
+        assert video['visibility'] == visibility 
+        assert video['url'] == url 
+        assert video['thumb'] == thumb 
+        assert video['user_id'] == user_id 
+        assert video['id'] == id 
 
     def test_get_video_by_id_success(self):
         """ Get existent video by id should return 200 """
@@ -162,7 +163,7 @@ class TestMockMediaServer:
 
         response = self.mock_media_server.get_videos()
         json = loads(response.get_data())
-        assert len(json) == 4
+        assert len(json) == 0
         assert response.status_code == 200
 
     def test_delete_unexistent_video(self):

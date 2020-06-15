@@ -4,14 +4,15 @@ from shared_servers.AuthServer import AuthServer, MockAuthServer
 from shared_servers.MediaServer import MediaServer, MockMediaServer
 
 class Config(object):
-    DEBUG = False
-    TESTING = False
-    AUTH_SERVER = AuthServer()
-    MEDIA_SERVER = MediaServer()
-    MONGODB_SETTINGS = {
-	    'db': 'appserver-db',
-	    'host': 'mongodb://appserver-db:27017/appserver-db'
-    }
+    def __init__(self):
+        self.DEBUG = False
+        self.TESTING = False
+        self.AUTH_SERVER = AuthServer()
+        self.MEDIA_SERVER = MediaServer()
+        self.MONGODB_SETTINGS = {
+	        'db': 'appserver-db',
+	        'host': 'mongodb://appserver-db:27017/appserver-db'
+        }
 
     def __repr__(self):
         printable_fields = ['DEBUG', 'AUTH_SERVER', 'MEDIA_SERVER']
@@ -22,12 +23,28 @@ class Config(object):
         return output 
 
 class ProductionConfig(Config):
-    DEBUG = False
-    AUTH_SERVER = AuthServer(url = os.getenv('AUTH_URI', 'localhost:5000'))
-    MEDIA_SERVER = MockMediaServer()
+    def __init__(self):
+        super().__init__()
+        self.DEBUG = False
+        self.AUTH_SERVER = AuthServer(url = os.getenv('AUTH_URI', 'localhost:5000'))
+        self.MEDIA_SERVER = MockMediaServer()
 
 class DevelopmentConfig(Config):
-    TESTING = True
-    AUTH_SERVER = MockAuthServer()
-    MEDIA_SERVER = MockMediaServer()
+    def __init__(self):
+        super().__init__()
+        self.TESTING = True
+        self.AUTH_SERVER = MockAuthServer()
+        self.MEDIA_SERVER = MockMediaServer()
+
+class TestingConfig(Config):
+    def __init__(self):
+        super().__init__()
+        self.TESTING = True
+        self.AUTH_SERVER = MockAuthServer()
+        self.MEDIA_SERVER = MockMediaServer()
+        self.MONGODB_SETTINGS = {
+            'db': 'appserver-db-test',
+            'host': 'mongomock://localhost',
+            'connect': False
+        }
 
