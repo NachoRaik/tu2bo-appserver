@@ -267,6 +267,14 @@ class TestVideoController:
         assert res_json['likes'] == 0
         assert res_json['user_related_info']['is_liked'] == False
 
+    def test_get_inexistent_video(self, client):
+        """ GET /videos/video_id
+        Should: return 404"""
+
+        res = get_video(client, 100)
+        assert res.status_code == 404
+        assert b'Video not found' in res.get_data()
+
     def test_get_video_with_zero_likes(self, client):
         """ GET /videos/video_id
         Should: return 200"""
