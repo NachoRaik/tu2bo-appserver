@@ -23,7 +23,7 @@ class TestVideoController:
         """ POST /videos/video_id/comments
         Should: return 200"""
         
-        res = add_video(client, 1, 'url2', 'someAuthor', 'someTitle', 'public', '06/14/20 16:39:33')
+        res = add_video(client, 1, 'url', 'someAuthor', 'someTitle', 'public', '06/14/20 16:39:33')
         assert res.status_code == 201
         res_json = json.loads(res.get_data())
         video_id = int(res_json['id'])
@@ -53,7 +53,7 @@ class TestVideoController:
         """ POST /videos/video_id/comments
         Should: return 400"""
 
-        res = add_video(client, 1, 'url3', 'someAuthor', 'someTitle', 'public', '06/14/20 16:39:33')
+        res = add_video(client, 1, 'url', 'someAuthor', 'someTitle', 'public', '06/14/20 16:39:33')
         assert res.status_code == 201
         res_json = json.loads(res.get_data())
         video_id = int(res_json['id'])
@@ -80,7 +80,7 @@ class TestVideoController:
         """ GET /videos/video_id/comments
         Should: return 200"""
         
-        res = add_video(client, 1, 'url4', 'someAuthor', 'someTitle', 'public', '06/14/20 16:39:33')
+        res = add_video(client, 1, 'url', 'someAuthor', 'someTitle', 'public', '06/14/20 16:39:33')
         assert res.status_code == 201
         res_json = json.loads(res.get_data())
         video_id = int(res_json['id'])
@@ -102,7 +102,7 @@ class TestVideoController:
         """ GET /videos/video_id/comments
         Should: return 200"""
         
-        res = add_video(client, 1, 'url6', 'someAuthor', 'someTitle', 'public', '06/14/20 16:39:33')
+        res = add_video(client, 1, 'url', 'someAuthor', 'someTitle', 'public', '06/14/20 16:39:33')
         assert res.status_code == 201
         res_json = json.loads(res.get_data())
         video_id = int(res_json['id'])
@@ -142,7 +142,7 @@ class TestVideoController:
         """ PUT /videos/video_id/likes
         Should: return 200"""
 
-        res = add_video(client, 1, 'url7', 'someAuthor', 'someTitle', 'public', '06/14/20 16:39:33')
+        res = add_video(client, 1, 'url', 'someAuthor', 'someTitle', 'public', '06/14/20 16:39:33')
         assert res.status_code == 201
         res_json = json.loads(res.get_data())
         video_id = int(res_json['id'])
@@ -155,7 +155,7 @@ class TestVideoController:
         """ PUT /videos/video_id/likes
         Should: return 200"""
 
-        res = add_video(client, 1, 'url8', 'someAuthor', 'someTitle', 'public', '06/14/20 16:39:33')
+        res = add_video(client, 1, 'url', 'someAuthor', 'someTitle', 'public', '06/14/20 16:39:33')
         assert res.status_code == 201
         res_json = json.loads(res.get_data())
         video_id = int(res_json['id'])
@@ -171,7 +171,7 @@ class TestVideoController:
         """ PUT /videos/video_id/likes
         Should: return 200"""
 
-        res = add_video(client, 1, 'url9', 'someAuthor', 'someTitle', 'public', '06/14/20 16:39:33')
+        res = add_video(client, 1, 'url', 'someAuthor', 'someTitle', 'public', '06/14/20 16:39:33')
         assert res.status_code == 201
         res_json = json.loads(res.get_data())
         video_id = int(res_json['id'])
@@ -194,7 +194,7 @@ class TestVideoController:
         """ PUT /videos/video_id/likes
         Should: return 404"""
 
-        res = add_video(client, 1, 'url10', 'someAuthor', 'someTitle', 'public', '06/14/20 16:39:33')
+        res = add_video(client, 1, 'url', 'someAuthor', 'someTitle', 'public', '06/14/20 16:39:33')
         assert res.status_code == 201
         res_json = json.loads(res.get_data())
         video_id = int(res_json['id'])

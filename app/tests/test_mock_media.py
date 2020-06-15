@@ -53,7 +53,7 @@ class TestMockMediaServer:
     def test_add_video_with_invalid_date(self):
         """ Add a video with invalid date should return 400 """
 
-        video_data = {'author': 'anAuthor', 'title': 'aTitle', 'date': '09/19/20 13:55:26', 'visibility': 'public', 
+        video_data = {'author': 'anAuthor', 'title': 'aTitle', 'date': '09/19/50 13:55:26', 'visibility': 'public', 
         'url': 'anUrl', 'thumb': 'aThumb', 'user_id': '4'}
         response = self.mock_media_server.add_video(video_data)
         assert b'Invalid date' in response.get_data()
