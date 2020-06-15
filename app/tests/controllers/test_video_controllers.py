@@ -19,15 +19,6 @@ class TestVideoController:
         db.drop_collection('video_info')
         disconnect(alias='test')
 
-    def test_add_video(self, client):
-        """ POST /users/user_id/videos
-        Should: return 201 with video id """
-
-        res = add_video(client, 1, 'url1', 'someAuthor', 'someTitle', 'public', '06/14/20 16:39:33')
-        res_json = json.loads(res.get_data())
-        assert res_json['id'] == 5
-        assert res.status_code == 201
-
     def test_add_comment_to_video_succesful(self, client):
         """ POST /videos/video_id/comments
         Should: return 200"""

@@ -25,9 +25,10 @@ def user_videos(user_id):
                 return Response(json.dumps({'reason':'Fields are incomplete'}), status=400) 
         
         response = media_server.add_video(body)
-        response_data = json.loads(response.get_data())
-        video_id = response_data['id']
-        video_info = VideoInfo(video_id=video_id).save()
+        if response.status_code == 201:
+            response_data = json.loads(response.get_data())
+            video_id = response_data['id']
+            video_info = VideoInfo(video_id=video_id).save()
 
         return response
     else:
