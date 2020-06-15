@@ -20,7 +20,7 @@ def get_user_profile(user_id):
 def user_videos(user_info, user_id):
     media_server = app.config['MEDIA_SERVER']
     if request.method == 'POST':
-        if user_info["id"] != user_id:
+        if int(user_info["id"]) != user_id:
             return Response(json.dumps({'reason':'Forbidden'}), status=403)
         body = request.get_json()
         body['user_id'] = user_id

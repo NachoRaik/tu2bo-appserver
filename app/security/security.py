@@ -18,5 +18,5 @@ def token_required(f):
         if (response.status_code == 401):
             return make_response("Invalid Token",401,{'message':'Unauthorized'})
         user_info = ast.literal_eval(response.data.decode("UTF-8"))
-        return f(user_info,*args, **kwargs)
+        return f(user_info["user"],*args, **kwargs)
     return decorated

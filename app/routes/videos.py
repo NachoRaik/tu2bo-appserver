@@ -52,7 +52,7 @@ def add_comment_to_video(user_info, request, video_id):
     if video is None:
         return Response(json.dumps({'reason':'Video not found'}), status=404)
 
-    user_id = user_info["id"]
+    user_id = int(user_info["id"])
 
     author, content, timestamp = body['author'], body['content'], body['timestamp']
     comment = Comment(author=author, user_id=user_id, content=content, timestamp=timestamp)
@@ -100,7 +100,7 @@ def video_likes(user_info, video_id):
 
     liked = body['liked']
 
-    user_id=user_info["id"]
+    user_id= int(user_info["id"])
 
     video_info = VideoInfo.objects.get(video_id=video_id)
     likes = video_info.likes
