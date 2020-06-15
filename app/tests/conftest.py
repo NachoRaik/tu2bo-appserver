@@ -8,5 +8,5 @@ from config import TestingConfig
 @pytest.fixture
 def client():
     """A test client for the app."""
-    app = create_app(TestingConfig)
+    app = create_app(TestingConfig())
     return app.test_client()

@@ -22,22 +22,25 @@ class Config(object):
         return output 
 
 class ProductionConfig(Config):
-    DEBUG = False
-    AUTH_SERVER = AuthServer(url = os.getenv('AUTH_URI', 'localhost:5000'))
-    MEDIA_SERVER = MockMediaServer()
+    def __init__(self):
+        self.DEBUG = False
+        self.AUTH_SERVER = AuthServer(url = os.getenv('AUTH_URI', 'localhost:5000'))
+        self.MEDIA_SERVER = MockMediaServer()
 
 class DevelopmentConfig(Config):
-    TESTING = True
-    AUTH_SERVER = MockAuthServer()
-    MEDIA_SERVER = MockMediaServer()
+    def __init__(self):
+        self.TESTING = True
+        self.AUTH_SERVER = MockAuthServer()
+        self.MEDIA_SERVER = MockMediaServer()
 
 class TestingConfig(Config):
-    TESTING = True
-    AUTH_SERVER = MockAuthServer()
-    MEDIA_SERVER = MockMediaServer()
-    MONGODB_SETTINGS = {
-	    'db': 'appserver-db-test',
-	    'host': 'mongomock://localhost',
-        'connect': False
-    }
+    def __init__(self):
+        self.TESTING = True
+        self.AUTH_SERVER = MockAuthServer()
+        self.MEDIA_SERVER = MockMediaServer()
+        self.MONGODB_SETTINGS = {
+            'db': 'appserver-db-test',
+            'host': 'mongomock://localhost',
+            'connect': False
+        }
 
