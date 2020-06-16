@@ -147,7 +147,7 @@ class TestMockMediaServer:
         """ Get all videos from an unexistent user should return 404 """
 
         response = self.mock_media_server.get_user_videos('100')
-        assert b'User not found' in response.get_data()
+        assert b'User does not have any videos yet' in response.get_data()
         assert response.status_code == 404
 
     def test_delete_video_success(self):

@@ -25,9 +25,12 @@ class Config(object):
 class ProductionConfig(Config):
     def __init__(self):
         super().__init__()
-        self.DEBUG = False
         self.AUTH_SERVER = AuthServer(url = os.getenv('AUTH_URI', 'localhost:5000'))
         self.MEDIA_SERVER = MockMediaServer()
+        self.MONGODB_SETTINGS = {
+            'host': os.getenv('MONGODB_URI'),
+            'retryWrites': False
+        }
 
 class DevelopmentConfig(Config):
     def __init__(self):

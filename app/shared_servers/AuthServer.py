@@ -3,6 +3,7 @@ import json
 import flask
 import requests
 from shared_servers.utils_auth import *
+from utils.flask_utils import error_response
 
 class AuthServer():
 
@@ -23,7 +24,7 @@ class AuthServer():
 
     def authorize_user(self, token):
         headers = {'access-token': token}
-        response = requests.post(self.url + '/authorize', headers=headers)
+        response = requests.post(self.url + '/users/authorize', headers=headers)
         return make_flask_response(response)
 
     def __str__(self):
@@ -42,9 +43,9 @@ class MockAuthServer(AuthServer):
         email = data['email']
         password = data['password']
         if email not in self.db:
-            return flask.Response('Could not find user', status=401)
+            return error_response(401, 'Could not find user')
         if not check_password_hash(password, self.db[email]['password']):
-            return flask.Response('Password incorrect', status=401)
+            return error_response(401, 'Password incorrect')
         
         user = self.db[email]
         response_data = {'token': get_token(email), 'user': get_fields(user)}
@@ -60,9 +61,9 @@ class MockAuthServer(AuthServer):
         password = data['password']
         hashed_password = get_hash(password)
         if email in self.db or any(user['username'] == username for user in self.db.values()):
-            return flask.Response('User already registered', status=409)
+            return error_response(409, 'User already registered')
         if not validate(email):
-            return flask.Response('Invalid email address', status=400)
+            return error_response(400, 'Invalid email address')
         id = self.generate_id()
         self.db[email] = {'id': id, 'email': email, 'password': hashed_password, 'username': username}
         response_data = {'id': id}
@@ -75,7 +76,7 @@ class MockAuthServer(AuthServer):
     def authorize_user(self, token): 
         email = get_email(token)
         if email not in self.db:
-            return flask.Response("Invalid Token", status=401)
+            return error_response(401, 'Invalid Token')
         user = self.db[email]
         response_data = {'user': get_fields(user)}
         return flask.Response(json.dumps(response_data), status=200)
