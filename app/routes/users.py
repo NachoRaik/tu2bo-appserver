@@ -35,5 +35,5 @@ def user_videos(user_info, user_id):
             video_info = VideoInfo(video_id=video_id).save()
         return response
     else:
-        videos = media_server.get_user_videos(userId)
+        videos = media_server.get_user_videos(user_id)
         return videos

@@ -23,7 +23,7 @@ class AuthServer():
 
     def authorize_user(self, token):
         headers = {'access-token': token}
-        response = requests.post(self.url + '/authorize', headers=headers)
+        response = requests.post(self.url + '/users/authorize', headers=headers)
         return make_flask_response(response)
 
     def __str__(self):
