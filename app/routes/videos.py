@@ -24,7 +24,6 @@ def home_videos():
         video_id = video['id']
         video_info = VideoInfo.objects.get(video_id=video_id)
         video['likes'] = len(video_info.likes)
-        video['user_related_info'] = {'is_liked': user_id in video_info.likes}
     return Response(json.dumps(res_json), status=200)
 
 @bp_videos.route('/videos/<int:video_id>', methods=['GET'])
@@ -39,7 +38,7 @@ def get_video(user_info, video_id):
     video_id = video['id']
     video_info = VideoInfo.objects.get(video_id=video_id)
     video['likes'] = len(video_info.likes)
-    video['user_related_info'] = {'is_liked': user_id in video_info.likes}
+    video['user_related_info'] = {'is_liked': user_info['id'] in video_info.likes}
     return Response(json.dumps(video), status=200)
 
 def add_comment_to_video(user_info, request, video_id):
