@@ -303,3 +303,34 @@ class TestVideoController:
         res_json = json.loads(res.get_data())
         assert res_json['likes'] == 0
         assert res_json['user_related_info']['is_liked'] == False
+
+    def test_liked_by_other_user(self, client):
+        """ GET /videos/video_id
+        Should: return 200"""
+
+        token = login_and_token_user(client)
+        user_id, url, author, title, visibility, timestamp = 1, 'url', 'someAuthor', 'someTitle', 'public', '06/14/20 16:39:33'
+        res = add_video(client, token, user_id, url, author, title, visibility, timestamp)
+        assert res.status_code == 201
+        res_json = json.loads(res.get_data())
+        video_id = res_json['id']
+
+        res = get_video(client, token, video_id)
+        res_json = json.loads(res.get_data())
+        assert res_json['likes'] == 0
+        assert res_json['user_related_info']['is_liked'] == False
+
+        token2 = login_and_token_user(client, 2)
+        liked = True
+        res = like_video(client, token2, video_id, liked)
+        assert res.status_code == 200
+
+        res = get_video(client, token, video_id)
+        res_json = json.loads(res.get_data())
+        assert res_json['likes'] == 1
+        assert res_json['user_related_info']['is_liked'] == False
+
+        res = get_video(client, token2, video_id)
+        res_json = json.loads(res.get_data())
+        assert res_json['likes'] == 1
+        assert res_json['user_related_info']['is_liked'] == True
