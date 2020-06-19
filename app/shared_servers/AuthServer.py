@@ -3,7 +3,7 @@ import json
 import flask
 import requests
 from shared_servers.utils_auth import *
-from utils.flask_utils import error_response
+from utils.flask_utils import error_response, success_response
 
 class AuthServer():
 
@@ -43,13 +43,13 @@ class MockAuthServer(AuthServer):
         email = data['email']
         password = data['password']
         if email not in self.db:
-            return error_response(401, 'Could not find user')
+            return error_response(401, 'Wrong credentials')
         if not check_password_hash(password, self.db[email]['password']):
-            return error_response(401, 'Password incorrect')
+            return error_response(401, 'Wrong credentials')
         
         user = self.db[email]
         response_data = {'token': get_token(email), 'user': get_fields(user)}
-        return flask.Response(json.dumps(response_data), status=200)
+        return success_response(200, response_data)
     
     def generate_id(self):
         self.next_id += 1
@@ -67,11 +67,11 @@ class MockAuthServer(AuthServer):
         id = self.generate_id()
         self.db[email] = {'id': id, 'email': email, 'password': hashed_password, 'username': username}
         response_data = {'id': id}
-        return flask.Response(json.dumps(response_data), status=200)
+        return success_response(200, response_data)
 
     def get_users(self):
         response_data = list(map(lambda user: get_fields(user), self.db.values()))
-        return flask.Response(json.dumps(response_data), status=200)
+        return success_response(200, response_data)
 
     def authorize_user(self, token): 
         email = get_email(token)
@@ -79,5 +79,5 @@ class MockAuthServer(AuthServer):
             return error_response(401, 'Invalid Token')
         user = self.db[email]
         response_data = {'user': get_fields(user)}
-        return flask.Response(json.dumps(response_data), status=200)
+        return success_response(200, response_data)
 

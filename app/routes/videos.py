@@ -1,11 +1,13 @@
 import json
+from datetime import datetime
 from flask import Blueprint, request, Response
 from flask import current_app as app
 from werkzeug.utils import secure_filename
 from security.security import token_required
+from utils.flask_utils import error_response
+
 from database.models.video_info import VideoInfo
 from database.models.comment import Comment
-from datetime import datetime
 
 bp_videos = Blueprint("bp_videos", __name__)
 
@@ -45,11 +47,11 @@ def add_comment_to_video(user_info, request, video_id):
     body = request.get_json()
 
     if any(r not in body for r in required_post_comment_fields):
-        return Response(json.dumps({'reason':'Fields are incomplete'}), status=400)
+        return error_response(400, 'Fields are incomplete')
 
     video = VideoInfo.objects.with_id(video_id)
     if video is None:
-        return Response(json.dumps({'reason':'Video not found'}), status=404)
+        return error_response(404, 'Video not found')
 
     user_id = int(user_info["id"])
 
@@ -65,7 +67,7 @@ def add_comment_to_video(user_info, request, video_id):
 def get_comment_from_video(request, video_id):
     video = VideoInfo.objects.with_id(video_id)
     if video is None:
-        return Response(json.dumps({'reason':'Video not found'}), status=404)
+        return error_response(404, 'Video not found')
 
     body = request.get_json()
     video_info = VideoInfo.objects.get(video_id=video_id)
@@ -91,11 +93,11 @@ def video_likes(user_info, video_id):
     body = request.get_json()
 
     if required_put_likes_field not in body:
-        return Response(json.dumps({'reason':'Fields are incomplete'}), status=400)
+        return error_response(400, 'Fields are incomplete')
 
     video = VideoInfo.objects.with_id(video_id)
     if video is None:
-        return Response(json.dumps({'reason':'Video not found'}), status=404)
+        return error_response(404, 'Video not found')
 
     liked = body['liked']
 
