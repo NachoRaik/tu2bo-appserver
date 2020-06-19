@@ -1,9 +1,9 @@
-from datetime import datetime
-from shared_servers.utils_media import *
-from utils.flask_utils import error_response
 import flask
 import json
 import requests
+from datetime import datetime
+from shared_servers.utils_media import *
+from utils.flask_utils import error_response, success_response
 
 class MediaServer():
     def __init__(self, url = "localhost:5005"):
@@ -62,18 +62,18 @@ class MockMediaServer(MediaServer):
         self.db[id] = {'author': author, 'title': title, 'description': description, 'date': date, 'visibility': visibility, 
         'url': url, 'thumb': thumb, 'user_id': user_id}
         response_data = {'id': id}
-        return flask.Response(json.dumps(response_data), status=201)
+        return success_response(201, response_data)
 
     def get_videos(self):
-        response_data = [get_fields(video_id, video) for video_id, video in self.db.items()]        
-        return flask.Response(json.dumps(response_data), status=200)
+        response_data = [get_fields(video_id, video) for video_id, video in self.db.items()]
+        return success_response(200, response_data)
 
     def get_video(self, video_id):
         if not video_id in self.db:
             return error_response(404, 'Video not found')
         video = self.db[video_id]
         response_data = [get_fields(video_id, video)]
-        return flask.Response(json.dumps(response_data), status=200)
+        return success_response(200, response_data)
 
     def get_user_videos(self, user_id):
         if not any(video['user_id'] == user_id for video in self.db.values()):
@@ -82,8 +82,8 @@ class MockMediaServer(MediaServer):
         response_data = []
         for video_id, video in self.db.items():
             if video['user_id'] == user_id:
-                response_data.append(get_fields(video_id, video))  
-        return flask.Response(json.dumps(response_data), status=200)
+                response_data.append(get_fields(video_id, video))
+        return success_response(200, response_data)
 
     def delete_video(self, video_id):        
         if not video_id in self.db:
@@ -100,7 +100,7 @@ class MockMediaServer(MediaServer):
             return error_response(404, 'Video not found')
 
         if not validate_visibility(data['visibility']):
-            return flask.Response('Invalid visibility', status=400)
+            return error_response(400, 'Invalid visibility')
         
         video = self.db[video_id]
         video['visibility'] = visibility

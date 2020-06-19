@@ -56,7 +56,7 @@ class TestMockAuthServer:
         self.mock_auth_server.register(registration_data)
         login_data = {'email': 'email@gmail.com', 'password': 'wrong'}
         response = self.mock_auth_server.login(login_data)
-        assert b'Password incorrect' in response.get_data()
+        assert b'Wrong credentials' in response.get_data()
         assert response.status_code == 401
 
     def test_login_failure_inexistent(self):
@@ -64,7 +64,7 @@ class TestMockAuthServer:
 
         login_data = {'email': 'email@gmail.com', 'password': 'wrong'}
         response = self.mock_auth_server.login(login_data)
-        assert b'Could not find user' in response.get_data()
+        assert b'Wrong credentials' in response.get_data()
         assert response.status_code == 401
 
     def test_authorize_success(self):

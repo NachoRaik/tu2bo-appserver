@@ -57,9 +57,9 @@ paths:
                         type: string
                         example: matiscakosky@hostame.com
         '400':
-          description: Email or password is missing
+          $ref: '#/components/responses/BadRequestResponse'
         '401':
-          description: Password incorrect
+          $ref: '#/components/responses/UnauthorizedResponse'
 
   /register:
     post:
@@ -95,9 +95,98 @@ paths:
                     type: integer
                     example: 1
         '400':
-          description: Invalid email address
+          $ref: '#/components/responses/BadRequestResponse'
         '409':
-          description: User already registered
+          $ref: '#/components/responses/ConflictResponse'
+
+  /users/{id}:
+    get:
+      tags:
+        - users
+      summary: Get user by id
+      operationId: getUserById
+      parameters:
+        - $ref: '#/components/parameters/requiredPathUserId'
+        - $ref: '#/components/parameters/accessTokenHeader'
+      responses:
+        '200':
+          description: User Profile
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  id:
+                    type: integer
+                    example: 1
+                  username:
+                    type: string
+                    example: olifer97
+                  videos:
+                    type: string
+                    example: []
+        '401':
+          $ref: '#/components/responses/UnauthorizedResponse'
+        '404':
+          $ref: '#/components/responses/NotFoundResponse'
+
+  /users/{id}/videos:
+    get:
+      tags:
+        - users
+        - videos
+      summary: Get videos from user by id
+      operationId: userVideos
+      parameters:
+        - $ref: '#/components/parameters/requiredPathUserId'
+        - $ref: '#/components/parameters/accessTokenHeader'
+      responses:
+        '200':
+          description: User videos
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Video'
+        '401':
+          $ref: '#/components/responses/UnauthorizedResponse'
+        '404':
+          $ref: '#/components/responses/NotFoundResponse'
+    post:
+      tags:
+        - users
+        - videos
+      summary: Post a video to the user account
+      operationId: userAddVideo
+      parameters:
+        - $ref: '#/components/parameters/requiredPathUserId'
+        - $ref: '#/components/parameters/accessTokenHeader'
+      requestBody:
+        description: Video data
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/VideoUpload'
+      responses:
+        '201':
+          description: Video created
+          content:
+            application/json:
+              schema:
+                properties:
+                  id:
+                    type: integer
+                    example: 1
+        '400':
+          $ref: '#/components/responses/BadRequestResponse'
+        '401':
+          $ref: '#/components/responses/UnauthorizedResponse'
+        '404':
+          $ref: '#/components/responses/NotFoundResponse'
+        '409':
+          $ref: '#/components/responses/ConflictResponse'
 
   /videos:
     get:
@@ -123,17 +212,8 @@ paths:
       description: ''
       operationId: getVideoById
       parameters:
-        - in: path
-          name: video_id
-          required: true
-          schema:
-            type: integer
-            minimum: 1
-        - in: header
-          name: access-token
-          required: true
-          schema:
-            type: string
+        - $ref: '#/components/parameters/requiredPathVideoId'
+        - $ref: '#/components/parameters/accessTokenHeader'
       responses:
         '200':
           description: Video uploaded in Media Server
@@ -143,118 +223,10 @@ paths:
                 type: object
                 allOf:
                   - $ref: '#/components/schemas/VideoDetail'
+        '401':
+          $ref: '#/components/responses/UnauthorizedResponse'
         '404':
-          description: Video not found
-
-  /users/{id}:
-    get:
-      tags:
-        - users
-      summary: Get user by id
-      operationId: getUserById
-      parameters:
-        - in: path
-          name: id
-          required: true
-          schema:
-            type: integer
-            minimum: 1
-        - in: header
-          name: access-token
-          required: true
-          schema:
-            type: string
-      responses:
-        '200':
-          description: User Profile
-          content:
-            application/json:
-              schema:
-                type: object
-                properties:
-                  id:
-                    type: integer
-                    example: 1
-                  username:
-                    type: string
-                    example: olifer97
-                  videos:
-                    type: string
-                    example: []
-        '404':
-          description: Could not find user
-
-  /users/{id}/videos:
-    get:
-      tags:
-        - users
-        - videos
-      summary: Get videos from user by id
-      operationId: userVideos
-      parameters:
-        - in: path
-          name: id
-          required: true
-          schema:
-            type: integer
-            minimum: 1
-        - in: header
-          name: access-token
-          required: true
-          schema:
-            type: string
-      responses:
-        '200':
-          description: User videos
-          content:
-            application/json:
-              schema:
-                type: array
-                items:
-                  $ref: '#/components/schemas/Video'
-        '404':
-          description: User not found
-    post:
-      tags:
-        - users
-        - videos
-      summary: Post a video to the user account
-      operationId: userAddVideo
-      parameters:
-        - in: path
-          name: id
-          required: true
-          schema:
-            type: integer
-            minimum: 1
-        - in: header
-          name: access-token
-          required: true
-          schema:
-            type: string
-      requestBody:
-        description: Video data
-        required: true
-        content:
-          application/json:
-            schema:
-              $ref: '#/components/schemas/VideoUpload'
-      responses:
-        '201':
-          description: Video created
-          content:
-            application/json:
-              schema:
-                properties:
-                  id:
-                    type: integer
-                    example: 1
-        '400':
-          description: Fields are incomplete or wrong
-        '404':
-          description: User not found
-        '409':
-          description: Video already uploaded
+          $ref: '#/components/responses/NotFoundResponse'
 
   /videos/{video_id}/comments:
     get:
@@ -263,12 +235,8 @@ paths:
       summary: Get comments for video matching video_id
       operationId: videoComments
       parameters:
-        - in: path
-          name: video_id
-          required: true
-          schema:
-            type: integer
-            minimum: 1
+        - $ref: '#/components/parameters/requiredPathVideoId'
+        - $ref: '#/components/parameters/accessTokenHeader'
       responses:
         '200':
           description: Video comments
@@ -278,20 +246,18 @@ paths:
                 type: array
                 items:
                   $ref: '#/components/schemas/Comment'
+        '401':
+          $ref: '#/components/responses/UnauthorizedResponse'
         '404':
-          description: Video not found
+          $ref: '#/components/responses/NotFoundResponse'
     post:
       tags:
         - videos
       summary: Add comment to a video
       operationId: addComment
       parameters:
-        - in: path
-          name: video_id
-          required: true
-          schema:
-            type: integer
-            minimum: 1
+        - $ref: '#/components/parameters/requiredPathVideoId'
+        - $ref: '#/components/parameters/accessTokenHeader'
       requestBody:
         description: Comment data
         required: true
@@ -307,9 +273,11 @@ paths:
               schema:
                 $ref: '#/components/schemas/Comment'
         '400':
-          description: Fields are incomplete or wrong
+          $ref: '#/components/responses/BadRequestResponse'
+        '401':
+          $ref: '#/components/responses/UnauthorizedResponse'
         '404':
-          description: Video not found
+          $ref: '#/components/responses/NotFoundResponse'
 
   /videos/{video_id}/likes:
     put:
@@ -318,12 +286,8 @@ paths:
       summary: Like a video
       operationId: addLike
       parameters:
-        - in: path
-          name: video_id
-          required: true
-          schema:
-            type: integer
-            minimum: 1
+        - $ref: '#/components/parameters/requiredPathVideoId'
+        - $ref: '#/components/parameters/accessTokenHeader'
       requestBody:
         description: Has liked
         required: true
@@ -338,11 +302,73 @@ paths:
         '200':
           description: Like updated
         '400':
-          description: Fields are incomplete or wrong
+          $ref: '#/components/responses/BadRequestResponse'
+        '401':
+          $ref: '#/components/responses/UnauthorizedResponse'
         '404':
-          description: Video not found
+          $ref: '#/components/responses/NotFoundResponse'
 
 components:
+  responses:
+    UnauthorizedResponse:
+      description: Not authorized
+      content:
+        application/json:
+          schema:
+            properties:
+              reason:
+                type: string
+                example: Invalid data
+    BadRequestResponse:
+      description: Fields are incomplete or wrong
+      content:
+        application/json:
+          schema:
+            properties:
+              reason:
+                type: string
+                example: Invalid request
+    NotFoundResponse:
+      description: Resource was not found
+      content:
+        application/json:
+          schema:
+            properties:
+              reason:
+                type: string
+                example: Not Found
+    ConflictResponse:
+      description: Resource already exists
+      content:
+        application/json:
+          schema:
+            properties:
+              reason:
+                type: string
+                example: Already taken
+  
+  parameters:
+    accessTokenHeader:
+      in: header
+      name: access-token
+      required: true
+      schema:
+        type: string
+    requiredPathUserId:
+      in: path
+      name: id
+      required: true
+      schema:
+        type: integer
+        minimum: 1
+    requiredPathVideoId:
+      in: path
+      name: video_id
+      required: true
+      schema:
+        type: integer
+        minimum: 1
+
   schemas:
     VideoUpload:
       type: object

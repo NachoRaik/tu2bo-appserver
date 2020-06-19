@@ -1,24 +1,30 @@
 import ast
 
-def register(client,email,username,password):
-    return client.post('/register',json={
-        'email': email,
-        'username': username,
-        'password': password
-    })
+def register_user(client, email=None, username=None, password=None):
+    request = {}
+    if email != None: request['email'] = email
+    if username != None: request['username'] = username
+    if password != None: request['password'] = password
 
-def login(client,email,password):
-    return client.post('/login',json={
-        'email': email,
-        'password': password
-    })
+    return client.post('/register', json=request)
+
+def login_user(client, email=None, password=None):
+    request = {}
+    if email != None: request['email'] = email
+    if password != None: request['password'] = password
+
+    return client.post('/login', json=request)
+
+def parse_login(response):
+    parsed_res = ast.literal_eval(response.data.decode("UTF-8"))
+    return parsed_res['token'], parsed_res['user']
 
 def login_and_token_user(client, id = 1):
-    response = login(client,"email{}".format(id),"password{}".format(id))
-    response = ast.literal_eval(response.data.decode("UTF-8"))
-    return response["token"]
+    response = login_user(client, "email{}".format(id), "password{}".format(id))
+    token, user = parse_login(response)
+    return token
 
-def add_video(client,token, user_id, url, author, title, visibility, date):
+def add_video(client, token, user_id, url, author, title, visibility, date):
     return client.post('/users/{}/videos'.format(user_id), headers={"access-token":token}, json={
         'url': url,
         'author': author,
@@ -36,13 +42,13 @@ def add_comment_to_video(client, token, video_id, author=None, content=None, tim
     if timestamp != None:
         request['timestamp'] = timestamp
 
-    return client.post('/videos/{}/comments'.format(video_id),headers={"access-token":token}, json=request)
+    return client.post('/videos/{}/comments'.format(video_id), headers={"access-token":token}, json=request)
 
 def get_comments_from_video(client, token, video_id):
-    return client.get('/videos/{}/comments'.format(video_id),headers={"access-token":token})
+    return client.get('/videos/{}/comments'.format(video_id), headers={"access-token":token})
 
 def like_video(client, token, video_id, liked):
-    return client.put('/videos/{}/likes'.format(video_id),headers={"access-token":token}, json={
+    return client.put('/videos/{}/likes'.format(video_id), headers={"access-token":token}, json={
         'liked': liked
     })
 
@@ -50,4 +56,4 @@ def get_videos(client):
     return client.get('/videos')
 
 def get_video(client, token, video_id):
-    return client.get('/videos/{}'.format(video_id),headers={"access-token":token})
+    return client.get('/videos/{}'.format(video_id), headers={"access-token":token})

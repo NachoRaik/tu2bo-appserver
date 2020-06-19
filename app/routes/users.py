@@ -1,8 +1,10 @@
 import json
-from flask import Blueprint, request, jsonify, Response
+from flask import Blueprint, request, jsonify
 from flask import current_app as app
 from werkzeug.utils import secure_filename
 from security.security import token_required
+from utils.flask_utils import error_response
+
 from database.models.video_info import VideoInfo
 
 bp_users = Blueprint("bp_users", __name__)
@@ -21,12 +23,12 @@ def user_videos(user_info, user_id):
     media_server = app.config['MEDIA_SERVER']
     if request.method == 'POST':
         if int(user_info["id"]) != user_id:
-            return Response(json.dumps({'reason':'Forbidden'}), status=403)
+            return error_response(403, 'Forbidden')
         body = request.get_json()
         body['user_id'] = user_id
         for r in required_post_video_fields:
             if r not in body:
-                return Response(json.dumps({'reason':'Fields are incomplete'}), status=400)
+                return error_response(400, 'Fields are incomplete')
 
         response = media_server.add_video(body)
         if response.status_code == 201:

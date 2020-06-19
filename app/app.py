@@ -1,4 +1,4 @@
-from flask import Flask, request, Response
+from flask import Flask, request
 from database.db import initialize_db
 from config import DevelopmentConfig
 from flask_swagger_ui import get_swaggerui_blueprint
