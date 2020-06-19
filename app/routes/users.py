@@ -1,5 +1,5 @@
 import json
-from flask import Blueprint, request, jsonify, Response
+from flask import Blueprint, request, jsonify
 from flask import current_app as app
 from werkzeug.utils import secure_filename
 from security.security import token_required

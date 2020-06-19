@@ -1,5 +1,5 @@
 import json
-from flask import Blueprint, Response, request, jsonify
+from flask import Blueprint, request, jsonify
 from flask import current_app as app
 from utils.flask_utils import error_response
 

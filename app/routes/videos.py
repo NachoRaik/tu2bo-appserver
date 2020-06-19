@@ -1,10 +1,10 @@
 import json
 from datetime import datetime
-from flask import Blueprint, request, Response
+from flask import Blueprint, request
 from flask import current_app as app
 from werkzeug.utils import secure_filename
 from security.security import token_required
-from utils.flask_utils import error_response
+from utils.flask_utils import error_response, success_response
 
 from database.models.video_info import VideoInfo
 from database.models.comment import Comment
@@ -26,7 +26,7 @@ def home_videos():
         video_id = video['id']
         video_info = VideoInfo.objects.get(video_id=video_id)
         video['likes'] = len(video_info.likes)
-    return Response(json.dumps(res_json), status=200)
+    return success_response(200, res_json)
 
 @bp_videos.route('/videos/<int:video_id>', methods=['GET'])
 @token_required
@@ -41,7 +41,7 @@ def get_video(user_info, video_id):
     video_info = VideoInfo.objects.get(video_id=video_id)
     video['likes'] = len(video_info.likes)
     video['user_related_info'] = {'is_liked': int(user_info['id']) in video_info.likes}
-    return Response(json.dumps(video), status=200)
+    return success_response(200, video)
 
 def add_comment_to_video(user_info, request, video_id):
     body = request.get_json()
@@ -62,7 +62,7 @@ def add_comment_to_video(user_info, request, video_id):
     video_info.save()
 
     result = {'comment_id': comment.comment_id, 'user_id': user_id, 'author': author, 'content': content, 'timestamp': timestamp}
-    return Response(json.dumps(result), status=201)
+    return success_response(201, result)
 
 def get_comment_from_video(request, video_id):
     video = VideoInfo.objects.with_id(video_id)
@@ -78,7 +78,7 @@ def get_comment_from_video(request, video_id):
         result.append({'comment_id': comment.comment_id, 'user_id': comment.user_id, 'author': comment.author,
         'content': comment.content, 'timestamp': comment.timestamp})
     result.sort(key=lambda d: datetime.strptime(d['timestamp'], '%m/%d/%y %H:%M:%S'))
-    return Response(json.dumps(result), status=200)
+    return success_response(200, result)
 
 @bp_videos.route('/videos/<int:video_id>/comments', methods=['GET', 'POST'])
 @token_required
@@ -112,4 +112,4 @@ def video_likes(user_info, video_id):
         likes.append(user_id)
     video_info.save()
 
-    return Response(json.dumps({'result':'Like updated'}), status=200)
+    return success_response(200, {'result':'Like updated'})
