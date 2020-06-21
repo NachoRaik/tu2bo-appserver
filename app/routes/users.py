@@ -56,7 +56,7 @@ def user_friend_request(user_info,user_id_request):
     response = auth_server.get_user_profile(user_id_request)
     app.logger.debug("/userId=%s || Auth Server response %d %s ", user_id_request, response.status_code, response.data)
     if response.status_code != 200:
-        return error_response(400, 'Cant send friend request')
+        return error_response(406, 'Cant send friend request')
 
     friendship = Friends.objects.with_id(user_info['id']    )
     app.logger.debug(friendship)

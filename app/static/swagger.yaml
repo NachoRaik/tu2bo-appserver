@@ -122,9 +122,9 @@ paths:
                   username:
                     type: string
                     example: olifer97
-                  videos:
+                  friendship_status:
                     type: string
-                    example: []
+                    example: 'pending'
         '401':
           $ref: '#/components/responses/UnauthorizedResponse'
         '404':
@@ -187,6 +187,91 @@ paths:
           $ref: '#/components/responses/NotFoundResponse'
         '409':
           $ref: '#/components/responses/ConflictResponse'
+
+  /users/my_reqests:
+    get:
+      tags:
+        - users
+      summary: Get pending request
+      operationId: 'myRequest'
+      description: ''
+      parameters:
+        - $ref: '#/components/parameters/requiredPathUserId'
+        - $ref: '#/components/parameters/accessTokenHeader'
+      responses:
+        '200':
+          description: List of pending friend requests
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  type: integer
+                  example: 1,3,4
+        '404':
+          $ref: '#/components/responses/UserPendingRequestNotFound'
+
+  /users/{id}/friend_request:
+    post:
+      tags:
+        - users
+      summary: Send a friend request
+      operationId: 'friendRequest'
+      description: ''
+      parameters:
+        - $ref: '#/components/parameters/requiredPathUserId'
+        - $ref: '#/components/parameters/accessTokenHeader'
+      responses:
+        '200':
+          description: Request sent successfully
+        '406':
+          $ref: '#/components/responses/CantSendInvitation'
+        '400':
+          $ref: '#/components/responses/ConflictFriends'
+
+  /users/{id}/friends:
+    post:
+      tags:
+        - users
+      summary: Accept a friend request
+      description: ''
+      operationId: 'acceptFriendRequest'
+      parameters:
+        - $ref: '#/components/parameters/requiredPathUserId'
+        - $ref: '#/components/parameters/accessTokenHeader'
+      responses:
+        '200':
+          description: Friend accepted successfully
+        '404':
+          $ref: '#/components/responses/NotFoundResponse'
+        '400':
+          description: Cant accept with no request
+          content:
+            application/json:
+              schema:
+                properties:
+                  reason:
+                    type: string
+                    example: Cant accept friendship without request
+    get:
+      tags:
+        - users
+      summary: Get friends of user
+      description: ''
+      operationId: 'friendsList'
+      parameters:
+        - $ref: '#/components/parameters/requiredPathUserId'
+        - $ref: '#/components/parameters/accessTokenHeader'
+      responses:
+        '200':
+          description: List of actual friends for user requested
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  type: integer
+                  example: 1,2,3
 
   /videos:
     get:
@@ -346,7 +431,34 @@ components:
               reason:
                 type: string
                 example: Already taken
-  
+    UserPendingRequestNotFound:
+      description: User has not pending requests
+      content:
+        application/json:
+          schema:
+            properties:
+              reason:
+                type: string
+                example: User pending request not found
+    ConflictFriends:
+      description: User are already friends
+      content:
+        application/json:
+          schema:
+            properties:
+              reason:
+                type: string
+                example: Already friends
+    CantSendInvitation:
+      description: User is not avalible
+      content:
+        application/json:
+          schema:
+            properties:
+              reason:
+                type: string
+                example: Cant send friend request
+
   parameters:
     accessTokenHeader:
       in: header
@@ -399,7 +511,7 @@ components:
         - author
         - title
         - visibility
-      
+
     Video:
       type: object
       properties:

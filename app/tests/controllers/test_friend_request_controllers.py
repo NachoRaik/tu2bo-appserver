@@ -58,7 +58,7 @@ class TestFriendsRequestController:
         token = login_and_token_user(client)
         res = send_friend_request(client,token,ANOTHER_USER_ID)
 
-        assert res.status_code == 400
+        assert res.status_code == 406
         res_json = json.loads(res.get_data())
         assert res_json["reason"] == "Cant send friend request"
 
