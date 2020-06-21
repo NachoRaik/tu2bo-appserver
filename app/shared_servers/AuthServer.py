@@ -27,6 +27,10 @@ class AuthServer():
         response = requests.post(self.url + '/users/authorize', headers=headers)
         return make_flask_response(response)
 
+    def get_user_profile(self,user_id_request):
+        response = requests.get(self.url + '/users/' + str(user_id_request))
+        return make_flask_response(response)
+
     def __str__(self):
         return "url => {}".format(self.url)
 
@@ -73,7 +77,7 @@ class MockAuthServer(AuthServer):
         response_data = list(map(lambda user: get_fields(user), self.db.values()))
         return success_response(200, response_data)
 
-    def authorize_user(self, token): 
+    def authorize_user(self, token):
         email = get_email(token)
         if email not in self.db:
             return error_response(401, 'Invalid Token')
@@ -81,3 +85,9 @@ class MockAuthServer(AuthServer):
         response_data = {'user': get_fields(user)}
         return success_response(200, response_data)
 
+    def get_user_profile(self,user_id_request):
+        user_id_request = "email" + user_id_request
+        if user_id_request not in self.db:
+            return error_response(404,"User not found")
+        response_data = self.db[user_id_request]
+        return success_response(200,response_data)

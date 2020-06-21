@@ -3,9 +3,11 @@ from flask import Blueprint, request, jsonify
 from flask import current_app as app
 from werkzeug.utils import secure_filename
 from security.security import token_required
-from utils.flask_utils import error_response
+from utils.flask_utils import error_response,success_response
 
 from database.models.video_info import VideoInfo
+from database.models.pending_request import PendingRequest
+from database.models.friends import Friends
 
 bp_users = Blueprint("bp_users", __name__)
 
@@ -13,9 +15,31 @@ required_post_video_fields = ['url', 'author', 'title', 'visibility', 'user_id']
 
 # -- Endpoints
 
-@bp_users.route('/users/<user_id>', methods=['GET'])
-def get_user_profile(user_id):
-    raise Exception('Not implemented yet')
+@bp_users.route('/users/<user_id_request>', methods=['GET'])
+@token_required
+def get_user_profile(user_info, user_id_request):
+    auth_server = app.config['AUTH_SERVER']
+    app.logger.debug("/userId=%s || Sending request to AuthServer",user_id_request)
+    response = auth_server.get_user_profile(user_id_request)
+    app.logger.debug("/userId=%s || Auth Server response %d %s ",user_id_request, response.status_code, response.data)
+
+    if user_id_request == user_info["id"] or response.status_code != 200:
+        return response
+
+    status = 'no-friends'
+    pending = PendingRequest.objects.with_id(user_info["id"])
+    if pending is not None:
+        pending_list_users = pending['requests']
+        if user_id_request in pending_list_users:
+            status = 'pending'
+    friends = Friends.objects.with_id(user_info["id"])
+    if friends is not None:
+        friends_list = friends['friends']
+        if user_id_request in friends_list:
+            status = 'friends'
+    response_data = json.loads(response.get_data())
+    response_data["friendship_status"] = status
+    return success_response(200,response_data)
 
 @bp_users.route('/users/<int:user_id>/videos', methods=['GET', 'POST'])
 @token_required
