@@ -57,3 +57,6 @@ def get_videos(client):
 
 def get_video(client, token, video_id):
     return client.get('/videos/{}'.format(video_id), headers={"access-token":token})
+
+def get_user_profile(client,token, user_id_request):
+    return client.get('/users/{}'.format(user_id_request),headers={"access-token":token})
