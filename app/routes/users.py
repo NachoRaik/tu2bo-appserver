@@ -41,6 +41,15 @@ def user_friends(user_info,user_id_request):
         pending.save()
         add_both_friends_list(user_id,user_id_request)
         return success_response(200, "Friend accepted successfully")
+    else:
+        user_id_request = int(user_id_request)
+        friendship = Friends.objects.with_id(user_id_request)
+        if friendship is None:
+            return error_response(404, "User has not friends")
+        return success_response(200,{"friends": friendship.friends})
+
+
+
 
 @bp_users.route('/users/<user_id_request>/friend_request', methods=['POST'])
 @token_required
