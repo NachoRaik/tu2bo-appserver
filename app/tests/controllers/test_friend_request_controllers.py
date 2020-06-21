@@ -96,3 +96,41 @@ class TestFriendsRequestController:
         assert res.status_code == 200
         res_json = json.loads(res.get_data())
         assert res_json[0]["id"] == "2"
+
+    def test_pending_and_not_friend_status(self, client):
+        """ GET /users/<user_id_request>
+        Should: return 200"""
+        ANOTHER_USER_ID = 2
+        token = login_and_token_user(client)
+        res = send_friend_request(client,token,ANOTHER_USER_ID)
+        res = get_user_profile(client,token,ANOTHER_USER_ID)
+
+        assert res.status_code == 200
+        res_json = json.loads(res.get_data())
+        assert res_json["friendship_status"] == "pending"
+
+        token  = login_and_token_user(client,2)
+        res = get_user_profile(client,token,1)
+
+        assert res.status_code == 200
+        res_json = json.loads(res.get_data())
+        assert res_json["friendship_status"] == "no-friends"
+
+    def test_pending_and_my_request_status(self, client):
+        """ GET /users/<user_id_request>
+        Should: return 200"""
+        ANOTHER_USER_ID = 2
+        token = login_and_token_user(client)
+        res = send_friend_request(client,token,ANOTHER_USER_ID)
+        res = get_user_profile(client,token,ANOTHER_USER_ID)
+
+        assert res.status_code == 200
+        res_json = json.loads(res.get_data())
+        assert res_json["friendship_status"] == "pending"
+
+        token  = login_and_token_user(client,2)
+        res = my_requests(client,token)
+
+        assert res.status_code == 200
+        res_json = json.loads(res.get_data())
+        assert res_json[0]["id"] == "1"
