@@ -66,3 +66,9 @@ def my_requests(client,token):
 
 def send_friend_request(client,token, user_id_request):
     return client.post('/users/{}/friend_request'.format(user_id_request), headers={"access-token":token})
+
+def accept_friend_request(client,token,user_id_request):
+    return client.post('/users/{}/friends'.format(user_id_request),headers={"access-token":token})
+
+def get_user_friends(client,token,user_id_request):
+    return client.get('/users/{}/friends'.format(user_id_request),headers={"access-token":token})

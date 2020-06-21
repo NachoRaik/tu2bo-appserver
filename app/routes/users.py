@@ -48,9 +48,6 @@ def user_friends(user_info,user_id_request):
             return error_response(404, "User has not friends")
         return success_response(200,{"friends": friendship.friends})
 
-
-
-
 @bp_users.route('/users/<user_id_request>/friend_request', methods=['POST'])
 @token_required
 def user_friend_request(user_info,user_id_request):
@@ -60,6 +57,11 @@ def user_friend_request(user_info,user_id_request):
     app.logger.debug("/userId=%s || Auth Server response %d %s ", user_id_request, response.status_code, response.data)
     if response.status_code != 200:
         return error_response(400, 'Cant send friend request')
+
+    friendship = Friends.objects.with_id(user_info['id']    )
+    app.logger.debug(friendship)
+    if friendship is not None and int(user_id_request) in friendship.friends:
+        return error_response(400,'Already friends')
 
     pending = PendingRequest.objects.with_id(user_id_request)
     if pending is None:
@@ -88,7 +90,6 @@ def user_pending_requests(user_info):
         pending_info = json.loads(response.get_data())
         response_data.append({"id":pending_info["id"], "username":pending_info["username"]})
     return success_response(200,response_data)
-
 
 @bp_users.route('/users/<user_id_request>', methods=['GET'])
 @token_required

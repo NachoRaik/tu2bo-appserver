@@ -134,3 +134,156 @@ class TestFriendsRequestController:
         assert res.status_code == 200
         res_json = json.loads(res.get_data())
         assert res_json[0]["id"] == "1"
+
+    def test_accept_friend_request(self, client):
+        """ POST /users/<user_id_request>/friends
+        Should: return 200"""
+        ANOTHER_USER_ID = 2
+        token = login_and_token_user(client)
+        send_friend_request(client,token,ANOTHER_USER_ID)
+        token = login_and_token_user(client,2)
+        res = accept_friend_request(client,token,1)
+        assert res.status_code == 200
+
+    def test_accept_and_check_status_for_both(self, client):
+        """ GET /users/<user_id_request>
+        Should: return 200"""
+        ANOTHER_USER_ID = 2
+        token = login_and_token_user(client)
+        send_friend_request(client,token,ANOTHER_USER_ID)
+        token = login_and_token_user(client,ANOTHER_USER_ID)
+        accept_friend_request(client,token,1)
+
+        #User 1
+        token = login_and_token_user(client)
+        res = get_user_profile(client,token,ANOTHER_USER_ID)
+
+        assert res.status_code == 200
+        res_json = json.loads(res.get_data())
+        assert res_json["friendship_status"] == "friends"
+
+        #User 2
+        token = login_and_token_user(client,ANOTHER_USER_ID)
+        res = get_user_profile(client,token,1)
+
+        assert res.status_code == 200
+        res_json = json.loads(res.get_data())
+        assert res_json["friendship_status"] == "friends"
+
+    def test_accept_and_remove_request(self, client):
+        """ GET /users/my_requests
+        Should: return 200"""
+        ANOTHER_USER_ID = 2
+        token = login_and_token_user(client)
+        send_friend_request(client,token,ANOTHER_USER_ID)
+        token = login_and_token_user(client,ANOTHER_USER_ID)
+        accept_friend_request(client,token,1)
+        res = my_requests(client,token)
+        assert res.status_code == 200
+        res_json = json.loads(res.get_data())
+        assert res_json == []
+
+
+    def test_list_of_friends(self, client):
+        """ GET /users/<user_id_request>/friends
+        Should: return 200"""
+
+        FRIEND_2 = 2
+        FRIEND_3 = 3
+        token = login_and_token_user(client)
+        send_friend_request(client,token,FRIEND_2)
+        send_friend_request(client,token,FRIEND_3)
+        token = login_and_token_user(client,FRIEND_2)
+        accept_friend_request(client,token,1)
+        token = login_and_token_user(client,FRIEND_3)
+        accept_friend_request(client,token,1)
+
+        #Friends User1
+        token = login_and_token_user(client)
+        res = get_user_friends(client,token,1)
+        assert res.status_code == 200
+        res_json = json.loads(res.get_data())
+        assert res_json["friends"] == [FRIEND_2,FRIEND_3]
+
+
+        #Friends User2
+        token = login_and_token_user(client,FRIEND_2)
+        res = get_user_friends(client,token,FRIEND_2)
+        assert res.status_code == 200
+        res_json = json.loads(res.get_data())
+        assert res_json["friends"] == [1]
+
+        #Friends User3
+        token = login_and_token_user(client,FRIEND_3)
+        res = get_user_friends(client,token,FRIEND_3)
+        assert res.status_code == 200
+        res_json = json.loads(res.get_data())
+        assert res_json["friends"] == [1]
+
+
+    def test_user_has_no_request(self, client):
+        """ GET /users/my_requests
+        Should: return 404"""
+
+        token = login_and_token_user(client)
+        res = my_requests(client,token)
+        assert res.status_code == 404
+        res_json = json.loads(res.get_data())
+        assert res_json["reason"] == "User pending requests not found"
+
+
+
+    def test_accept_any_request_fail(self, client):
+        """ POST /users/<user_id_request>/friends
+        Should: return 404"""
+
+        token = login_and_token_user(client)
+        res = accept_friend_request(client,token,1)
+        assert res.status_code == 404
+        res_json = json.loads(res.get_data())
+        assert res_json["reason"] == "User has not friend requests"
+
+    def test_accept_no_request(self, client):
+        """ POST /users/<user_id_request>/friends
+        Should: return 404"""
+
+        FRIEND_2 = 2
+        FRIEND_3 = 3
+        token = login_and_token_user(client)
+        send_friend_request(client,token,FRIEND_2)
+
+        token = login_and_token_user(client,FRIEND_2)
+        res = accept_friend_request(client,token,FRIEND_3)
+
+        assert res.status_code == 400
+        res_json = json.loads(res.get_data())
+        assert res_json["reason"] == "Cant accept friendship without request"
+
+
+    def test_user_has_not_friends(self, client):
+        """ GET /users/<user_id_request>/friends
+        Should: return 404"""
+
+        token = login_and_token_user(client)
+        res = get_user_friends(client,token,1)
+        assert res.status_code == 404
+        res_json = json.loads(res.get_data())
+        assert res_json["reason"] == "User has not friends"
+
+    def test_user_already_friends(self, client):
+        """ POST /users/<user_id_request>/friend_request
+        Should: return 400"""
+
+        FRIEND_2 = 2
+        token = login_and_token_user(client)
+        send_friend_request(client,token,FRIEND_2)
+
+        token = login_and_token_user(client,FRIEND_2)
+        accept_friend_request(client,token,1)
+
+        token = login_and_token_user(client)
+        res = send_friend_request(client,token,FRIEND_2)
+
+        assert res.status_code == 400
+        res_json = json.loads(res.get_data())
+        assert res_json["reason"] == "Already friends"
