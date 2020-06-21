@@ -15,6 +15,24 @@ required_post_video_fields = ['url', 'author', 'title', 'visibility', 'user_id']
 
 # -- Endpoints
 
+@bp_users.route('/users/<user_id_request>/friend_request', methods=['POST'])
+@token_required
+def user_friend_request(user_info,user_id_request):
+    auth_server = app.config['AUTH_SERVER']
+    app.logger.debug("/userId=%s || Sending request to AuthServer",user_id_request)
+    response = auth_server.get_user_profile(user_id_request)
+    app.logger.debug("/userId=%s || Auth Server response %d %s ", user_id_request, response.status_code, response.data)
+    if response.status_code != 200:
+        return error_response(400, 'Cant send friend request')
+
+    pending = PendingRequest.objects.with_id(user_id_request)
+    if pending is None:
+        pending = PendingRequest(user_id=user_id_request,requests=[]).save()
+    requests = pending.requests
+    requests.append(user_info['id'])
+    pending.save()
+    return success_response(200,"Request sent successfully")
+
 @bp_users.route('/users/my_requests', methods=['GET'])
 @token_required
 def user_pending_requests(user_info):
@@ -22,7 +40,7 @@ def user_pending_requests(user_info):
     user_id = user_info["id"]
     pending = PendingRequest.objects.with_id(user_id)
     if pending is None:
-        error_response(404,'User pending requests not found')
+        return error_response(404,'User pending requests not found')
 
     response_data = []
     pending_list = pending['requests']
@@ -47,16 +65,17 @@ def get_user_profile(user_info, user_id_request):
     if user_id_request == user_info["id"] or response.status_code != 200:
         return response
 
+    user_id = int(user_info["id"])
     status = 'no-friends'
-    pending = PendingRequest.objects.with_id(user_info["id"])
+    pending = PendingRequest.objects.with_id(user_id_request)
     if pending is not None:
         pending_list_users = pending['requests']
-        if user_id_request in pending_list_users:
+        if user_id in pending_list_users:
             status = 'pending'
-    friends = Friends.objects.with_id(user_info["id"])
+    friends = Friends.objects.with_id(user_id_request)
     if friends is not None:
         friends_list = friends['friends']
-        if user_id_request in friends_list:
+        if user_id in friends_list:
             status = 'friends'
     response_data = json.loads(response.get_data())
     response_data['friendship_status'] = status

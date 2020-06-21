@@ -86,7 +86,7 @@ class MockAuthServer(AuthServer):
         return success_response(200, response_data)
 
     def get_user_profile(self,user_id_request):
-        user_id_request = "email" + user_id_request
+        user_id_request = "email" + str(user_id_request)
         if user_id_request not in self.db:
             return error_response(404,"User not found")
         response_data = self.db[user_id_request]
