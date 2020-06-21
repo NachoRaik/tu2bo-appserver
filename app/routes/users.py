@@ -15,6 +15,33 @@ required_post_video_fields = ['url', 'author', 'title', 'visibility', 'user_id']
 
 # -- Endpoints
 
+def add_both_friends_list(user1,user2):
+    dic = {user1:user2, user2:user1}
+    for u in dic:
+        friendship = Friends.objects.with_id(u)
+        if friendship is None:
+            friendship = Friends(user_id=u,friends=[]).save()
+        friends = friendship.friends
+        friends.append(dic[u])
+        friendship.save()
+
+@bp_users.route('/users/<user_id_request>/friends', methods=['GET','POST'])
+@token_required
+def user_friends(user_info,user_id_request):
+    if request.method == 'POST':
+        user_id = int(user_info["id"])
+        user_id_request = int(user_id_request)
+        pending = PendingRequest.objects.with_id(user_id)
+        if pending is None:
+            return error_response(404, "User has not friend requests")
+        my_requests = pending["requests"]
+        if user_id_request not in my_requests:
+            return  error_response(400,"Cant accept friendship without request")
+        my_requests.remove(user_id_request)
+        pending.save()
+        add_both_friends_list(user_id,user_id_request)
+        return success_response(200, "Friend accepted successfully")
+
 @bp_users.route('/users/<user_id_request>/friend_request', methods=['POST'])
 @token_required
 def user_friend_request(user_info,user_id_request):
