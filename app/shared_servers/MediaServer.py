@@ -99,7 +99,7 @@ class MockMediaServer(MediaServer):
         return flask.Response('', status=204)
 
     def edit_video(self, video_id, data):
-        if 'id' in data or 'author' in data or 'user_id' in data or 'url' in data or 'date' in data:
+        if any(elemen in data for elemen in ['id', 'author', 'user_id', 'url', 'date']):
             return error_response(400, 'Invalid values')
 
         if not validate_visibility(data['visibility']):
