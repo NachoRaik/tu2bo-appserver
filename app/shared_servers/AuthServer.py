@@ -50,18 +50,18 @@ class MockAuthServer(AuthServer):
             return error_response(401, 'Wrong credentials')
         if not check_password_hash(password, self.db[email]['password']):
             return error_response(401, 'Wrong credentials')
-        
+
         user = self.db[email]
         response_data = {'token': get_token(email), 'user': get_fields(user)}
         return success_response(200, response_data)
-    
+
     def generate_id(self):
         self.next_id += 1
         return self.next_id
 
     def register(self, data):
-        email = data["email"] 
-        username = data['username'] 
+        email = data["email"]
+        username = data['username']
         password = data['password']
         hashed_password = get_hash(password)
         if email in self.db or any(user['username'] == username for user in self.db.values()):
@@ -88,5 +88,5 @@ class MockAuthServer(AuthServer):
     def get_user_profile(self,user_id_request):
         for v in self.db.values():
             if v['id'] == str(user_id_request):
-                return success_response(200,v)
+                return success_response(200,get_fields(v))
         return error_response(404,"User not found")

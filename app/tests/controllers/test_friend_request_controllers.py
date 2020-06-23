@@ -212,7 +212,7 @@ class TestFriendsRequestController:
         res = get_user_friends(client,token,MY_USER_ID)
         assert res.status_code == 200
         res_json = json.loads(res.get_data())
-        assert res_json["friends"] == [FRIEND_2,FRIEND_3]
+        assert res_json == [{'id': '2', 'username': 'user2'}, {'id': '3', 'username': 'user3'}]
 
 
         #Friends User2
@@ -220,14 +220,15 @@ class TestFriendsRequestController:
         res = get_user_friends(client,token,FRIEND_2)
         assert res.status_code == 200
         res_json = json.loads(res.get_data())
-        assert res_json["friends"] == [1]
+        assert res_json == [{'id': '1', 'username': 'user1'}]
+
 
         #Friends User3
         token = login_and_token_user(client,FRIEND_3)
         res = get_user_friends(client,token,FRIEND_3)
         assert res.status_code == 200
         res_json = json.loads(res.get_data())
-        assert res_json["friends"] == [1]
+        assert res_json == [{'id': '1', 'username': 'user1'}]
 
 
     def test_user_has_no_request(self, client):
@@ -299,4 +300,4 @@ class TestFriendsRequestController:
 
         assert res.status_code == 400
         res_json = json.loads(res.get_data())
-        assert res_json["reason"] == "Already friends"
+        assert res_json["reason"] == "Already friends or pending"

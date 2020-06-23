@@ -15,6 +15,19 @@ required_post_video_fields = ['url', 'author', 'title', 'visibility', 'user_id']
 
 # -- Endpoints
 
+def generate_response_list(_list):
+    auth_server = app.config['AUTH_SERVER']
+    response_data = []
+    for p_id in _list:
+        app.logger.debug("/users/%s || Sending request to AuthServer",p_id)
+        response = auth_server.get_user_profile(p_id)
+        app.logger.debug("/users/%s || Auth Server response %d %s ", p_id, response.status_code, response.data)
+        if response.status_code != 200:
+            continue
+        pending_info = json.loads(response.get_data())
+        response_data.append({"id":pending_info["id"], "username":pending_info["username"]})
+    return response_data
+
 def add_both_friends_list(user1,user2):
     dic = {user1:user2, user2:user1}
     for u in dic:
@@ -45,7 +58,7 @@ def user_friends(user_info,user_id_request):
         friendship = Friends.objects.with_id(user_id_request)
         if friendship is None:
             return error_response(404, "User has not friends")
-        return success_response(200,{"friends": friendship.friends})
+        return success_response(200,generate_response_list(friendship.friends))
 
 @bp_users.route('/users/<user_id_request>/friend_request', methods=['POST'])
 @token_required
@@ -58,14 +71,16 @@ def user_friend_request(user_info,user_id_request):
         return error_response(404, "Can't send friend request to inexistent user")
 
     friendship = Friends.objects.with_id(user_info['id'])
-    if friendship is not None and int(user_id_request) in friendship.friends:
-        return error_response(400,'Already friends')
+    my_pendings = PendingRequest.objects.with_id(user_info['id'])
+    if (friendship is not None and int(user_id_request) in friendship.friends) or (my_pendings is not None and int(user_id_request) in my_pending.requests):
+        return error_response(400,'Already friends or pending')
 
     pending = PendingRequest.objects.with_id(user_id_request)
     if pending is None:
         pending = PendingRequest(user_id=user_id_request,requests=[])
     requests = pending.requests
-    requests.append(user_info['id'])
+    if user_info['id'] not in requests:
+        requests.append(user_info['id'])
     pending.save()
     return success_response(200,{"message":"Request sent successfully"})
 
@@ -77,18 +92,7 @@ def user_pending_requests(user_info):
     pending = PendingRequest.objects.with_id(user_id)
     if pending is None:
         return success_response(200,[])
-
-    response_data = []
-    pending_list = pending['requests']
-    for p_id in pending_list:
-        app.logger.debug("/users/%s || Sending request to AuthServer",p_id)
-        response = auth_server.get_user_profile(p_id)
-        app.logger.debug("/users/%s || Auth Server response %d %s ", p_id, response.status_code, response.data)
-        if response.status_code != 200:
-            continue
-        pending_info = json.loads(response.get_data())
-        response_data.append({"id":pending_info["id"], "username":pending_info["username"]})
-    return success_response(200,response_data)
+    return success_response(200,generate_response_list(pending['requests']))
 
 @bp_users.route('/users/<user_id_request>', methods=['GET'])
 @token_required
