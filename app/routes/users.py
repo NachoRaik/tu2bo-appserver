@@ -20,9 +20,10 @@ def add_both_friends_list(user1,user2):
     for u in dic:
         friendship = Friends.objects.with_id(u)
         if friendship is None:
-            friendship = Friends(user_id=u,friends=[]).save()
+            friendship = Friends(user_id=u,friends=[])
         friends = friendship.friends
-        friends.append(dic[u])
+        if dic[u] not in friends:
+                friends.append(dic[u])
         friendship.save()
 
 @bp_users.route('/users/<user_id_request>/friends', methods=['GET','POST'])
@@ -32,15 +33,13 @@ def user_friends(user_info,user_id_request):
         user_id = int(user_info["id"])
         user_id_request = int(user_id_request)
         pending = PendingRequest.objects.with_id(user_id)
-        if pending is None:
-            return error_response(404, "User has not friend requests")
+        if (pending is None) or (user_id_request not in pending["requests"]):
+            return  error_response(400,"Can't accept friendship without request")
         my_requests = pending["requests"]
-        if user_id_request not in my_requests:
-            return  error_response(400,"Cant accept friendship without request")
         my_requests.remove(user_id_request)
         pending.save()
         add_both_friends_list(user_id,user_id_request)
-        return success_response(200, "Friend accepted successfully")
+        return success_response(200, {"message": "Friend accepted successfully"} )
     else:
         user_id_request = int(user_id_request)
         friendship = Friends.objects.with_id(user_id_request)
@@ -52,24 +51,23 @@ def user_friends(user_info,user_id_request):
 @token_required
 def user_friend_request(user_info,user_id_request):
     auth_server = app.config['AUTH_SERVER']
-    app.logger.debug("/userId=%s || Sending request to AuthServer",user_id_request)
+    app.logger.debug("/users/%s || Sending request to AuthServer",user_id_request)
     response = auth_server.get_user_profile(user_id_request)
-    app.logger.debug("/userId=%s || Auth Server response %d %s ", user_id_request, response.status_code, response.data)
+    app.logger.debug("/users/%s || Auth Server response %d %s ", user_id_request, response.status_code, response.data)
     if response.status_code != 200:
-        return error_response(406, 'Cant send friend request')
+        return error_response(404, "Can't send friend request to inexistent user")
 
-    friendship = Friends.objects.with_id(user_info['id']    )
-    app.logger.debug(friendship)
+    friendship = Friends.objects.with_id(user_info['id'])
     if friendship is not None and int(user_id_request) in friendship.friends:
         return error_response(400,'Already friends')
 
     pending = PendingRequest.objects.with_id(user_id_request)
     if pending is None:
-        pending = PendingRequest(user_id=user_id_request,requests=[]).save()
+        pending = PendingRequest(user_id=user_id_request,requests=[])
     requests = pending.requests
     requests.append(user_info['id'])
     pending.save()
-    return success_response(200,"Request sent successfully")
+    return success_response(200,{"message":"Request sent successfully"})
 
 @bp_users.route('/users/my_requests', methods=['GET'])
 @token_required
@@ -78,15 +76,16 @@ def user_pending_requests(user_info):
     user_id = user_info["id"]
     pending = PendingRequest.objects.with_id(user_id)
     if pending is None:
-        return error_response(404,'User pending requests not found')
+        return success_response(200,[])
 
     response_data = []
     pending_list = pending['requests']
     for p_id in pending_list:
-        app.logger.debug("/userId=%s || Sending request to AuthServer",p_id)
+        app.logger.debug("/users/%s || Sending request to AuthServer",p_id)
         response = auth_server.get_user_profile(p_id)
-        app.logger.debug("/userId=%s || Auth Server response %d %s ", p_id, response.status_code, response.data)
-        if response.status_code != 200: continue
+        app.logger.debug("/users/%s || Auth Server response %d %s ", p_id, response.status_code, response.data)
+        if response.status_code != 200:
+            continue
         pending_info = json.loads(response.get_data())
         response_data.append({"id":pending_info["id"], "username":pending_info["username"]})
     return success_response(200,response_data)
@@ -95,25 +94,25 @@ def user_pending_requests(user_info):
 @token_required
 def get_user_profile(user_info, user_id_request):
     auth_server = app.config['AUTH_SERVER']
-    app.logger.debug("/userId=%s || Sending request to AuthServer",user_id_request)
+    app.logger.debug("/users/%s || Sending request to AuthServer",user_id_request)
     response = auth_server.get_user_profile(user_id_request)
-    app.logger.debug("/userId=%s || Auth Server response %d %s ",user_id_request, response.status_code, response.data)
+    app.logger.debug("/users/%s || Auth Server response %d %s ",user_id_request, response.status_code, response.data)
 
     if user_id_request == user_info["id"] or response.status_code != 200:
         return response
 
     user_id = int(user_info["id"])
+    user_id_request = int(user_id_request)
     status = 'no-friends'
     pending = PendingRequest.objects.with_id(user_id_request)
-    if pending is not None:
-        pending_list_users = pending['requests']
-        if user_id in pending_list_users:
-            status = 'pending'
     friends = Friends.objects.with_id(user_id_request)
-    if friends is not None:
-        friends_list = friends['friends']
-        if user_id in friends_list:
-            status = 'friends'
+    my_pendings = PendingRequest.objects.with_id(user_id)
+    if pending is not None and user_id in pending['requests']:
+        status = 'pending'
+    elif friends is not None and user_id in friends['friends']:
+        status = 'friends'
+    elif my_pendings is not None and user_id_request in my_pendings['requests']:
+        status = 'waiting acceptance'
     response_data = json.loads(response.get_data())
     response_data['friendship_status'] = status
     return success_response(200, response_data)

@@ -208,8 +208,6 @@ paths:
                 items:
                   type: integer
                   example: 1,3,4
-        '404':
-          $ref: '#/components/responses/UserPendingRequestNotFound'
 
   /users/{id}/friend_request:
     post:
@@ -223,8 +221,16 @@ paths:
         - $ref: '#/components/parameters/accessTokenHeader'
       responses:
         '200':
-          description: Request sent successfully
-        '406':
+          description: Success
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: Request sent successfully
+        '404':
           $ref: '#/components/responses/CantSendInvitation'
         '400':
           $ref: '#/components/responses/ConflictFriends'
@@ -241,9 +247,15 @@ paths:
         - $ref: '#/components/parameters/accessTokenHeader'
       responses:
         '200':
-          description: Friend accepted successfully
-        '404':
-          $ref: '#/components/responses/NotFoundResponse'
+          description: Success
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: Friend accepted successfully
         '400':
           description: Cant accept with no request
           content:
@@ -252,7 +264,7 @@ paths:
                 properties:
                   reason:
                     type: string
-                    example: Cant accept friendship without request
+                    example: Can't accept friendship without request
     get:
       tags:
         - users
@@ -272,6 +284,9 @@ paths:
                 items:
                   type: integer
                   example: 1,2,3
+        '400':
+          $ref: '#/components/responses/NotFoundResponse'
+
 
   /videos:
     get:
@@ -431,15 +446,6 @@ components:
               reason:
                 type: string
                 example: Already taken
-    UserPendingRequestNotFound:
-      description: User has not pending requests
-      content:
-        application/json:
-          schema:
-            properties:
-              reason:
-                type: string
-                example: User pending request not found
     ConflictFriends:
       description: User are already friends
       content:
@@ -457,7 +463,7 @@ components:
             properties:
               reason:
                 type: string
-                example: Cant send friend request
+                example: Can't send friend request to inexistent user
 
   parameters:
     accessTokenHeader:
