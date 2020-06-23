@@ -16,7 +16,7 @@ class Config(object):
 
     def __repr__(self):
         printable_fields = ['DEBUG', 'AUTH_SERVER', 'MEDIA_SERVER']
-        fields = self.__class__.__dict__
+        fields = vars(self)
         output = ""
         for x in printable_fields: 
             output+="\n\t{} = {}".format(x, fields.get(x, "Not setted"))
@@ -25,8 +25,8 @@ class Config(object):
 class ProductionConfig(Config):
     def __init__(self):
         super().__init__()
-        self.AUTH_SERVER = AuthServer(url = os.getenv('AUTH_URI', 'localhost:5000'))
-        self.MEDIA_SERVER = MockMediaServer()
+        self.AUTH_SERVER = AuthServer(url = os.getenv('AUTH_URI', 'localhost:3000'))
+        self.MEDIA_SERVER = MediaServer(url = os.getenv('MEDIA_URI', 'localhost:5005'))
         self.MONGODB_SETTINGS = {
             'host': os.getenv('MONGODB_URI'),
             'retryWrites': False
