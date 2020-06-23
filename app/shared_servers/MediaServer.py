@@ -85,9 +85,6 @@ class MockMediaServer(MediaServer):
         return success_response(200, response_data)
 
     def get_user_videos(self, user_id):
-        if not any(video['user_id'] == user_id for video in self.db.values()):
-            return error_response(404, 'User does not have any videos yet')
-
         response_data = []
         for video_id, video in self.db.items():
             if video['user_id'] == user_id:

@@ -143,11 +143,12 @@ class TestMockMediaServer:
         assert response.status_code == 200
 
     def test_get_videos_from_inexistent_user(self):
-        """ Get all videos from an unexistent user should return 404 """
+        """ Get all videos from an unexistent user should return 200 and empty list """
 
         response = self.mock_media_server.get_user_videos('100')
-        assert b'User does not have any videos yet' in response.get_data()
-        assert response.status_code == 404
+        json = loads(response.get_data())
+        assert len(json) == 0
+        assert response.status_code == 200
 
     def test_delete_video_success(self):
         """ Delete an existent video should return 200 """
