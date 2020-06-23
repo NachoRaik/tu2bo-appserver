@@ -118,7 +118,7 @@ class TestFriendsRequestController:
 
         assert res.status_code == 200
         res_json = json.loads(res.get_data())
-        assert res_json["friendship_status"] == "waiting acceptance"
+        assert res_json["friendship_status"] == "waiting-acceptance"
 
     def test_pending_and_my_request_status(self, client):
         """ GET /users/<user_id_request>

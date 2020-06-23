@@ -116,7 +116,7 @@ def get_user_profile(user_info, user_id_request):
     elif friends is not None and user_id in friends['friends']:
         status = 'friends'
     elif my_pendings is not None and user_id_request in my_pendings['requests']:
-        status = 'waiting acceptance'
+        status = 'waiting-acceptance'
     response_data = json.loads(response.get_data())
     response_data['friendship_status'] = status
     return success_response(200, response_data)
