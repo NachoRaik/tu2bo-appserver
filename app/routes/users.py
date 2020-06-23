@@ -19,9 +19,7 @@ def generate_response_list(_list):
     auth_server = app.config['AUTH_SERVER']
     response_data = []
     for p_id in _list:
-        app.logger.debug("/users/%s || Sending request to AuthServer",p_id)
         response = auth_server.get_user_profile(p_id)
-        app.logger.debug("/users/%s || Auth Server response %d %s ", p_id, response.status_code, response.data)
         if response.status_code != 200:
             continue
         pending_info = json.loads(response.get_data())
@@ -58,7 +56,10 @@ def user_friends(user_info,user_id_request):
         friendship = Friends.objects.with_id(user_id_request)
         if friendship is None:
             return error_response(404, "User has not friends")
-        return success_response(200,generate_response_list(friendship.friends))
+        app.logger.debug("/users/%s/friends || Fetching %d user profiles from AuthServer", user_id_request, len(friendship.friends))
+        response_data = generate_response_list(friendship.friends)
+        app.logger.debug("/users/%s/friends || Fetched %d user profiles", user_id_request, len(response_data))
+        return success_response(200,response_data)
 
 @bp_users.route('/users/<user_id_request>/friend_request', methods=['POST'])
 @token_required
@@ -71,9 +72,11 @@ def user_friend_request(user_info,user_id_request):
         return error_response(404, "Can't send friend request to inexistent user")
 
     friendship = Friends.objects.with_id(user_info['id'])
+    if friendship is not None and int(user_id_request) in friendship.friends:
+        return error_response(400, 'Already friends')
     my_pendings = PendingRequest.objects.with_id(user_info['id'])
-    if (friendship is not None and int(user_id_request) in friendship.friends) or (my_pendings is not None and int(user_id_request) in my_pending.requests):
-        return error_response(400,'Already friends or pending')
+    if my_pendings is not None and int(user_id_request) in my_pendings.requests:
+        return error_response(400, 'Already pending')
 
     pending = PendingRequest.objects.with_id(user_id_request)
     if pending is None:
@@ -92,7 +95,10 @@ def user_pending_requests(user_info):
     pending = PendingRequest.objects.with_id(user_id)
     if pending is None:
         return success_response(200,[])
-    return success_response(200,generate_response_list(pending['requests']))
+    app.logger.debug("/users/my_requests || Fetching %d user profiles from AuthServer", len(pending["requests"]))
+    response_data = generate_response_list(pending["requests"])
+    app.logger.debug("/users/my_requests || Fetched %d user profiles", len(response_data))
+    return success_response(200,response_data)
 
 @bp_users.route('/users/<user_id_request>', methods=['GET'])
 @token_required

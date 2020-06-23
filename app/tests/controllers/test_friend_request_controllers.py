@@ -300,4 +300,20 @@ class TestFriendsRequestController:
 
         assert res.status_code == 400
         res_json = json.loads(res.get_data())
-        assert res_json["reason"] == "Already friends or pending"
+        assert res_json["reason"] == "Already friends"
+
+    def test_user_already_friends(self, client):
+        """ POST /users/<user_id_request>/friend_request
+        Should: return 400"""
+
+        MY_USER_ID = 1
+        FRIEND_2 = 2
+        token = login_and_token_user(client)
+        send_friend_request(client,token,FRIEND_2)
+
+        token = login_and_token_user(client, FRIEND_2)
+        res = send_friend_request(client,token,MY_USER_ID)
+
+        assert res.status_code == 400
+        res_json = json.loads(res.get_data())
+        assert res_json["reason"] == "Already pending"
