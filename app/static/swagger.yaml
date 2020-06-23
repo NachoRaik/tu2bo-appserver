@@ -122,9 +122,9 @@ paths:
                   username:
                     type: string
                     example: olifer97
-                  videos:
+                  friendship_status:
                     type: string
-                    example: []
+                    example: 'pending'
         '401':
           $ref: '#/components/responses/UnauthorizedResponse'
         '404':
@@ -187,6 +187,118 @@ paths:
           $ref: '#/components/responses/NotFoundResponse'
         '409':
           $ref: '#/components/responses/ConflictResponse'
+
+  /users/my_requests:
+    get:
+      tags:
+        - users
+      summary: Get pending requests
+      operationId: 'myRequest'
+      description: ''
+      parameters:
+        - $ref: '#/components/parameters/accessTokenHeader'
+      responses:
+        '200':
+          description: List of pending friend requests
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  type: object
+                  properties:
+                    id:
+                      type: integer
+                      example: 1
+                    username:
+                      type: string
+                      example: username1
+
+  /users/{id}/friend_request:
+    post:
+      tags:
+        - users
+      summary: Send a friend request
+      operationId: 'friendRequest'
+      description: ''
+      parameters:
+        - $ref: '#/components/parameters/requiredPathUserId'
+        - $ref: '#/components/parameters/accessTokenHeader'
+      responses:
+        '200':
+          description: Success
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: Request sent successfully
+        '404':
+          $ref: '#/components/responses/CantSendInvitation'
+        '400':
+          $ref: '#/components/responses/ConflictFriends'
+
+  /users/{id}/friends:
+    post:
+      tags:
+        - users
+      summary: Accept a friend request
+      description: ''
+      operationId: 'acceptFriendRequest'
+      parameters:
+        - $ref: '#/components/parameters/requiredPathUserId'
+        - $ref: '#/components/parameters/accessTokenHeader'
+      responses:
+        '200':
+          description: Success
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: Friend accepted successfully
+        '400':
+          description: Cant accept with no request
+          content:
+            application/json:
+              schema:
+                properties:
+                  reason:
+                    type: string
+                    example: Can't accept friendship without request
+    get:
+      tags:
+        - users
+      summary: Get friends of user
+      description: ''
+      operationId: 'friendsList'
+      parameters:
+        - $ref: '#/components/parameters/requiredPathUserId'
+        - $ref: '#/components/parameters/accessTokenHeader'
+      responses:
+        '200':
+          description: List of actual friends for user requested
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  type: object
+                  properties:
+                    id:
+                      type: integer
+                      example: 1
+                    username:
+                      type: string
+                      example: username1
+
+        '404':
+          $ref: '#/components/responses/NotFoundResponse'
+
 
   /videos:
     get:
@@ -346,7 +458,25 @@ components:
               reason:
                 type: string
                 example: Already taken
-  
+    ConflictFriends:
+      description: User are already friends or pending
+      content:
+        application/json:
+          schema:
+            properties:
+              reason:
+                type: string
+                example: Already friends
+    CantSendInvitation:
+      description: User is not avalible
+      content:
+        application/json:
+          schema:
+            properties:
+              reason:
+                type: string
+                example: Can't send friend request to inexistent user
+
   parameters:
     accessTokenHeader:
       in: header
@@ -399,7 +529,7 @@ components:
         - author
         - title
         - visibility
-      
+
     Video:
       type: object
       properties:

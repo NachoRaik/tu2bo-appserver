@@ -27,6 +27,10 @@ class AuthServer():
         response = requests.post(self.url + '/users/authorize', headers=headers)
         return make_flask_response(response)
 
+    def get_user_profile(self,user_id_request):
+        response = requests.get(self.url + '/users/' + str(user_id_request))
+        return make_flask_response(response)
+
     def __str__(self):
         return "url => {}".format(self.url)
 
@@ -46,18 +50,18 @@ class MockAuthServer(AuthServer):
             return error_response(401, 'Wrong credentials')
         if not check_password_hash(password, self.db[email]['password']):
             return error_response(401, 'Wrong credentials')
-        
+
         user = self.db[email]
         response_data = {'token': get_token(email), 'user': get_fields(user)}
         return success_response(200, response_data)
-    
+
     def generate_id(self):
         self.next_id += 1
         return self.next_id
 
     def register(self, data):
-        email = data["email"] 
-        username = data['username'] 
+        email = data["email"]
+        username = data['username']
         password = data['password']
         hashed_password = get_hash(password)
         if email in self.db or any(user['username'] == username for user in self.db.values()):
@@ -73,7 +77,7 @@ class MockAuthServer(AuthServer):
         response_data = list(map(lambda user: get_fields(user), self.db.values()))
         return success_response(200, response_data)
 
-    def authorize_user(self, token): 
+    def authorize_user(self, token):
         email = get_email(token)
         if email not in self.db:
             return error_response(401, 'Invalid Token')
@@ -81,3 +85,8 @@ class MockAuthServer(AuthServer):
         response_data = {'user': get_fields(user)}
         return success_response(200, response_data)
 
+    def get_user_profile(self,user_id_request):
+        for v in self.db.values():
+            if v['id'] == str(user_id_request):
+                return success_response(200,get_fields(v))
+        return error_response(404,"User not found")
