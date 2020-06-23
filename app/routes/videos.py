@@ -35,7 +35,7 @@ def get_video(user_info, video_id):
     res = media_server.get_video(video_id)
     if res.status_code != 200:
         return res
-    video = json.loads(res.get_data())[0]
+    video = json.loads(res.get_data())
     user_id = video['user_id']
     video_id = video['id']
     video_info = VideoInfo.objects.get(video_id=video_id)

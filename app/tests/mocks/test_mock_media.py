@@ -110,18 +110,17 @@ class TestMockMediaServer:
         id = loads(response.get_data())['id']
 
         response = self.mock_media_server.get_video(id)
-        json = loads(response.get_data())
-        assert len(json) == 1
+        video = loads(response.get_data())
         assert response.status_code == 200
-        assert any(video['author'] == author for video in json)
-        assert any(video['title'] == title for video in json)
-        assert any(video['description'] == description for video in json)
-        assert any(video['date'] == date for video in json)
-        assert any(video['visibility'] == visibility for video in json)
-        assert any(video['url'] == url for video in json)
-        assert any(video['thumb'] == thumb for video in json)
-        assert any(video['user_id'] == user_id for video in json)
-        assert any(video['id'] == id for video in json)
+        assert video['author'] == author
+        assert video['title'] == title
+        assert video['description'] == description
+        assert video['date'] == date
+        assert video['visibility'] == visibility
+        assert video['url'] == url
+        assert video['thumb'] == thumb
+        assert video['user_id'] == user_id
+        assert video['id'] == id
 
     def test_get_unexistent_video(self):
         """ Get unexistent video by id should return 404 """
@@ -156,15 +155,13 @@ class TestMockMediaServer:
         video_data = {'author': 'anAuthor', 'title': 'aTitle', 'date': '09/19/18 13:55:26', 'visibility': 'public', 
         'url': 'anUrl', 'thumb': 'aThumb', 'user_id': '4'}
         response = self.mock_media_server.add_video(video_data)
-        id = loads(response.get_data())['id']
+        video_id = loads(response.get_data())['id']
 
-        response = self.mock_media_server.delete_video(id)
-        assert response.status_code == 200
+        response = self.mock_media_server.delete_video(video_id)
+        assert response.status_code == 204
 
-        response = self.mock_media_server.get_videos()
-        json = loads(response.get_data())
-        assert len(json) == 0
-        assert response.status_code == 200
+        response = self.mock_media_server.get_video(video_id)
+        assert response.status_code == 404
 
     def test_delete_unexistent_video(self):
         """ Delete an unexistent video should return 404 """
@@ -173,43 +170,80 @@ class TestMockMediaServer:
         assert b'Video not found' in response.get_data()
         assert response.status_code == 404
 
-    def test_change_visibility_success(self):
-        """ Change visibility of a video should return 200 """
+    def test_edit_video_success(self):
+        """ Edit video should return 200 """
 
         video_data = {'author': 'anAuthor', 'title': 'aTitle', 'date': '09/19/18 13:55:26', 'visibility': 'public', 
         'url': 'anUrl', 'thumb': 'aThumb', 'user_id': '4'}
         response = self.mock_media_server.add_video(video_data)
-        id = loads(response.get_data())['id']
+        video_id = loads(response.get_data())['id']
 
-        new_visibility = 'private'
-        request_data = {'id': id, 'visibility': new_visibility}
-        response = self.mock_media_server.change_video_visiblity(request_data)
+        request_data = { 'visibility': 'private', 'title': 'aNewTitle' }
+        response = self.mock_media_server.edit_video(video_id, request_data)
+        video = loads(response.get_data())
         assert response.status_code == 200
+        assert video['id'] == video_id
+        assert video['url'] == 'anUrl'
+        assert video['author'] == 'anAuthor'
+        assert video['title'] == 'aNewTitle'
+        assert video['visibility'] == 'private'
 
-        response = self.mock_media_server.get_videos()
-        json = loads(response.get_data())
-        assert any(video['id'] == id for video in json)  
-        for video in json:
-            if video['id'] == id:
-                assert video['visibility'] == new_visibility
+        # Check persistency
+        response = self.mock_media_server.get_video(video_id)
+        video = loads(response.get_data())
+        assert response.status_code == 200
+        assert response.status_code == 200
+        assert video['id'] == video_id
+        assert video['url'] == 'anUrl'
+        assert video['author'] == 'anAuthor'
+        assert video['title'] == 'aNewTitle'
+        assert video['visibility'] == 'private'
 
-    def test_change_visibility_with_invalid_format(self):
-        """ Change visibility of a video with invalid format should return 400 """
+    def test_edit_video_with_invalid_fields(self):
+        """ Edit video with invalid values should return 400 """
 
         video_data = {'author': 'anAuthor', 'title': 'aTitle', 'date': '09/19/18 13:55:26', 'visibility': 'public', 
         'url': 'anUrl', 'thumb': 'aThumb', 'user_id': '4'}
         response = self.mock_media_server.add_video(video_data)
-        id = loads(response.get_data())['id']
+        video_id = loads(response.get_data())['id']
 
-        request_data = {'id': id, 'visibility': 'invalid'}
-        response = self.mock_media_server.change_video_visiblity(request_data)
-        assert b'Invalid visibility' in response.get_data()
+        request_data = {'id': '1245'}
+        response = self.mock_media_server.edit_video(video_id, request_data)
         assert response.status_code == 400
+        assert b'Invalid values' in response.get_data()
 
-    def test_change_visibility_of_unexistent_video(self):
-        """" Change visibility of an unexistent video should return 404 """
+        request_data = {'author': 'someThief'}
+        response = self.mock_media_server.edit_video(video_id, request_data)
+        assert response.status_code == 400
+        assert b'Invalid values' in response.get_data()
 
-        request_data = {'id': '100', 'visibility': 'public'}
-        response = self.mock_media_server.change_video_visiblity(request_data)
-        assert b'Video not found' in response.get_data()
+        request_data = {'date': '01/01/21 00:00:00'}
+        response = self.mock_media_server.edit_video(video_id, request_data)
+        assert response.status_code == 400
+        assert b'Invalid values' in response.get_data()
+
+        request_data = {'url': 'maliciousUrl.com'}
+        response = self.mock_media_server.edit_video(video_id, request_data)
+        assert response.status_code == 400
+        assert b'Invalid values' in response.get_data()
+
+    def test_edit_video_with_invalid_visibility(self):
+        """ Edit video with invalid visibility should return 400 """
+
+        video_data = {'author': 'anAuthor', 'title': 'aTitle', 'date': '09/19/18 13:55:26', 'visibility': 'public', 
+        'url': 'anUrl', 'thumb': 'aThumb', 'user_id': '4'}
+        response = self.mock_media_server.add_video(video_data)
+        video_id = loads(response.get_data())['id']
+
+        request_data = {'visibility': 'blabla'}
+        response = self.mock_media_server.edit_video(video_id, request_data)
+        assert response.status_code == 400
+        assert b'Invalid visibility' in response.get_data()
+
+    def test_edit_unexistent_video(self):
+        """" Edit unexistent video should return 404 """
+
+        request_data = {'visibility': 'private'}
+        response = self.mock_media_server.edit_video(100, request_data)
         assert response.status_code == 404
+        assert b'Video not found' in response.get_data()
