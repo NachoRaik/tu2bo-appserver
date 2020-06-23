@@ -188,11 +188,11 @@ paths:
         '409':
           $ref: '#/components/responses/ConflictResponse'
 
-  /users/my_reqests:
+  /users/my_requests:
     get:
       tags:
         - users
-      summary: Get pending request
+      summary: Get pending requests
       operationId: 'myRequest'
       description: ''
       parameters:
