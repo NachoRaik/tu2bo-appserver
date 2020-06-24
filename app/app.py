@@ -1,4 +1,5 @@
 from flask import Flask, request
+from flask_cors import CORS
 from database.db import initialize_db
 from config import DevelopmentConfig
 from flask_swagger_ui import get_swaggerui_blueprint
@@ -26,6 +27,7 @@ def setup_swaggerui(app):
 
 def create_app(config=DevelopmentConfig()):
     app = Flask(__name__)
+    CORS(app)
     app.config.from_object(config)
     app.logger.setLevel(logging.DEBUG)
 
