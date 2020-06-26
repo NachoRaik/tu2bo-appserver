@@ -56,3 +56,24 @@ class TestUsersController:
         res = add_video(client, token, 1, 'url', 'someAuthor', 'someTitle', 'invalidVisibility', '09/19/18 13:55:26')
         assert b'Invalid visibility' in res.get_data()
         assert res.status_code == 400
+
+    def test_edit_user_profile_successully(self, client):
+        """ PUT /users/user_id
+        Should: return 200 """
+
+        new_profile_pic = 'myNewProfilePic'
+        token = login_and_token_user(client)
+        res = edit_user_profile(client, token, 1, new_profile_pic)
+        res_json = json.loads(res.get_data())
+        assert res.status_code == 200
+        assert res_json['profile']['picture'] == new_profile_pic
+    
+    def test_edit_forbidden_user_profile(self, client):
+        """ PUT /users/user_id
+        Should: return 403 """
+
+        new_profile_pic = 'myNewProfilePic'
+        token = login_and_token_user(client)
+        res = edit_user_profile(client, token, 2, new_profile_pic)
+        res_json = json.loads(res.get_data())
+        assert res.status_code == 403

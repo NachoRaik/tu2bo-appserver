@@ -58,17 +58,22 @@ def get_videos(client):
 def get_video(client, token, video_id):
     return client.get('/videos/{}'.format(video_id), headers={"access-token":token})
 
-def get_user_profile(client,token, user_id_request):
+def get_user_profile(client, token, user_id_request):
     return client.get('/users/{}'.format(user_id_request), headers={"access-token":token})
 
 def my_requests(client,token):
     return client.get('/users/my_requests', headers={"access-token":token})
 
-def send_friend_request(client,token, user_id_request):
+def send_friend_request(client, token, user_id_request):
     return client.post('/users/{}/friend_request'.format(user_id_request), headers={"access-token":token})
 
-def accept_friend_request(client,token,user_id_request):
-    return client.post('/users/{}/friends'.format(user_id_request),headers={"access-token":token})
+def accept_friend_request(client, token, user_id_request):
+    return client.post('/users/{}/friends'.format(user_id_request), headers={"access-token":token})
 
-def get_user_friends(client,token,user_id_request):
-    return client.get('/users/{}/friends'.format(user_id_request),headers={"access-token":token})
+def get_user_friends(client, token, user_id_request):
+    return client.get('/users/{}/friends'.format(user_id_request), headers={"access-token":token})
+
+def edit_user_profile(client, token, user_id, profile_pic):
+    return client.put('users/{}'.format(user_id), headers={"access-token":token}, json={
+        'picture': profile_pic
+    })

@@ -149,3 +149,16 @@ def user_videos(user_info, user_id):
     else:
         videos = media_server.get_user_videos(user_id)
         return videos
+
+@bp_users.route('/users/<int:user_id>', methods=['PUT'])
+@token_required
+def edit_user_profile(user_info, user_id):
+    auth_server = app.config['AUTH_SERVER']
+    if int(user_info["id"]) != user_id:
+            return error_response(403, 'Forbidden')
+    body = request.get_json()
+    if 'picture' not in body:
+        return error_response(400, 'Fields are incomplete')
+    
+    response = auth_server.edit_user_profile(user_id, body)
+    return response
