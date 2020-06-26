@@ -2,7 +2,7 @@ import json
 from flask import Blueprint, request, jsonify
 from flask import current_app as app
 from werkzeug.utils import secure_filename
-from security.security import token_required
+from middlewares.security_wrapper import token_required
 from utils.flask_utils import error_response,success_response
 
 from database.models.video_info import VideoInfo

@@ -21,6 +21,6 @@ def token_required(f):
         if (response.status_code in (400, 401, 404)):
             return Response(json.dumps({ 'reason':'Invalid token' }), status=401, mimetype='application/json')
         user_info = ast.literal_eval(response.data.decode("UTF-8"))
-        return f(user_info["user"],*args, **kwargs)
+        return f(user_info["user"], *args, **kwargs)
     
     return decorated
