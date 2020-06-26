@@ -129,6 +129,35 @@ paths:
           $ref: '#/components/responses/UnauthorizedResponse'
         '404':
           $ref: '#/components/responses/NotFoundResponse'
+        
+    put:
+      tags:
+        - users
+      summary: Edit user info
+      operationId: editUserById
+      parameters:
+        - $ref: '#/components/parameters/requiredPathUserId'
+        - $ref: '#/components/parameters/accessTokenHeader'
+      requestBody:
+        description: New field values
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                picture:
+                  type: string
+                  example: images.com/myProfilePic
+      responses:
+        '200':
+          description: User Profile
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/User'
+        '404':
+          $ref: '#/components/responses/NotFoundResponse'
 
   /users/{id}/videos:
     get:
@@ -629,3 +658,21 @@ components:
         timestamp:
           type: string
           example: '06/18/20 10:39:33'
+
+    User:
+      type: object
+      properties:
+        id:
+          type: integer
+          example: 1
+        username:
+          type: string
+          example: olifer97
+        email:
+          type: string
+          example: olifer97@address.com
+        profile:
+          type: object
+          example:
+            picture: images.com/myProfilePic        
+            
