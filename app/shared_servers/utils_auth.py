@@ -2,10 +2,10 @@ from flask import Response
 import json
 
 def init_db(db):
-    db['email1'] = {'id': '1', 'email': 'email1', 'password': 'hash_password1', 'username': 'user1', 'profile': {}}
-    db['email2'] = {'id': '2', 'email': 'email2', 'password': 'hash_password2', 'username': 'user2', 'profile': {}}
-    db['email3'] = {'id': '3', 'email': 'email3', 'password': 'hash_password3', 'username': 'user3', 'profile': {}}
-    db['email4'] = {'id': '4', 'email': 'email4', 'password': 'hash_password4', 'username': 'user4', 'profile': {}}
+    db['email1'] = {'id': '1', 'email': 'email1', 'password': 'hash_password1', 'username': 'user1', 'profile': {'picture': 'picture1'}}
+    db['email2'] = {'id': '2', 'email': 'email2', 'password': 'hash_password2', 'username': 'user2', 'profile': {'picture': 'picture2'}}
+    db['email3'] = {'id': '3', 'email': 'email3', 'password': 'hash_password3', 'username': 'user3', 'profile': {'picture': 'picture3'}}
+    db['email4'] = {'id': '4', 'email': 'email4', 'password': 'hash_password4', 'username': 'user4', 'profile': {'picture': 'picture4'}}
 
 def get_hash(password):
     return 'hash_' + password

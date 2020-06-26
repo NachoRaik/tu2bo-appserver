@@ -57,6 +57,27 @@ class TestUsersController:
         assert b'Invalid visibility' in res.get_data()
         assert res.status_code == 400
 
+    def test_get_existing_user(self, client):
+        """ GET /users/user_id
+        Should: return 200"""
+
+        token = login_and_token_user(client)
+        res = get_user_profile(client, token, 3)
+        res_json = json.loads(res.get_data())
+        assert res.status_code == 200
+        assert res_json['id'] == '3'
+        assert res_json['username'] == 'user3'
+        assert res_json['email'] == 'email3'
+        assert res_json['profile']['picture'] == 'picture3'
+    
+    def test_get_existing_user(self, client):
+        """ GET /users/user_id
+        Should: return 404"""
+
+        token = login_and_token_user(client)
+        res = get_user_profile(client, token, 100)
+        assert res.status_code == 404
+
     def test_edit_user_profile_successully(self, client):
         """ PUT /users/user_id
         Should: return 200 """

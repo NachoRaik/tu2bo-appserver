@@ -13,7 +13,39 @@ bp_users = Blueprint("bp_users", __name__)
 
 required_post_video_fields = ['url', 'author', 'title', 'visibility', 'user_id']
 
-# -- Endpoints
+def edit_user_profile(user_id_request, user_info, request):
+    auth_server = app.config['AUTH_SERVER']
+    if int(user_info["id"]) != int(user_id_request):
+        return error_response(403, 'Forbidden')
+    body = request.get_json()
+    if 'picture' not in body:
+        return error_response(400, 'Fields are incomplete')
+    return auth_server.edit_user_profile(user_id_request, body)
+
+def get_user_profile(user_id_request, user_info, request):
+    auth_server = app.config['AUTH_SERVER']
+    app.logger.debug("/users/%s || Sending request to AuthServer",user_id_request)
+    response = auth_server.get_user_profile(user_id_request)
+    app.logger.debug("/users/%s || Auth Server response %d %s ",user_id_request, response.status_code, response.data)
+
+    if user_id_request == user_info["id"] or response.status_code != 200:
+        return response
+
+    user_id = int(user_info["id"])
+    user_id_request = int(user_id_request)
+    status = 'no-friends'
+    pending = PendingRequest.objects.with_id(user_id_request)
+    friends = Friends.objects.with_id(user_id_request)
+    my_pendings = PendingRequest.objects.with_id(user_id)
+    if pending is not None and user_id in pending['requests']:
+        status = 'pending'
+    elif friends is not None and user_id in friends['friends']:
+        status = 'friends'
+    elif my_pendings is not None and user_id_request in my_pendings['requests']:
+        status = 'waiting-acceptance'
+    response_data = json.loads(response.get_data())
+    response_data['friendship_status'] = status
+    return success_response(200, response_data)
 
 def generate_response_list(_list):
     auth_server = app.config['AUTH_SERVER']
@@ -36,6 +68,8 @@ def add_both_friends_list(user1,user2):
         if dic[u] not in friends:
                 friends.append(dic[u])
         friendship.save()
+
+# -- Endpoints
 
 @bp_users.route('/users/<user_id_request>/friends', methods=['GET','POST'])
 @token_required
@@ -100,32 +134,13 @@ def user_pending_requests(user_info):
     app.logger.debug("/users/my_requests || Fetched %d user profiles", len(response_data))
     return success_response(200,response_data)
 
-@bp_users.route('/users/<user_id_request>', methods=['GET'])
+@bp_users.route('/users/<user_id_request>', methods=['GET', 'PUT'])
 @token_required
-def get_user_profile(user_info, user_id_request):
-    auth_server = app.config['AUTH_SERVER']
-    app.logger.debug("/users/%s || Sending request to AuthServer",user_id_request)
-    response = auth_server.get_user_profile(user_id_request)
-    app.logger.debug("/users/%s || Auth Server response %d %s ",user_id_request, response.status_code, response.data)
-
-    if user_id_request == user_info["id"] or response.status_code != 200:
-        return response
-
-    user_id = int(user_info["id"])
-    user_id_request = int(user_id_request)
-    status = 'no-friends'
-    pending = PendingRequest.objects.with_id(user_id_request)
-    friends = Friends.objects.with_id(user_id_request)
-    my_pendings = PendingRequest.objects.with_id(user_id)
-    if pending is not None and user_id in pending['requests']:
-        status = 'pending'
-    elif friends is not None and user_id in friends['friends']:
-        status = 'friends'
-    elif my_pendings is not None and user_id_request in my_pendings['requests']:
-        status = 'waiting-acceptance'
-    response_data = json.loads(response.get_data())
-    response_data['friendship_status'] = status
-    return success_response(200, response_data)
+def user_profile(user_info, user_id_request):
+    if request.method == 'GET':
+        return get_user_profile(user_id_request, user_info, request)
+    else:
+        return edit_user_profile(user_id_request, user_info, request)
 
 @bp_users.route('/users/<int:user_id>/videos', methods=['GET', 'POST'])
 @token_required
@@ -150,15 +165,3 @@ def user_videos(user_info, user_id):
         videos = media_server.get_user_videos(user_id)
         return videos
 
-@bp_users.route('/users/<int:user_id>', methods=['PUT'])
-@token_required
-def edit_user_profile(user_info, user_id):
-    auth_server = app.config['AUTH_SERVER']
-    if int(user_info["id"]) != user_id:
-            return error_response(403, 'Forbidden')
-    body = request.get_json()
-    if 'picture' not in body:
-        return error_response(400, 'Fields are incomplete')
-    
-    response = auth_server.edit_user_profile(user_id, body)
-    return response

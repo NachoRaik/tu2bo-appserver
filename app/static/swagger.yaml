@@ -125,6 +125,10 @@ paths:
                   friendship_status:
                     type: string
                     example: 'pending'
+                  profile:
+                    type: object
+                    example:
+                      picture: images.com/myProfilePic 
         '401':
           $ref: '#/components/responses/UnauthorizedResponse'
         '404':
