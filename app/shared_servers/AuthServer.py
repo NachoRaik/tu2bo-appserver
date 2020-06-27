@@ -31,6 +31,10 @@ class AuthServer():
         response = requests.get(self.url + '/users/' + str(user_id_request))
         return make_flask_response(response)
 
+    def edit_user_profile(self, user_id, body):
+        response = requests.put(self.url + '/users/{}'.format(user_id), json=body)    
+        return make_flask_response(response)
+
     def __str__(self):
         return "url => {}".format(self.url)
 
@@ -69,7 +73,7 @@ class MockAuthServer(AuthServer):
         if not validate(email):
             return error_response(400, 'Invalid email address')
         id = self.generate_id()
-        self.db[email] = {'id': id, 'email': email, 'password': hashed_password, 'username': username}
+        self.db[email] = {'id': id, 'email': email, 'password': hashed_password, 'username': username, 'profile':{}}
         response_data = {'id': id}
         return success_response(200, response_data)
 
@@ -90,3 +94,10 @@ class MockAuthServer(AuthServer):
             if v['id'] == str(user_id_request):
                 return success_response(200,get_fields(v))
         return error_response(404,"User not found")
+
+    def edit_user_profile(self, user_id, body):
+        for v in self.db.values():
+            if v['id'] == str(user_id):
+                v['profile'] = body
+                return success_response(200, get_fields(v))
+        return error_response(404, "User not found")

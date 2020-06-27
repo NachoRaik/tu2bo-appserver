@@ -102,3 +102,19 @@ class TestMockAuthServer:
             assert user['username'] == 'user' + str(id)
             id += 1
 
+    def test_edit_user_success(self):
+        """ Edit user should return 200 with user data """
+
+        profile_data = {'picture': 'somePicture'}
+        response = self.mock_auth_server.edit_user_profile(1, profile_data)
+        json = loads(response.get_data())
+        assert response.status_code == 200
+        assert json['profile'] == profile_data
+
+    def test_edit_user_inexistent(self):
+        """ Edit inexistent user should return 404 """
+
+        profile_data = {'picture': 'somePicture'}
+        response = self.mock_auth_server.edit_user_profile(100, profile_data)
+        json = loads(response.get_data())
+        assert response.status_code == 404

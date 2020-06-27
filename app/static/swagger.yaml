@@ -122,13 +122,53 @@ paths:
                   username:
                     type: string
                     example: olifer97
+                  email:
+                    type: string
+                    example: olifer97@gmail.com
                   friendship_status:
                     type: string
                     example: 'pending'
+                  profile:
+                    type: object
+                    example:
+                      picture: images.com/myProfilePic 
         '401':
           $ref: '#/components/responses/UnauthorizedResponse'
         '404':
           $ref: '#/components/responses/NotFoundResponse'
+        
+    put:
+      tags:
+        - users
+      summary: Edit user info
+      operationId: editUserById
+      parameters:
+        - $ref: '#/components/parameters/requiredPathUserId'
+        - $ref: '#/components/parameters/accessTokenHeader'
+      requestBody:
+        description: New field values
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                picture:
+                  type: string
+                  example: images.com/myProfilePic
+      responses:
+        '200':
+          description: User Profile
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/User'
+        '404':
+          $ref: '#/components/responses/NotFoundResponse'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '401':
+          $ref: '#/components/responses/UnauthorizedResponse'
 
   /users/{id}/videos:
     get:
@@ -187,6 +227,8 @@ paths:
           $ref: '#/components/responses/NotFoundResponse'
         '409':
           $ref: '#/components/responses/ConflictResponse'
+        '403':
+          $ref: '#/components/responses/Forbidden'
 
   /users/my_requests:
     get:
@@ -468,7 +510,7 @@ components:
                 type: string
                 example: Already friends
     CantSendInvitation:
-      description: User is not avalible
+      description: User is not available
       content:
         application/json:
           schema:
@@ -476,7 +518,15 @@ components:
               reason:
                 type: string
                 example: Can't send friend request to inexistent user
-
+    Forbidden:
+      description: Forbidden request
+      content:
+        application/json:
+          schema:
+            properties:
+              reason:
+                type: string
+                example: The token provided doesn't match
   parameters:
     accessTokenHeader:
       in: header
@@ -629,3 +679,21 @@ components:
         timestamp:
           type: string
           example: '06/18/20 10:39:33'
+
+    User:
+      type: object
+      properties:
+        id:
+          type: integer
+          example: 1
+        username:
+          type: string
+          example: olifer97
+        email:
+          type: string
+          example: olifer97@address.com
+        profile:
+          type: object
+          example:
+            picture: images.com/myProfilePic        
+            

@@ -40,7 +40,7 @@ class TestFriendsRequestController:
 
         assert res.status_code == 200
         res_json = json.loads(res.get_data())
-        assert res_json.get("friendship_status",None) == None
+        assert res_json.get("friendship_status", None) == None
 
     def test_send_friend_request_successfully(self, client):
         """ POST /users/<user_id_request>/friend_request
