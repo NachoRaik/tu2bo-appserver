@@ -18,8 +18,6 @@ def edit_user_profile(user_id_request, user_info, request):
     if int(user_info["id"]) != int(user_id_request):
         return error_response(403, 'Forbidden')
     body = request.get_json()
-    if 'picture' not in body:
-        return error_response(400, 'Fields are incomplete')
     return auth_server.edit_user_profile(user_id_request, body)
 
 def get_user_profile(user_id_request, user_info, request):

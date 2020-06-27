@@ -98,3 +98,12 @@ class TestUsersController:
         res = edit_user_profile(client, token, 2, new_profile_pic)
         res_json = json.loads(res.get_data())
         assert res.status_code == 403
+
+    def test_edit_bad_credentials_user_profile(self, client):
+        """ PUT /users/user_id
+        Should: return 401 """
+
+        new_profile_pic = 'myNewProfilePic'
+        res = edit_user_profile(client, 'invalid', 2, new_profile_pic)
+        res_json = json.loads(res.get_data())
+        assert res.status_code == 401

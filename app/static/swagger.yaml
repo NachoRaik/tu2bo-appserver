@@ -122,6 +122,9 @@ paths:
                   username:
                     type: string
                     example: olifer97
+                  email:
+                    type: string
+                    example: olifer97@gmail.com
                   friendship_status:
                     type: string
                     example: 'pending'
@@ -162,6 +165,10 @@ paths:
                 $ref: '#/components/schemas/User'
         '404':
           $ref: '#/components/responses/NotFoundResponse'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '401':
+          $ref: '#/components/responses/UnauthorizedResponse'
 
   /users/{id}/videos:
     get:
@@ -184,6 +191,7 @@ paths:
                   $ref: '#/components/schemas/Video'
         '401':
           $ref: '#/components/responses/UnauthorizedResponse'
+          
         '404':
           $ref: '#/components/responses/NotFoundResponse'
     post:
@@ -501,7 +509,7 @@ components:
                 type: string
                 example: Already friends
     CantSendInvitation:
-      description: User is not avalible
+      description: User is not available
       content:
         application/json:
           schema:
@@ -509,7 +517,15 @@ components:
               reason:
                 type: string
                 example: Can't send friend request to inexistent user
-
+    Forbidden:
+      description: Forbidden request
+      content:
+        application/json:
+          schema:
+            properties:
+              reason:
+                type: string
+                example: The token provided is invalid
   parameters:
     accessTokenHeader:
       in: header
