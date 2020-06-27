@@ -57,6 +57,14 @@ class TestUsersController:
         assert b'Invalid visibility' in res.get_data()
         assert res.status_code == 400
 
+    def test_add_video_forbidden(self, client):
+        """ POST /users/user_id/videos
+        Should: return 403 """
+
+        token = login_and_token_user(client)
+        res = add_video(client, token, 2, 'url', 'someAuthor', 'someTitle', 'public', '06/14/20 16:39:33')
+        assert res.status_code == 403
+
     def test_get_existing_user(self, client):
         """ GET /users/user_id
         Should: return 200"""
@@ -96,7 +104,6 @@ class TestUsersController:
         new_profile_pic = 'myNewProfilePic'
         token = login_and_token_user(client)
         res = edit_user_profile(client, token, 2, new_profile_pic)
-        res_json = json.loads(res.get_data())
         assert res.status_code == 403
 
     def test_edit_bad_credentials_user_profile(self, client):
@@ -105,5 +112,4 @@ class TestUsersController:
 
         new_profile_pic = 'myNewProfilePic'
         res = edit_user_profile(client, 'invalid', 2, new_profile_pic)
-        res_json = json.loads(res.get_data())
         assert res.status_code == 401
