@@ -191,7 +191,6 @@ paths:
                   $ref: '#/components/schemas/Video'
         '401':
           $ref: '#/components/responses/UnauthorizedResponse'
-          
         '404':
           $ref: '#/components/responses/NotFoundResponse'
     post:
@@ -228,6 +227,8 @@ paths:
           $ref: '#/components/responses/NotFoundResponse'
         '409':
           $ref: '#/components/responses/ConflictResponse'
+        '403':
+          $ref: '#/components/responses/Forbidden'
 
   /users/my_requests:
     get:
