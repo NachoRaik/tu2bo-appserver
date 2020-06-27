@@ -73,9 +73,7 @@ def accept_friend_request(client, token, user_id_request):
 def get_user_friends(client, token, user_id_request):
     return client.get('/users/{}/friends'.format(user_id_request), headers={"access-token":token})
 
-def edit_user_profile(client, token, user_id, profile_pic=None):
-    request = {}
-    if profile_pic != None:
-        request['picture'] = profile_pic
-
-    return client.put('users/{}'.format(user_id), headers={"access-token":token}, json=request)
+def edit_user_profile(client, token, user_id, profile_pic):
+    return client.put('users/{}'.format(user_id), headers={"access-token":token}, json={
+        'picture': profile_pic
+    })

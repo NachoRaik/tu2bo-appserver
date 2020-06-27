@@ -525,7 +525,7 @@ components:
             properties:
               reason:
                 type: string
-                example: The token provided is invalid
+                example: The token provided doesn't match
   parameters:
     accessTokenHeader:
       in: header
