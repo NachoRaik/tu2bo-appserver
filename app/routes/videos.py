@@ -44,7 +44,7 @@ def construct_blueprint(media_server):
         elif request.method == 'PATCH':
             if requester_id != video['user_id']:
                 return error_response(403, 'Forbidden')
-            return service.editVideo(video_id)
+            return service.editVideo(video_id, request.get_json())
         elif request.method == 'DELETE':
             if requester_id != video['user_id']:
                 return error_response(403, 'Forbidden')
