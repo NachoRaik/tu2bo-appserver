@@ -32,13 +32,23 @@ def construct_blueprint(media_server):
     def home_videos():
         return success_response(200, service.listVideos())
 
-    @bp_videos.route('/videos/<int:video_id>', methods=['GET'])
+    @bp_videos.route('/videos/<int:video_id>', methods=['GET', 'PATCH', 'DELETE'])
     @token_required
     def get_video(user_info, video_id):
-        video, err = service.getVideo(int(user_info['id']), video_id)
+        requester_id = int(user_info["id"])
+        video, err = service.getVideo(requester_id, video_id)
         if err:
             return err
-        return success_response(200, video)
+        if request.method == 'GET':
+            return success_response(200, video)
+        elif request.method == 'PATCH':
+            if requester_id != video['user_id']:
+                return error_response(403, 'Forbidden')
+            return service.editVideo(video_id)
+        elif request.method == 'DELETE':
+            if requester_id != video['user_id']:
+                return error_response(403, 'Forbidden')
+            return service.deleteVideo(video_id)
 
     @bp_videos.route('/videos/<int:video_id>/comments', methods=['GET', 'POST'])
     @token_required

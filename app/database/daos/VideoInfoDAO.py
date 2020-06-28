@@ -38,3 +38,7 @@ class VideoInfoDAO(object):
         video_info.comments.append(comment)
         video_info.save()
         return comment
+    
+    def delete_video_info(self, video_id):
+        video_info = VideoInfo.objects.with_id(video_id)
+        video_info.delete()

@@ -68,6 +68,39 @@ class TestVideoController:
         res = add_video(client, token, 2, 'url', 'someAuthor', 'someTitle', 'public', '06/14/20 16:39:33')
         assert res.status_code == 403
 
+    def test_delete_video_successfully(self, client):
+        """ DELETE /videos/video_id
+        Should: return 204 """
+
+        token = login_and_token_user(client)
+        add_video(client, token, 1, 'url', 'someAuthor', 'someTitle', 'public', '06/14/20 16:39:33')
+
+        res = delete_video(client, token, 1)
+
+        assert res.status_code == 204
+
+    def test_delete_video_forbidden(self, client):
+        """ DELETE /videos/video_id
+        Should: return 403 """
+
+        token = login_and_token_user(client)
+        token2 = login_and_token_user(client, id=2)
+        add_video(client, token, 1, 'url', 'someAuthor', 'someTitle', 'public', '06/14/20 16:39:33')
+
+        res = delete_video(client, token2, 1)
+
+        assert res.status_code == 403
+
+    def test_delete_video_not_found(self, client):
+        """ DELETE /videos/video_id
+        Should: return 404 """
+
+        token = login_and_token_user(client)
+
+        res = delete_video(client, token, 1)
+
+        assert res.status_code == 404
+
     
     # -- Video Info logic
 

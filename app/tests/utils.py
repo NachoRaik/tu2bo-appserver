@@ -33,6 +33,9 @@ def add_video(client, token, user_id, url, author, title, visibility, date):
         'date': date
     })
 
+def delete_video(client, token, video_id):
+    return client.delete('/videos/{}'.format(video_id), headers={"access-token":token})
+
 def add_comment_to_video(client, token, video_id, author=None, content=None, timestamp=None):
     request = {}
     if author != None:

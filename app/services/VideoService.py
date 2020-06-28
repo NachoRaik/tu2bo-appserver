@@ -16,7 +16,16 @@ class VideoService(object):
             video_id = response_data['id']
             video_info = self.db_handler.new_video_registered(video_id)
         return res
+
+    def deleteVideo(self, video_id):
+        res = self.media_server.delete_video(video_id)
+        if res.status_code == 200:
+            self.db_handler.delete_video_info(video_id)
+        return res
     
+    def editVideo(self, video_id, data):
+        return self.media_server.edit_video(video_id, data)
+
     def listVideosfromUser(self, user_id):
         return self.media_server.get_user_videos(user_id)
     
