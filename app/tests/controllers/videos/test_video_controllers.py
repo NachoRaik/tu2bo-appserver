@@ -76,8 +76,10 @@ class TestVideoController:
         add_video(client, token, 1, 'url', 'someAuthor', 'someTitle', 'public', '06/14/20 16:39:33')
 
         res = delete_video(client, token, 1)
-
         assert res.status_code == 204
+
+        res_not_found = get_video(client, token, 1)
+        assert res_not_found.status_code == 404
 
     def test_delete_video_forbidden(self, client):
         """ DELETE /videos/video_id
