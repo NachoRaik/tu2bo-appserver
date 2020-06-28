@@ -2,6 +2,11 @@ from database.models.comment import Comment
 from database.models.video_info import VideoInfo
 
 class VideoInfoDAO(object):
+    def new_video_registered(self, video_id):
+        video_info = VideoInfo(video_id=video_id)
+        video_info.save()
+        return video_info
+
     def get_video_likes(self, video_id):
         video_info = VideoInfo.objects.get(video_id=video_id)
         return video_info.likes

@@ -10,7 +10,7 @@ def body_validation(required_fields, msg='Fields are incomplete', involved_metho
             if request.method in involved_methods:
                 body = request.get_json()
                 if not body or any(field not in body for field in required_fields):
-                    app.logger.debug("[Body Validation] %s failed because %s", f.__name__, msg)
+                    app.logger.debug("[%s] Failed because %s ==> %s", f.__name__, msg, body)
                     return error_response(400, msg)
             return f(*args, **kwargs)
         

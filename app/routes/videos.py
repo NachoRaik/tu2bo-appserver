@@ -6,14 +6,27 @@ from utils.flask_utils import error_response, success_response
 
 from services.VideoService import VideoService
 
+required_post_video_fields = ['url', 'author', 'title', 'visibility']
 required_post_comment_fields = ['author', 'content', 'timestamp']
 required_put_likes_field = ['liked']
 
-# -- Endpoints
 def construct_blueprint(media_server):
     bp_videos = Blueprint("bp_videos", __name__)
     
     service = VideoService(media_server)
+
+    # -- Endpoints
+    
+    @bp_videos.route('/users/<int:user_id>/videos', methods=['GET', 'POST'])
+    @token_required
+    @body_validation(required_post_video_fields)
+    def user_videos(user_info, user_id):
+        if request.method == 'POST':
+            if int(user_info["id"]) != user_id:
+                return error_response(403, 'Forbidden')
+            return service.addNewVideo(user_id, request.get_json())
+        else:
+            return service.listVideosfromUser(user_id)
 
     @bp_videos.route('/videos', methods=['GET'])
     def home_videos():

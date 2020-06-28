@@ -8,6 +8,18 @@ class VideoService(object):
         self.media_server = media_server
         self.db_handler = db_handler
     
+    def addNewVideo(self, user_id, fields):
+        fields['user_id'] = user_id
+        res = self.media_server.add_video(fields)
+        if res.status_code == 201:
+            response_data = json.loads(res.get_data())
+            video_id = response_data['id']
+            video_info = self.db_handler.new_video_registered(video_id)
+        return res
+    
+    def listVideosfromUser(self, user_id):
+        return self.media_server.get_user_videos(user_id)
+    
     def listVideos(self):
         res = self.media_server.get_videos()
         videos = json.loads(res.get_data())
