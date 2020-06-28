@@ -11,7 +11,7 @@ VALID_USER = {
 }
 NEXT_ID = 5
 
-class TestUsersController:
+class TestAuthController:
     def test_register_success(self, client):
         """ POST /register
         Should: return 200 with user id """

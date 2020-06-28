@@ -277,12 +277,38 @@ paths:
                   message:
                     type: string
                     example: Request sent successfully
-        '404':
-          $ref: '#/components/responses/CantSendInvitation'
         '400':
           $ref: '#/components/responses/ConflictFriends'
+        '404':
+          $ref: '#/components/responses/NotFoundResponse'
 
   /users/{id}/friends:
+    get:
+      tags:
+        - users
+      summary: Get friends of user
+      description: ''
+      operationId: 'friendsList'
+      parameters:
+        - $ref: '#/components/parameters/requiredPathUserId'
+        - $ref: '#/components/parameters/accessTokenHeader'
+      responses:
+        '200':
+          description: List of actual friends for user requested
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  type: object
+                  properties:
+                    id:
+                      type: integer
+                      example: 1
+                    username:
+                      type: string
+                      example: username1
+    
     post:
       tags:
         - users
@@ -312,34 +338,6 @@ paths:
                   reason:
                     type: string
                     example: Can't accept friendship without request
-    get:
-      tags:
-        - users
-      summary: Get friends of user
-      description: ''
-      operationId: 'friendsList'
-      parameters:
-        - $ref: '#/components/parameters/requiredPathUserId'
-        - $ref: '#/components/parameters/accessTokenHeader'
-      responses:
-        '200':
-          description: List of actual friends for user requested
-          content:
-            application/json:
-              schema:
-                type: array
-                items:
-                  type: object
-                  properties:
-                    id:
-                      type: integer
-                      example: 1
-                    username:
-                      type: string
-                      example: username1
-
-        '404':
-          $ref: '#/components/responses/NotFoundResponse'
 
 
   /videos:
@@ -500,24 +498,15 @@ components:
               reason:
                 type: string
                 example: Already taken
-    ConflictFriends:
-      description: User are already friends or pending
+    RequestFriendErrorResponse:
+      description: Users are already friends, pending or awaiting
       content:
         application/json:
           schema:
             properties:
               reason:
                 type: string
-                example: Already friends
-    CantSendInvitation:
-      description: User is not available
-      content:
-        application/json:
-          schema:
-            properties:
-              reason:
-                type: string
-                example: Can't send friend request to inexistent user
+                example: Can't send friend request to user who is friend, pending or awaiting for acceptance
     Forbidden:
       description: Forbidden request
       content:
@@ -570,7 +559,7 @@ components:
           example: 'This is my first video in TuTuBo - woohoo!'
         date:
           type: string
-          example: '01/01/19 00:00:00'
+          example: '06/18/20 10:39:33'
         thumb:
           type: string
           example: 'tutubo-storage-wequedecia.com/images/YRJkshnka61yH'
@@ -597,7 +586,7 @@ components:
           example: 'a descrption'
         date:
           type: string
-          example: '2019-01-02'
+          example: '06/18/20 10:39:33'
         visibility:
           type: string
           example: 'private'
@@ -628,7 +617,7 @@ components:
           example: 'a descrption'
         date:
           type: string
-          example: '2019-01-02'
+          example: '06/18/20 10:39:33'
         visibility:
           type: string
           example: 'private'
@@ -659,7 +648,7 @@ components:
           example: 'Great video!! Specially at minute {{14:05}}'
         timestamp:
           type: string
-          example: '2019-01-02 10:14:50'
+          example: '06/18/20 10:39:33'
 
     Comment:
       type: object

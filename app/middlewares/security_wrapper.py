@@ -15,12 +15,12 @@ def token_required(f):
         
         token = request.headers[HEADER_ACCESS_TOKEN]
         auth_server = app.config['AUTH_SERVER']
-        app.logger.debug("/authorize || Sending request to AuthServer")
+        app.logger.debug("[%s] Sending request to AuthServer /authorize", f.__name__)
         response = auth_server.authorize_user(token)
-        app.logger.debug("/authorize || Auth Server response %d %s ", response.status_code, response.data)
-        if (response.status_code in (400, 401, 404)):
+        app.logger.debug("[%s] Auth Server authorize response: %d %s ", f.__name__, response.status_code, response.data)
+        if response.status_code != 200:
             return Response(json.dumps({ 'reason':'Invalid token' }), status=401, mimetype='application/json')
         user_info = ast.literal_eval(response.data.decode("UTF-8"))
-        return f(user_info["user"],*args, **kwargs)
+        return f(user_info["user"], *args, **kwargs)
     
     return decorated
