@@ -379,6 +379,53 @@ paths:
           $ref: '#/components/responses/UnauthorizedResponse'
         '404':
           $ref: '#/components/responses/NotFoundResponse'
+    
+    patch:
+      tags:
+        - videos
+      summary: Edit video by id
+      description: ''
+      operationId: editVideo
+      parameters:
+        - $ref: '#/components/parameters/requiredPathVideoId'
+        - $ref: '#/components/parameters/accessTokenHeader'
+      requestBody:
+        description: Edit video object
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              allOf:
+                - $ref: '#/components/schemas/EditVideo'
+      responses:
+        '200':
+          description: Video edited successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                allOf:
+                  - $ref: '#/components/schemas/Video'
+        '400':
+          description: Invalid values / Invalid visibility
+        '404':
+          description: Video not found
+    
+    delete:
+      tags:
+        - videos
+      summary: Delete video by id
+      description: ''
+      operationId: deleteVideoById
+      parameters:
+        - $ref: '#/components/parameters/requiredPathVideoId'
+        - $ref: '#/components/parameters/accessTokenHeader'
+      responses:
+        '200':
+          description: Video deleted successfully
+        '404':
+          description: Video not found
 
   /videos/{video_id}/comments:
     get:
@@ -599,6 +646,22 @@ components:
         likes:
           type: integer
           example: 100000
+    
+    EditVideo:
+      type: object
+      properties:
+        thumb:
+          type: string
+          example: Thumb of a video
+        title:
+          type: string
+          example: Title of a video
+        description:
+          type: string
+          example: Description of a video
+        visibility:
+          type: string
+          example: public
 
     VideoDetail:
       type: object
