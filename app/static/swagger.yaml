@@ -559,7 +559,7 @@ components:
           example: 'This is my first video in TuTuBo - woohoo!'
         date:
           type: string
-          example: '01/01/19 00:00:00'
+          example: '06/18/20 10:39:33'
         thumb:
           type: string
           example: 'tutubo-storage-wequedecia.com/images/YRJkshnka61yH'
@@ -586,7 +586,7 @@ components:
           example: 'a descrption'
         date:
           type: string
-          example: '2019-01-02'
+          example: '06/18/20 10:39:33'
         visibility:
           type: string
           example: 'private'
@@ -617,7 +617,7 @@ components:
           example: 'a descrption'
         date:
           type: string
-          example: '2019-01-02'
+          example: '06/18/20 10:39:33'
         visibility:
           type: string
           example: 'private'
@@ -648,7 +648,7 @@ components:
           example: 'Great video!! Specially at minute {{14:05}}'
         timestamp:
           type: string
-          example: '2019-01-02 10:14:50'
+          example: '06/18/20 10:39:33'
 
     Comment:
       type: object
