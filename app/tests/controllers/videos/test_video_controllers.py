@@ -68,6 +68,101 @@ class TestVideoController:
         res = add_video(client, token, 2, 'url', 'someAuthor', 'someTitle', 'public', '06/14/20 16:39:33')
         assert res.status_code == 403
 
+    def test_delete_video_successfully(self, client):
+        """ DELETE /videos/video_id
+        Should: return 204 """
+
+        token = login_and_token_user(client)
+        add_video(client, token, 1, 'url', 'someAuthor', 'someTitle', 'public', '06/14/20 16:39:33')
+
+        res = delete_video(client, token, 1)
+        assert res.status_code == 204
+
+        res_not_found = get_video(client, token, 1)
+        assert res_not_found.status_code == 404
+
+    def test_delete_video_forbidden(self, client):
+        """ DELETE /videos/video_id
+        Should: return 403 """
+
+        token = login_and_token_user(client)
+        anotherToken = login_and_token_user(client, id=2)
+        add_video(client, token, 1, 'url', 'someAuthor', 'someTitle', 'public', '06/14/20 16:39:33')
+
+        res = delete_video(client, anotherToken, 1)
+
+        assert res.status_code == 403
+
+    def test_delete_video_not_found(self, client):
+        """ DELETE /videos/video_id
+        Should: return 404 """
+
+        token = login_and_token_user(client)
+
+        res = delete_video(client, token, 1)
+
+        assert res.status_code == 404
+
+    def test_edit_video_successfully(self, client):
+        """ PATCH /videos/video_id
+        Should: return 200 with updated video """
+
+        token = login_and_token_user(client)
+        add_video(client, token, 1, 'url', 'someAuthor', 'someTitle', 'public', '06/14/20 16:39:33')
+
+        res = edit_video(client, token, 1 , {'title': 'anotherTitle', 'visibility': 'private', 'description': 'newDescription'})
+        res_json = json.loads(res.get_data())
+        assert res.status_code == 200
+        assert res_json['title'] == 'anotherTitle'
+        assert res_json['visibility'] == 'private'
+        assert res_json['description'] == 'newDescription'
+
+    def test_edit_video_forbidden(self, client):
+        """ PATCH /videos/video_id
+        Should: return 403 """
+
+        token = login_and_token_user(client)
+        anotherToken = login_and_token_user(client, id=2)
+        add_video(client, token, 1, 'url', 'someAuthor', 'someTitle', 'public', '06/14/20 16:39:33')
+
+        res = edit_video(client, anotherToken, 1 , {'title': 'anotherTitle', 'visibility': 'private', 'description': 'newDescription'})
+        res_json = json.loads(res.get_data())
+        assert res.status_code == 403
+
+    def test_edit_video_not_found(self, client):
+        """ PATCH /videos/video_id
+        Should: return 404 """
+
+        token = login_and_token_user(client)
+
+        res = delete_video(client, token, 1)
+
+        assert res.status_code == 404
+    
+    def test_edit_video_invalid_values(self, client):
+        """ PATCH /videos/video_id
+        Should: return 400 """
+
+        token = login_and_token_user(client)
+        add_video(client, token, 1, 'url', 'someAuthor', 'someTitle', 'public', '06/14/20 16:39:33')
+
+        res = edit_video(client, token, 1 , {'author': 'anotherAuthor'})
+        res_json = json.loads(res.get_data())
+        assert res.status_code == 400
+        assert res_json['reason'] == 'Invalid values'
+
+    def test_edit_video_invalid_visibility(self, client):
+        """ PATCH /videos/video_id
+        Should: return 400 """
+
+        token = login_and_token_user(client)
+        add_video(client, token, 1, 'url', 'someAuthor', 'someTitle', 'public', '06/14/20 16:39:33')
+
+        res = edit_video(client, token, 1 , {'visibility': 'invalidVisibility'})
+        res_json = json.loads(res.get_data())
+        assert res.status_code == 400
+        assert res_json['reason'] == 'Invalid visibility'
+
     
     # -- Video Info logic
 
