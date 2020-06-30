@@ -5,6 +5,7 @@ from middlewares.body_validation import body_validation
 from utils.flask_utils import error_response, success_response
 
 from services.VideoService import VideoService
+from middlewares.metrics import add_video_stats
 
 required_post_video_fields = ['url', 'author', 'title', 'visibility']
 required_post_comment_fields = ['author', 'content', 'timestamp']
@@ -19,6 +20,7 @@ def construct_blueprint(media_server):
     
     @bp_videos.route('/users/<int:user_id>/videos', methods=['GET', 'POST'])
     @token_required
+    @add_video_stats
     @body_validation(required_post_video_fields)
     def user_videos(user_info, user_id):
         if request.method == 'POST':

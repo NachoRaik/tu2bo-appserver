@@ -19,7 +19,6 @@ class TestVideoController:
         db.drop_collection('video_info')
         disconnect(alias='test')
 
-   
     # -- Video management
 
     def test_add_video_successfully(self, client):

@@ -77,3 +77,6 @@ def edit_user_profile(client, token, user_id, profile_pic):
     return client.put('users/{}'.format(user_id), headers={"access-token":token}, json={
         'picture': profile_pic
     })
+
+def get_stats(client):
+    return client.get('/stats', query_string={'timestamp': '06/29/20 18:03:31', 'num': '3'})
