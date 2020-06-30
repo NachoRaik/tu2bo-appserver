@@ -22,6 +22,7 @@ def stats():
     if num > len_first_video:
         num = len_first_video
     date_to_timestamp = datetime.strptime(date, TIME_FORMAT)
+    print("El numero es: {}".format(num))
     response = [
         {"most_liked_videos": stat.videos_sorted_by_likes[:num], "most_commented_videos": stat.videos_sorted_by_comments[:num],
         "timestamp": stat.timestamp}
