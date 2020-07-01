@@ -45,6 +45,7 @@ def construct_blueprint(media_server):
     @bp_videos.route('/videos/<int:video_id>/comments', methods=['GET', 'POST'])
     @token_required
     @body_validation(required_post_comment_fields)
+    @add_video_stats
     def video_comments(user_info, video_id):
         if request.method == 'POST':
             result, err = service.addCommentToVideo(int(user_info["id"]), video_id, request.json)
@@ -60,6 +61,7 @@ def construct_blueprint(media_server):
     @bp_videos.route('/videos/<int:video_id>/likes', methods=['PUT'])
     @token_required
     @body_validation(required_put_likes_field)
+    @add_video_stats
     def video_likes(user_info, video_id):
         err = service.addLikeToVideo(int(user_info['id']), video_id, request.json['liked'])
         if err:

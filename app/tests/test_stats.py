@@ -48,7 +48,7 @@ class TestMonitoringController:
         assert id in res_json['most_commented_videos']
         assert id in res_json['most_liked_videos']
 
-    def test_stats_with_many_videos(self, client):
+    def test_stats_with_one_like_and_one_comment(self, client):
         """ GET /stats 
         Should: return 200 and stats"""
 
@@ -62,8 +62,58 @@ class TestMonitoringController:
         res_json = json.loads(res.get_data())
         second_id = res_json['id']
         assert res.status_code == 201
+
+        author, content, timestamp = 'anotherAuthor', 'this video sucks', '06/18/20 10:39:33'
+        res = add_comment_to_video(client, token, second_id, author=author, content=content, timestamp=timestamp)
         
+        assert res.status_code == 201
+
+        res = like_video(client, token, second_id, True)
+        assert res.status_code == 200
+    
         res = get_stats(client)
         assert res.status_code == 200
         body = json.loads(res.get_data())
-        print(body)
+        last_result = body[-1]
+        assert last_result['most_liked_videos'] == [second_id, first_id]
+        assert last_result['most_commented_videos'] == [second_id, first_id]
+
+    def test_stats_with_more_than_minimum_videos(self, client):
+        """ GET /stats 
+        Should: return 200 and stats"""
+
+        token = login_and_token_user(client)
+        ids = []
+        for i in range(10):
+            res = add_video(client, token, 1, 'url{}'.format(i), 'someAuthor', 'someTitle', 'public', '06/14/20 16:39:33')
+            res_json = json.loads(res.get_data())
+            ids.append(int(res_json['id']))
+            assert res.status_code == 201
+        
+        author, content, timestamp = 'anotherAuthor', 'this video sucks', '06/18/20 10:39:33'
+
+        # One comment to first video
+        res = add_comment_to_video(client, token, ids[0], author=author, content=content, timestamp=timestamp)
+        assert res.status_code == 201
+        
+        # Three comments to second video
+        res = add_comment_to_video(client, token, ids[1], author=author, content=content, timestamp=timestamp)        
+        res = add_comment_to_video(client, token, ids[1], author=author, content=content, timestamp=timestamp)
+        res = add_comment_to_video(client, token, ids[1], author=author, content=content, timestamp=timestamp)        
+        assert res.status_code == 201
+
+        # Two comments to third video
+        res = add_comment_to_video(client, token, ids[2], author=author, content=content, timestamp=timestamp)        
+        res = add_comment_to_video(client, token, ids[2], author=author, content=content, timestamp=timestamp)
+        assert res.status_code == 201
+
+        for i in range(6, 9):
+            res = like_video(client, token, ids[i], True)
+            assert res.status_code == 200
+    
+        res = get_stats(client)
+        assert res.status_code == 200
+        body = json.loads(res.get_data())
+        last_result = body[-1]
+        assert last_result['most_commented_videos'] == [ids[1], ids[2], ids[0]]
+        assert last_result['most_liked_videos'] == ids[6:9]

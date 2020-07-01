@@ -18,13 +18,14 @@ def add_video_stats(f):
     @wraps(f)
     def decorated(*args, **kwargs):
         response = f(*args, **kwargs)
-        if response.status_code == 201 and should_be_saved(): 
+        valid_codes = (200, 201)
+        if response.status_code in valid_codes and should_be_saved(): 
             media_server = app.config['MEDIA_SERVER']
             service = VideoService(media_server)
             videos = service.listVideos()
 
             for video in videos:
-                video['comments'] = len(service.getCommentsFromVideo(video['id']))
+                video['comments'] = len(service.getCommentsFromVideo(video['id'])[0])
 
             videos_sorted_by_likes = sorted(videos, key=lambda d: d['likes'], reverse=True)
             id_videos_sorted_by_likes = [v['id'] for v in videos_sorted_by_likes]
