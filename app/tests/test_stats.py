@@ -166,7 +166,6 @@ class TestMonitoringController:
         """ GET /stats 
         Should: return 200 and stats"""
 
-
         token = login_and_token_user(client)
         res = add_video(client, token, 1, 'url', 'someAuthor', 'someTitle', 'public', '06/14/20 16:39:33')
         res_json = json.loads(res.get_data())
