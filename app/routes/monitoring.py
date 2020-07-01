@@ -2,6 +2,7 @@ from flask import Blueprint, request, jsonify
 from flask import current_app as app
 from database.models.video_stat import VideoStat
 from datetime import datetime
+from datetime import timedelta
 
 bp_monitor = Blueprint("bp_monitor", __name__)
 TIME_FORMAT = "%m/%d/%y %H:%M:%S"
@@ -15,8 +16,9 @@ def ping():
 @bp_monitor.route('/stats')
 def stats():
     # TODO: make params not requested
-    date = request.args.get('timestamp')
-    num = int(request.args.get('num'))
+    default_date = (datetime.now() - timedelta(days=1)).strftime(TIME_FORMAT)
+    date = request.args.get('timestamp') if 'timestamp' in request.args else default_date
+    num = int(request.args.get('num')) if 'num' in request.args else 1
     video_stats = VideoStat.objects
     date_to_timestamp = datetime.strptime(date, TIME_FORMAT)
     response = [

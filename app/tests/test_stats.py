@@ -65,7 +65,6 @@ class TestMonitoringController:
 
         author, content, timestamp = 'anotherAuthor', 'this video sucks', '06/18/20 10:39:33'
         res = add_comment_to_video(client, token, second_id, author=author, content=content, timestamp=timestamp)
-        
         assert res.status_code == 201
 
         res = like_video(client, token, second_id, True)
@@ -144,3 +143,51 @@ class TestMonitoringController:
 
         body = json.loads(res.get_data())
         assert len(body) == 0
+
+    def test_default_date_if_not_present_in_request(self, client):
+        """ GET /stats 
+        Should: return 200 and stats"""
+
+        token = login_and_token_user(client)
+        res = add_video(client, token, 1, 'url', 'someAuthor', 'someTitle', 'public', '06/14/20 16:39:33')
+        res_json = json.loads(res.get_data())
+        id = res_json['id']
+        assert res.status_code == 201
+
+        res = get_stats(client, num=3)
+        assert res.status_code == 200
+        body = json.loads(res.get_data())
+        assert len(body) == 1
+        res_json = body[0]
+        assert id in res_json['most_commented_videos']
+        assert id in res_json['most_liked_videos']
+
+    def test_default_num_if_not_present_in_request(self, client):
+        """ GET /stats 
+        Should: return 200 and stats"""
+
+
+        token = login_and_token_user(client)
+        res = add_video(client, token, 1, 'url', 'someAuthor', 'someTitle', 'public', '06/14/20 16:39:33')
+        res_json = json.loads(res.get_data())
+        first_id = res_json['id']
+        assert res.status_code == 201
+        
+        res = add_video(client, token, 1, 'url2', 'someAuthor', 'someTitle', 'public', '06/14/20 16:39:33')
+        res_json = json.loads(res.get_data())
+        second_id = res_json['id']
+        assert res.status_code == 201
+
+        author, content, timestamp = 'anotherAuthor', 'this video sucks', '06/18/20 10:39:33'
+        res = add_comment_to_video(client, token, second_id, author=author, content=content, timestamp=timestamp)
+        assert res.status_code == 201
+
+        res = like_video(client, token, first_id, True)
+        assert res.status_code == 200
+    
+        res = get_stats(client, timestamp='06/29/20 18:03:31')
+        assert res.status_code == 200
+        body = json.loads(res.get_data())
+        last_result = body[-1]
+        assert last_result['most_liked_videos'] == [first_id]
+        assert last_result['most_commented_videos'] == [second_id]
