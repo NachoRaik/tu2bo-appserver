@@ -24,7 +24,7 @@ class TestMonitoringController:
         """ GET /stats 
         Should: return 200 and stats"""
 
-        res = get_stats(client)
+        res = get_stats(client, timestamp='06/29/20 18:03:31', num=3)
         assert res.status_code == 200
 
         body = json.loads(res.get_data())
@@ -40,7 +40,7 @@ class TestMonitoringController:
         id = res_json['id']
         assert res.status_code == 201
 
-        res = get_stats(client)
+        res = get_stats(client, timestamp='06/29/20 18:03:31', num=3)
         assert res.status_code == 200
         body = json.loads(res.get_data())
         assert len(body) == 1
@@ -71,7 +71,7 @@ class TestMonitoringController:
         res = like_video(client, token, second_id, True)
         assert res.status_code == 200
     
-        res = get_stats(client)
+        res = get_stats(client, timestamp='06/29/20 18:03:31', num=3)
         assert res.status_code == 200
         body = json.loads(res.get_data())
         last_result = body[-1]
@@ -111,9 +111,36 @@ class TestMonitoringController:
             res = like_video(client, token, ids[i], True)
             assert res.status_code == 200
     
-        res = get_stats(client)
+        res = get_stats(client, timestamp='06/29/20 18:03:31', num=3)
         assert res.status_code == 200
         body = json.loads(res.get_data())
         last_result = body[-1]
         assert last_result['most_commented_videos'] == [ids[1], ids[2], ids[0]]
         assert last_result['most_liked_videos'] == ids[6:9]
+
+    def test_invalid_token_then_0_videos(self, client):
+        """ GET /stats 
+        Should: return 200 and stats"""
+
+        token = login_and_token_user(client)
+        res = add_video(client, token, 100, 'url', 'someAuthor', 'someTitle', 'public', '06/14/20 16:39:33')
+        assert res.status_code == 403
+
+        res = get_stats(client, timestamp='06/29/20 18:03:31', num=3)
+        assert res.status_code == 200
+
+        body = json.loads(res.get_data())
+        assert len(body) == 0
+
+    def test_inexistent_token_then_0_videos(self, client):
+        """ GET /stats 
+        Should: return 200 and stats"""
+
+        res = add_video(client, 'inexistentToken', 1, 'url', 'someAuthor', 'someTitle', 'public', '06/14/20 16:39:33')
+        assert res.status_code == 401
+
+        res = get_stats(client, timestamp='06/29/20 18:03:31', num=3)
+        assert res.status_code == 200
+
+        body = json.loads(res.get_data())
+        assert len(body) == 0

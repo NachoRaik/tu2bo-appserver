@@ -41,7 +41,7 @@ def add_comment_to_video(client, token, video_id, author=None, content=None, tim
         request['content'] = content
     if timestamp != None:
         request['timestamp'] = timestamp
-        
+
     return client.post('/videos/{}/comments'.format(video_id), headers={"access-token":token}, json=request)
 
 def get_comments_from_video(client, token, video_id):
@@ -78,5 +78,10 @@ def edit_user_profile(client, token, user_id, profile_pic):
         'picture': profile_pic
     })
 
-def get_stats(client):
-    return client.get('/stats', query_string={'timestamp': '06/29/20 18:03:31', 'num': '3'})
+def get_stats(client, timestamp=None, num=None):
+    query_string = {}
+    if timestamp != None:
+        query_string['timestamp'] = timestamp
+    if num != None:
+        query_string['num'] = num
+    return client.get('/stats', query_string=query_string)
