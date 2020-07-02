@@ -16,7 +16,6 @@ class TestMonitoringController:
         call.
         """
         db = _get_db()
-        db.drop_collection('video_stat')
         db.drop_collection('video_info')
         disconnect(alias='test')
 
@@ -28,7 +27,8 @@ class TestMonitoringController:
         assert res.status_code == 200
 
         body = json.loads(res.get_data())
-        assert len(body) == 0
+        assert body['most_commented_videos'] == []
+        assert body['most_liked_videos'] == []
 
     def test_stats_with_one_video(self, client):
         """ GET /stats 
@@ -43,10 +43,10 @@ class TestMonitoringController:
         res = get_stats(client, timestamp='06/29/20 18:03:31', num=3)
         assert res.status_code == 200
         body = json.loads(res.get_data())
-        assert len(body) == 1
-        res_json = body[0]
-        assert id in res_json['most_commented_videos']
-        assert id in res_json['most_liked_videos']
+        assert len(body['most_commented_videos']) == 1
+        assert len(body['most_liked_videos']) == 1
+        assert body['most_commented_videos'][0]['id'] == id
+        assert body['most_liked_videos'][0]['id'] == id
 
     def test_stats_with_one_like_and_one_comment(self, client):
         """ GET /stats 
@@ -73,9 +73,11 @@ class TestMonitoringController:
         res = get_stats(client, timestamp='06/29/20 18:03:31', num=3)
         assert res.status_code == 200
         body = json.loads(res.get_data())
-        last_result = body[-1]
-        assert last_result['most_liked_videos'] == [second_id, first_id]
-        assert last_result['most_commented_videos'] == [second_id, first_id]
+        assert len(body['most_commented_videos']) == 2
+        assert len(body['most_liked_videos']) == 2
+
+        assert [video['id'] for video in body['most_liked_videos']] == [second_id, first_id]
+        assert [video['id'] for video in body['most_commented_videos']] == [second_id, first_id]
 
     def test_stats_with_more_than_minimum_videos(self, client):
         """ GET /stats 
@@ -113,9 +115,11 @@ class TestMonitoringController:
         res = get_stats(client, timestamp='06/29/20 18:03:31', num=3)
         assert res.status_code == 200
         body = json.loads(res.get_data())
-        last_result = body[-1]
-        assert last_result['most_commented_videos'] == [ids[1], ids[2], ids[0]]
-        assert last_result['most_liked_videos'] == ids[6:9]
+        assert len(body['most_commented_videos']) == 3
+        assert len(body['most_liked_videos']) == 3
+        
+        assert [video['id'] for video in body['most_liked_videos']] == ids[6:9]
+        assert [video['id'] for video in body['most_commented_videos']] == [ids[1], ids[2], ids[0]]
 
     def test_invalid_token_then_0_videos(self, client):
         """ GET /stats 
@@ -129,7 +133,8 @@ class TestMonitoringController:
         assert res.status_code == 200
 
         body = json.loads(res.get_data())
-        assert len(body) == 0
+        assert body['most_commented_videos'] == []
+        assert body['most_liked_videos'] == []
 
     def test_inexistent_token_then_0_videos(self, client):
         """ GET /stats 
@@ -142,25 +147,9 @@ class TestMonitoringController:
         assert res.status_code == 200
 
         body = json.loads(res.get_data())
-        assert len(body) == 0
+        assert body['most_commented_videos'] == []
+        assert body['most_liked_videos'] == []
 
-    def test_default_date_if_not_present_in_request(self, client):
-        """ GET /stats 
-        Should: return 200 and stats"""
-
-        token = login_and_token_user(client)
-        res = add_video(client, token, 1, 'url', 'someAuthor', 'someTitle', 'public', '06/14/20 16:39:33')
-        res_json = json.loads(res.get_data())
-        id = res_json['id']
-        assert res.status_code == 201
-
-        res = get_stats(client, num=3)
-        assert res.status_code == 200
-        body = json.loads(res.get_data())
-        assert len(body) == 1
-        res_json = body[0]
-        assert id in res_json['most_commented_videos']
-        assert id in res_json['most_liked_videos']
 
     def test_default_num_if_not_present_in_request(self, client):
         """ GET /stats 
@@ -187,6 +176,9 @@ class TestMonitoringController:
         res = get_stats(client, timestamp='06/29/20 18:03:31')
         assert res.status_code == 200
         body = json.loads(res.get_data())
-        last_result = body[-1]
-        assert last_result['most_liked_videos'] == [first_id]
-        assert last_result['most_commented_videos'] == [second_id]
+        assert len(body['most_commented_videos']) == 1
+        assert len(body['most_liked_videos']) == 1
+        
+        assert [video['id'] for video in body['most_liked_videos']] == [first_id]
+        assert [video['id'] for video in body['most_commented_videos']] == [second_id]
+    
