@@ -17,9 +17,9 @@ class TestVideoController:
         """
         db = _get_db()
         db.drop_collection('video_info')
+        db.drop_collection('comment')
         disconnect(alias='test')
 
-   
     # -- Video management
 
     def test_add_video_successfully(self, client):
@@ -73,7 +73,25 @@ class TestVideoController:
         Should: return 204 """
 
         token = login_and_token_user(client)
-        add_video(client, token, 1, 'url', 'someAuthor', 'someTitle', 'public', '06/14/20 16:39:33')
+        res = add_video(client, token, 1, 'url', 'someAuthor', 'someTitle', 'public', '06/14/20 16:39:33')
+
+        res = delete_video(client, token, 1)
+        assert res.status_code == 204
+
+        res_not_found = get_video(client, token, 1)
+        assert res_not_found.status_code == 404
+
+    def test_delete_video_with_comment(self, client):
+        """ DELETE /videos/video_id
+        Should: return 204 """
+
+        token = login_and_token_user(client)
+        res = add_video(client, token, 1, 'url', 'someAuthor', 'someTitle', 'public', '06/14/20 16:39:33')
+        assert res.status_code == 201
+        res_json = json.loads(res.get_data())
+        video_id = res_json['id']        
+        author, content, timestamp = 'anotherAuthor', 'this video sucks', '06/18/20 10:39:33'
+        res = add_comment_to_video(client, token, video_id, author=author, content=content, timestamp=timestamp)
 
         res = delete_video(client, token, 1)
         assert res.status_code == 204
@@ -181,6 +199,7 @@ class TestVideoController:
         assert res.status_code == 201
         res_json = json.loads(res.get_data())
 
+        assert 'comment_id' in res_json
         assert res_json['user_id'] == 1
         assert res_json['author'] == author
         assert res_json['content'] == content
@@ -247,7 +266,7 @@ class TestVideoController:
         res = get_comments_from_video(client, token, video_id)
         res_json = json.loads(res.get_data())[0]
 
-        #TODO: change this harcoded number
+        assert 'comment_id' in res_json
         assert res_json['user_id'] == 1
         assert res_json['author'] == author
         assert res_json['content'] == content
@@ -276,11 +295,13 @@ class TestVideoController:
         res_json = json.loads(res.get_data())
 
         first_comment = res_json[0]
+        assert 'comment_id' in first_comment
         assert first_comment['author'] == first_author
         assert first_comment['content'] == first_content
         assert first_comment['timestamp'] == first_timestamp
 
         second_comment = res_json[1]
+        assert 'comment_id' in second_comment
         assert second_comment['author'] == second_author
         assert second_comment['content'] == second_content
         assert second_comment['timestamp'] == second_timestamp
