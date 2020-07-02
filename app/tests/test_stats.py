@@ -150,7 +150,6 @@ class TestMonitoringController:
         assert body['most_commented_videos'] == []
         assert body['most_liked_videos'] == []
 
-
     def test_default_num_if_not_present_in_request(self, client):
         """ GET /stats 
         Should: return 200 and stats"""
