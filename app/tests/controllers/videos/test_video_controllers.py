@@ -17,7 +17,6 @@ class TestVideoController:
         """
         db = _get_db()
         db.drop_collection('video_info')
-        db.drop_collection('comment')
         disconnect(alias='test')
 
     # -- Video management
