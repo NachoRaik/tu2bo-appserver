@@ -19,7 +19,7 @@ class TestVideoController:
         db.drop_collection('video_info')
         disconnect(alias='test')
 
-   
+
     # -- Video management
 
     def test_add_video_successfully(self, client):
@@ -138,7 +138,7 @@ class TestVideoController:
         res = delete_video(client, token, 1)
 
         assert res.status_code == 404
-    
+
     def test_edit_video_invalid_values(self, client):
         """ PATCH /videos/video_id
         Should: return 400 """
@@ -163,7 +163,7 @@ class TestVideoController:
         assert res.status_code == 400
         assert res_json['reason'] == 'Invalid visibility'
 
-    
+
     # -- Video Info logic
 
     def test_add_comment_to_video_succesful(self, client):
@@ -373,7 +373,7 @@ class TestVideoController:
         res = add_video(client, token, user_id, url, author, title, visibility, timestamp)
         assert res.status_code == 201
 
-        res = get_videos(client)
+        res = get_videos(client, token)
         res_json = json.loads(res.get_data())[0]
         assert res_json['likes'] == 0
 
@@ -393,7 +393,7 @@ class TestVideoController:
         res = like_video(client, token, video_id, liked)
         assert res.status_code == 200
 
-        res = get_videos(client)
+        res = get_videos(client,token)
         res_json = json.loads(res.get_data())[0]
         assert res_json['likes'] == 1
 
