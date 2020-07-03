@@ -33,13 +33,19 @@ def create_app(config=DevelopmentConfig()):
 
     db = initialize_db(app)
 
+    # -- Services
+    from services.UsersService import UsersService
+    from services.VideoService import VideoService
+    user_service = UsersService(app.config['AUTH_SERVER'])
+    video_service = VideoService(app.config['MEDIA_SERVER'])
+
     # -- Routes registration
     from routes import auth, monitoring, users, videos
 
     app.register_blueprint(auth.bp_auth)
     app.register_blueprint(monitoring.bp_monitor)
-    app.register_blueprint(users.construct_blueprint(app.config['AUTH_SERVER']))
-    app.register_blueprint(videos.construct_blueprint(app.config['MEDIA_SERVER']))
+    app.register_blueprint(users.construct_blueprint(user_service))
+    app.register_blueprint(videos.construct_blueprint(video_service))
     setup_swaggerui(app)
 
     # -- Unassigned endpoints

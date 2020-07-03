@@ -10,13 +10,13 @@ required_post_video_fields = ['url', 'author', 'title', 'visibility']
 required_post_comment_fields = ['author', 'content', 'timestamp']
 required_put_likes_field = ['liked']
 
-def construct_blueprint(media_server):
+def construct_blueprint(video_service):
     bp_videos = Blueprint("bp_videos", __name__)
-    
-    service = VideoService(media_server)
+
+    service = video_service
 
     # -- Endpoints
-    
+
     @bp_videos.route('/users/<int:user_id>/videos', methods=['GET', 'POST'])
     @token_required
     @body_validation(required_post_video_fields)

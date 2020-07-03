@@ -11,10 +11,10 @@ from database.models.friends import Friends
 
 from services.UsersService import UsersService
 
-def construct_blueprint(auth_server):
+def construct_blueprint(user_service):
     bp_users = Blueprint("bp_users", __name__)
-    
-    service = UsersService(auth_server)
+
+    service = user_service
 
     # -- Endpoints
 
@@ -64,7 +64,7 @@ def construct_blueprint(auth_server):
             response = service.getUserProfile(user_id)
             if response.status_code != 200 or requester_id == user_id:
                 return response
-            
+
             profile_data = json.loads(response.get_data())
             profile_data['friendship_status'] = service.getFriendshipStatus(requester_id, user_id)
             return success_response(200, profile_data)
