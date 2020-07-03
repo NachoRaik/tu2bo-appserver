@@ -22,7 +22,7 @@ def setup_swaggerui(app):
         }
     )
     app.register_blueprint(SWAGGERUI_BLUEPRINT, url_prefix=SWAGGER_URL)
-    
+
 # -- App creation
 
 def create_app(config=DevelopmentConfig()):
@@ -45,7 +45,7 @@ def create_app(config=DevelopmentConfig()):
     app.register_blueprint(auth.bp_auth)
     app.register_blueprint(monitoring.bp_monitor)
     app.register_blueprint(users.construct_blueprint(user_service))
-    app.register_blueprint(videos.construct_blueprint(video_service))
+    app.register_blueprint(videos.construct_blueprint(video_service,user_service))
     setup_swaggerui(app)
 
     # -- Unassigned endpoints

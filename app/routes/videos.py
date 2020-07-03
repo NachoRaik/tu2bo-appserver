@@ -5,15 +5,17 @@ from middlewares.body_validation import body_validation
 from utils.flask_utils import error_response, success_response
 
 from services.VideoService import VideoService
+from services.RuleEngine import RuleEngine
 
 required_post_video_fields = ['url', 'author', 'title', 'visibility']
 required_post_comment_fields = ['author', 'content', 'timestamp']
 required_put_likes_field = ['liked']
 
-def construct_blueprint(video_service):
+def construct_blueprint(video_service,user_service):
     bp_videos = Blueprint("bp_videos", __name__)
 
     service = video_service
+    rule_engine = RuleEngine(user_service,video_service)
 
     # -- Endpoints
 
@@ -31,7 +33,7 @@ def construct_blueprint(video_service):
     @bp_videos.route('/videos', methods=['GET'])
     @token_required
     def home_videos(user_info):
-        return success_response(200, service.listVideos())
+        return success_response(200, rule_engine.listVideos(user_info))
 
     @bp_videos.route('/videos/<int:video_id>', methods=['GET', 'PATCH', 'DELETE'])
     @token_required
