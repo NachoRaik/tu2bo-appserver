@@ -53,6 +53,7 @@ class VideoService(object):
             return None, error_response(404, 'Video not found')
 
         result = comment.to_mongo().to_dict()
+        result['comment_id'] = result['_id']
         del result['_id']
         return result, None
 
