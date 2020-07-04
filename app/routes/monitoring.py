@@ -13,7 +13,7 @@ def ping():
 
 @bp_monitor.route('/stats')
 def stats():
-    num = int(request.args.get('num')) if 'num' in request.args else 1
+    num = int(request.args.get('num')) if 'num' in request.args and len(request.args.get('num')) != 0 else 1
 
     media_server = app.config['MEDIA_SERVER']
     service = VideoService(media_server)
@@ -25,9 +25,9 @@ def stats():
     videos_sorted_by_likes = sorted(videos, key=lambda d: d['likes'], reverse=True)            
     videos_sorted_by_comments = sorted(videos, key=lambda d: d['comments'], reverse=True)
             
-    request_response = jsonify(
-        {"most_liked_videos": videos_sorted_by_likes[:num], 
+    response = {"most_liked_videos": videos_sorted_by_likes[:num], 
         "most_commented_videos": videos_sorted_by_comments[:num]}
-    )
+    request_response = jsonify(response)
+    
     request_response.status_code = 200
     return request_response
