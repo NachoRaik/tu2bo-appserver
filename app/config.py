@@ -2,6 +2,7 @@ import os
 
 from shared_servers.AuthServer import AuthServer, MockAuthServer
 from shared_servers.MediaServer import MediaServer, MockMediaServer
+from datetime import timedelta
 
 class Config(object):
     def __init__(self):
@@ -31,6 +32,7 @@ class ProductionConfig(Config):
             'host': os.getenv('MONGODB_URI'),
             'retryWrites': False
         }
+        self.DELAY = timedelta(days=1)
 
 class DevelopmentConfig(Config):
     def __init__(self):
@@ -38,6 +40,7 @@ class DevelopmentConfig(Config):
         self.TESTING = True
         self.AUTH_SERVER = MockAuthServer()
         self.MEDIA_SERVER = MockMediaServer()
+        self.DELAY = timedelta(minutes=1)
 
 class TestingConfig(Config):
     def __init__(self):
@@ -50,4 +53,4 @@ class TestingConfig(Config):
             'host': 'mongomock://localhost',
             'connect': False
         }
-
+        self.DELAY = timedelta(milliseconds=1)
