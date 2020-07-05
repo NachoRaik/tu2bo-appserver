@@ -34,11 +34,17 @@ class VideoService(object):
             videos.remove(video)
         return videos
 
-    def listVideos(self):
+    def listVideos(self, friends_ids=None):
         res = self.media_server.get_videos()
         videos = json.loads(res.get_data())
         for video in videos:
             video['likes'] = len(self.db_handler.get_video_likes(video['id']))
+        videos_to_delete = [video for video in videos 
+                            if friends_ids != None and video['user_id'] not in friends_ids 
+                            and video['visibility'] == 'private'
+                        ] 
+        for video in videos_to_delete: 
+            videos.remove(video)
         return videos
     
     def getVideo(self, user_id, video_id):

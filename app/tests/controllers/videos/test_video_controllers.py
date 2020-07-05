@@ -94,7 +94,7 @@ class TestVideoController:
         res_json = json.loads(res.get_data())
         assert len(res_json) == 0
 
-    def test_get_video_from_no_friend(self, client):
+    def test_get_video_from_user_no_friend(self, client):
         """ GET /users/user_id/videos
         Should: return 200 """
 
@@ -111,7 +111,24 @@ class TestVideoController:
         res_json = json.loads(res.get_data())
         assert len(res_json) == 0
 
-    def test_get_videos_from_no_friend(self, client):
+    def test_get_video_no_friend(self, client):
+        """ GET /videos
+        Should: return 200 """
+
+        user_id_video = 1
+        user_id_viewer = 2
+        token_user_video = login_and_token_user(client, user_id_video)
+        token_user_viewer = login_and_token_user(client, user_id_viewer)
+
+        res = add_video(client, token_user_video, user_id_video, 'url', 'someAuthor', 'someTitle', 'private', '06/14/20 16:39:33')
+        assert res.status_code == 201
+
+        res = get_videos(client, token_user_viewer)
+        assert res.status_code == 200
+        res_json = json.loads(res.get_data())
+        assert len(res_json) == 0
+
+    def test_get_videos_from_user_no_friend(self, client):
         """ GET /users/user_id/videos
         Should: return 200 """
 
@@ -138,7 +155,34 @@ class TestVideoController:
         assert len(res_json) == 1
         assert public_video_id == res_json[0]['id']
 
-    def test_get_video_from_yourself(self, client):
+    def test_get_videos_from_no_friend(self, client):
+        """ GET /videos
+        Should: return 200 """
+
+        user_id_video = 1
+        user_id_viewer = 2
+        token_user_video = login_and_token_user(client, user_id_video)
+        token_user_viewer = login_and_token_user(client, user_id_viewer)
+
+        # Adding private video
+        res = add_video(client, token_user_video, user_id_video, 'url', 'someAuthor', 'someTitle', 'private', '06/14/20 16:39:33')
+        assert res.status_code == 201
+        res_json = json.loads(res.get_data())
+        private_video_id = res_json['id']
+
+        # Adding public video
+        res = add_video(client, token_user_video, user_id_video, 'url2', 'someAuthor', 'someTitle', 'public', '06/14/20 16:39:33')
+        assert res.status_code == 201
+        res_json = json.loads(res.get_data())
+        public_video_id = res_json['id']
+
+        res = get_videos(client, token_user_viewer)
+        assert res.status_code == 200
+        res_json = json.loads(res.get_data())
+        assert len(res_json) == 1
+        assert public_video_id == res_json[0]['id']
+
+    def test_get_video_from_user_yourself(self, client):
         """ GET /users/user_id/videos
         Should: return 200 """
 
@@ -156,7 +200,25 @@ class TestVideoController:
         assert len(res_json) == 1
         assert video_id == res_json[0]['id']
 
-    def test_get_videos_from_yourself(self, client):
+    def test_get_video_from_yourself(self, client):
+        """ GET /videos
+        Should: return 200 """
+
+        token = login_and_token_user(client)
+        user_id = 1
+
+        res = add_video(client, token, user_id, 'url', 'someAuthor', 'someTitle', 'private', '06/14/20 16:39:33')
+        assert res.status_code == 201
+        res_json = json.loads(res.get_data())
+        video_id = res_json['id']
+
+        res = get_videos(client, token)
+        assert res.status_code == 200
+        res_json = json.loads(res.get_data())
+        assert len(res_json) == 1
+        assert video_id == res_json[0]['id']
+
+    def test_get_videos_from_user_yourself(self, client):
         """ GET /users/user_id/videos
         Should: return 200 """
 
@@ -182,7 +244,33 @@ class TestVideoController:
         assert any(video['id'] == private_video_id for video in res_json)
         assert any(video['id'] == public_video_id for video in res_json)
 
-    def test_get_video_from_friend(self, client):
+    def test_get_videos_from_yourself(self, client):
+        """ GET /videos
+        Should: return 200 """
+
+        token = login_and_token_user(client)
+        user_id = 1
+
+        # Adding private video
+        res = add_video(client, token, user_id, 'url', 'someAuthor', 'someTitle', 'private', '06/14/20 16:39:33')
+        assert res.status_code == 201
+        res_json = json.loads(res.get_data())
+        private_video_id = res_json['id']
+
+        # Adding public video
+        res = add_video(client, token, user_id, 'url2', 'someAuthor', 'someTitle', 'public', '06/14/20 16:39:33')
+        assert res.status_code == 201
+        res_json = json.loads(res.get_data())
+        public_video_id = res_json['id']
+
+        res = get_videos(client, token)
+        assert res.status_code == 200
+        res_json = json.loads(res.get_data())
+        assert len(res_json) == 2
+        assert any(video['id'] == private_video_id for video in res_json)
+        assert any(video['id'] == public_video_id for video in res_json)
+
+    def test_get_video_from_user_friend(self, client):
         """ GET /users/user_id/videos
         Should: return 200 """
 
@@ -205,7 +293,30 @@ class TestVideoController:
         assert len(res_json) == 1
         assert video_id == res_json[0]['id']
 
-    def test_get_videos_from_friend(self, client):
+    def test_get_video_from_friend(self, client):
+        """ GET /videos
+        Should: return 200 """
+
+        user_id_video = 1
+        user_id_viewer = 2
+        token_user_video = login_and_token_user(client, user_id_video)
+        token_user_viewer = login_and_token_user(client, user_id_viewer)
+
+        send_friend_request(client, token_user_video, user_id_viewer)
+        accept_friend_request(client, token_user_viewer, user_id_video)
+
+        res = add_video(client, token_user_video, user_id_video, 'url', 'someAuthor', 'someTitle', 'private', '06/14/20 16:39:33')
+        assert res.status_code == 201
+        res_json = json.loads(res.get_data())
+        video_id = res_json['id']
+
+        res = get_videos(client, token_user_viewer)
+        assert res.status_code == 200
+        res_json = json.loads(res.get_data())
+        assert len(res_json) == 1
+        assert video_id == res_json[0]['id']
+
+    def test_get_videos_from_user_friend(self, client):
         """ GET /users/user_id/videos
         Should: return 200 """
 
@@ -228,6 +339,35 @@ class TestVideoController:
         public_video_id = res_json['id']        
 
         res = get_videos_from_user_id(client, token_user_viewer, user_id_video)
+        assert res.status_code == 200
+        res_json = json.loads(res.get_data())
+        assert len(res_json) == 2
+        assert any(video['id'] == private_video_id for video in res_json)
+        assert any(video['id'] == public_video_id for video in res_json)
+
+    def test_get_videos_from_friend(self, client):
+        """ GET /videos
+        Should: return 200 """
+
+        user_id_video = 1
+        user_id_viewer = 2
+        token_user_video = login_and_token_user(client, user_id_video)
+        token_user_viewer = login_and_token_user(client, user_id_viewer)
+
+        send_friend_request(client, token_user_video, user_id_viewer)
+        accept_friend_request(client, token_user_viewer, user_id_video)
+
+        res = add_video(client, token_user_video, user_id_video, 'url', 'someAuthor', 'someTitle', 'private', '06/14/20 16:39:33')
+        assert res.status_code == 201
+        res_json = json.loads(res.get_data())
+        private_video_id = res_json['id']
+
+        res = add_video(client, token_user_video, user_id_video, 'url2', 'someAuthor', 'someTitle', 'public', '06/14/20 16:39:33')
+        assert res.status_code == 201
+        res_json = json.loads(res.get_data())
+        public_video_id = res_json['id']        
+
+        res = get_videos(client, token_user_viewer)
         assert res.status_code == 200
         res_json = json.loads(res.get_data())
         assert len(res_json) == 2
