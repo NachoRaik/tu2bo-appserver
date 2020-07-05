@@ -33,6 +33,9 @@ def add_video(client, token, user_id, url, author, title, visibility, date):
         'date': date
     })
 
+def get_videos_from_user_id(client, token, user_id):
+    return client.get('/users/{}/videos'.format(user_id), headers={"access-token":token})
+
 def delete_video(client, token, video_id):
     return client.delete('/videos/{}'.format(video_id), headers={"access-token":token})
 

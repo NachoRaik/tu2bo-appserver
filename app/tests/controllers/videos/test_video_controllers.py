@@ -67,6 +67,33 @@ class TestVideoController:
         res = add_video(client, token, 2, 'url', 'someAuthor', 'someTitle', 'public', '06/14/20 16:39:33')
         assert res.status_code == 403
 
+    def test_get_videos_from_user(self, client):
+        """ GET /users/user_id/videos
+        Should: return 200 """
+
+        token = login_and_token_user(client)
+        user_id = 1
+        res = add_video(client, token, user_id, 'url', 'someAuthor', 'someTitle', 'public', '06/14/20 16:39:33')
+        assert res.status_code == 201
+        res_json = json.loads(res.get_data())
+        video_id = res_json['id']
+
+        res = get_videos_from_user_id(client, token, user_id)
+        assert res.status_code == 200
+        res_json = json.loads(res.get_data())
+        assert len(res_json) == 1
+        assert res_json[0]['id'] == video_id
+
+    def test_get_videos_from_inexistent_user(self, client):
+        """ GET /users/user_id/videos
+        Should: return 200 and empty json"""
+
+        token = login_and_token_user(client)
+        res = get_videos_from_user_id(client, token, 100)
+        assert res.status_code == 200
+        res_json = json.loads(res.get_data())
+        assert len(res_json) == 0
+
     def test_delete_video_successfully(self, client):
         """ DELETE /videos/video_id
         Should: return 204 """
