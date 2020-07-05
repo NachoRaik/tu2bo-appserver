@@ -58,8 +58,8 @@ def like_video(client, token, video_id, liked):
         'liked': liked
     })
 
-def get_videos(client):
-    return client.get('/videos')
+def get_videos(client, token):
+    return client.get('/videos', headers={"access-token":token})
 
 def get_video(client, token, video_id):
     return client.get('/videos/{}'.format(video_id), headers={"access-token":token})

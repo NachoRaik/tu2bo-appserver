@@ -29,7 +29,8 @@ def construct_blueprint(media_server):
             return service.listVideosfromUser(user_id)
 
     @bp_videos.route('/videos', methods=['GET'])
-    def home_videos():
+    @token_required
+    def home_videos(user_info):
         return success_response(200, service.listVideos())
 
     @bp_videos.route('/videos/<int:video_id>', methods=['GET', 'PATCH', 'DELETE'])

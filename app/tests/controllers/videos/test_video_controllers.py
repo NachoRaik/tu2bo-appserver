@@ -393,7 +393,7 @@ class TestVideoController:
         res = add_video(client, token, user_id, url, author, title, visibility, timestamp)
         assert res.status_code == 201
 
-        res = get_videos(client)
+        res = get_videos(client, token)
         res_json = json.loads(res.get_data())[0]
         assert res_json['likes'] == 0
 
@@ -413,7 +413,7 @@ class TestVideoController:
         res = like_video(client, token, video_id, liked)
         assert res.status_code == 200
 
-        res = get_videos(client)
+        res = get_videos(client, token)
         res_json = json.loads(res.get_data())[0]
         assert res_json['likes'] == 1
 
