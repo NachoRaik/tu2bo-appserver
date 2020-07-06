@@ -137,7 +137,46 @@ class TestMockMediaServer:
         'url': 'anUrl', 'thumb': 'aThumb', 'user_id': user_id}
         self.mock_media_server.add_video(video_data)
 
-        response = self.mock_media_server.get_user_videos(user_id)
+        response = self.mock_media_server.get_user_videos(user_id, {})
+        json = loads(response.get_data())
+        assert len(json) == 1
+        assert response.status_code == 200
+
+    def test_get_private_videos_from_user_no_friend(self):
+        """ Get all videos from an existent user should return 200 """
+
+        user_id = '4'
+        video_data = {'author': 'anAuthor', 'title': 'aTitle', 'date': '09/19/18 13:55:26', 'visibility': 'private', 
+        'url': 'anUrl', 'thumb': 'aThumb', 'user_id': user_id}
+        self.mock_media_server.add_video(video_data)
+
+        response = self.mock_media_server.get_user_videos(user_id, {'visibility': 'public'})
+        json = loads(response.get_data())
+        assert len(json) == 0
+        assert response.status_code == 200
+
+    def test_get_public_videos_from_user_no_friend(self):
+        """ Get all videos from an existent user should return 200 """
+
+        user_id = '4'
+        video_data = {'author': 'anAuthor', 'title': 'aTitle', 'date': '09/19/18 13:55:26', 'visibility': 'public', 
+        'url': 'anUrl', 'thumb': 'aThumb', 'user_id': user_id}
+        self.mock_media_server.add_video(video_data)
+
+        response = self.mock_media_server.get_user_videos(user_id, {'visibility': 'public'})
+        json = loads(response.get_data())
+        assert len(json) == 1
+        assert response.status_code == 200
+
+    def test_get_videos_from_user(self):
+        """ Get all videos from an existent user should return 200 """
+
+        user_id = '4'
+        video_data = {'author': 'anAuthor', 'title': 'aTitle', 'date': '09/19/18 13:55:26', 'visibility': 'public', 
+        'url': 'anUrl', 'thumb': 'aThumb', 'user_id': user_id}
+        self.mock_media_server.add_video(video_data)
+
+        response = self.mock_media_server.get_user_videos(user_id, {})
         json = loads(response.get_data())
         assert len(json) == 1
         assert response.status_code == 200
@@ -145,7 +184,7 @@ class TestMockMediaServer:
     def test_get_videos_from_inexistent_user(self):
         """ Get all videos from an unexistent user should return 200 and empty list """
 
-        response = self.mock_media_server.get_user_videos('100')
+        response = self.mock_media_server.get_user_videos('100', {})
         json = loads(response.get_data())
         assert len(json) == 0
         assert response.status_code == 200

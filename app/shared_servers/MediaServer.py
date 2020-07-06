@@ -21,8 +21,10 @@ class MediaServer():
         response = requests.get('{}/videos/{}'.format(self.url, video_id))
         return make_flask_response(response)
 
-    def get_user_videos(self, user_id):
-        response = requests.get('{}/videos?user_id={}'.format(self.url, user_id))
+    def get_user_videos(self, user_id, search={}):
+        query = "?user_id={}".format(user_id)
+        for k,v in search: query+= "&{}={}".format(k,v)
+        response = requests.get('{}/videos{}'.format(self.url, query))
         return make_flask_response(response)
 
     def delete_video(self, video_id):
@@ -84,10 +86,11 @@ class MockMediaServer(MediaServer):
         response_data = get_fields(video_id, video)
         return success_response(200, response_data)
 
-    def get_user_videos(self, user_id):
+    def get_user_videos(self, user_id, video_searching):
         response_data = []
         for video_id, video in self.db.items():
-            if video['user_id'] == user_id:
+            is_private = (video['visibility'] == 'private' and len(video_searching) != 0)
+            if video['user_id'] == user_id and not is_private:
                 response_data.append(get_fields(video_id, video))
         return success_response(200, response_data)
 

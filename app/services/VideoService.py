@@ -27,12 +27,10 @@ class VideoService(object):
         return self.media_server.edit_video(video_id, data)
 
     def listVideosFromUser(self, user_id, are_friends):
-        res = self.media_server.get_user_videos(user_id)
-        videos = json.loads(res.get_data())
-        videos_to_delete = [video for video in videos if not are_friends and video['visibility'] == 'private'] 
-        for video in videos_to_delete: 
-            videos.remove(video)
-        return videos
+        video_searching = {}
+        if not are_friends: 
+            video_searching['visibility'] = 'public'
+        return self.media_server.get_user_videos(user_id, video_searching)
 
     def listVideos(self, friends_ids=None):
         res = self.media_server.get_videos()
