@@ -29,8 +29,8 @@ def construct_blueprint(media_server, auth_server):
                 return error_response(403, 'Forbidden')
             return video_service.addNewVideo(user_id, request.get_json())
         else:
-            friends = (requester_id == user_id) or (users_service.getFriendshipStatus(requester_id, user_id) == 'friends')
-            return success_response(200, video_service.listVideosFromUser(user_id, friends))
+            are_friends = (requester_id == user_id) or (users_service.getFriendshipStatus(requester_id, user_id) == 'friends')
+            return success_response(200, video_service.listVideosFromUser(user_id, are_friends))
             
     @bp_videos.route('/videos', methods=['GET'])
     @token_required
