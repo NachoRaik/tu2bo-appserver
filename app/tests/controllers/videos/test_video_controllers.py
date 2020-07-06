@@ -317,6 +317,13 @@ class TestVideoController:
         assert any(video['id'] == private_video_id for video in res_json)
         assert any(video['id'] == public_video_id for video in res_json)
 
+    def test_get_videos_forbidden(self, client):
+        """ GET /videos
+        Should: return 401 """     
+
+        res = get_videos(client, 'invalidToken')
+        assert res.status_code == 401
+
     def test_delete_video_successfully(self, client):
         """ DELETE /videos/video_id
         Should: return 204 """
