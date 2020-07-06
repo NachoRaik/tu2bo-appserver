@@ -36,12 +36,8 @@ def construct_blueprint(media_server, auth_server):
     @token_required
     def home_videos(user_info):
         requester_id = int(user_info["id"])        
-        videos = video_service.listVideos()
-        friends_ids = [
-            video['user_id'] for video in videos 
-            if (requester_id == video['user_id']) or 
-            (users_service.getFriendshipStatus(requester_id, video['user_id']) == 'friends')
-        ]
+        friends_ids = users_service.getFriends(requester_id)[:]
+        friends_ids.append(requester_id)
         return success_response(200, video_service.listVideos(friends_ids))
 
     @bp_videos.route('/videos/<int:video_id>', methods=['GET', 'PATCH', 'DELETE'])
