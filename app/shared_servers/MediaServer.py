@@ -21,9 +21,9 @@ class MediaServer():
         response = requests.get('{}/videos/{}'.format(self.url, video_id))
         return make_flask_response(response)
 
-    def get_user_videos(self, user_id, search={}):
+    def get_user_videos(self, user_id, search):
         query = "?user_id={}".format(user_id)
-        for k,v in search: query+= "&{}={}".format(k,v)
+        for k,v in search.items(): query+= "&{}={}".format(k,v)
         response = requests.get('{}/videos{}'.format(self.url, query))
         return make_flask_response(response)
 
