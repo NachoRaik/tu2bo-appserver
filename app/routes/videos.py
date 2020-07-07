@@ -5,15 +5,17 @@ from middlewares.body_validation import body_validation
 from utils.flask_utils import error_response, success_response
 
 from services.VideoService import VideoService
+from services.UsersService import UsersService
 
 required_post_video_fields = ['url', 'author', 'title', 'visibility']
 required_post_comment_fields = ['author', 'content', 'timestamp']
 required_put_likes_field = ['liked']
 
-def construct_blueprint(media_server):
+def construct_blueprint(media_server, auth_server):
     bp_videos = Blueprint("bp_videos", __name__)
     
-    service = VideoService(media_server)
+    video_service = VideoService(media_server)
+    users_service = UsersService(auth_server)
 
     # -- Endpoints
     
@@ -21,22 +23,28 @@ def construct_blueprint(media_server):
     @token_required
     @body_validation(required_post_video_fields)
     def user_videos(user_info, user_id):
+        requester_id = int(user_info["id"])
         if request.method == 'POST':
-            if int(user_info["id"]) != user_id:
+            if requester_id != user_id:
                 return error_response(403, 'Forbidden')
-            return service.addNewVideo(user_id, request.get_json())
+            return video_service.addNewVideo(user_id, request.get_json())
         else:
-            return service.listVideosfromUser(user_id)
-
+            are_friends = (requester_id == user_id) or (users_service.getFriendshipStatus(requester_id, user_id) == 'friends')
+            return video_service.listVideosFromUser(user_id, are_friends)
+            
     @bp_videos.route('/videos', methods=['GET'])
-    def home_videos():
-        return success_response(200, service.listVideos())
+    @token_required
+    def home_videos(user_info):
+        requester_id = int(user_info["id"])        
+        friends_ids = users_service.getFriends(requester_id)[:]
+        friends_ids.append(requester_id)
+        return success_response(200, video_service.listVideos(friends_ids))
 
     @bp_videos.route('/videos/<int:video_id>', methods=['GET', 'PATCH', 'DELETE'])
     @token_required
     def get_video(user_info, video_id):
         requester_id = int(user_info["id"])
-        video, err = service.getVideo(requester_id, video_id)
+        video, err = video_service.getVideo(requester_id, video_id)
         if err:
             return err
         if request.method == 'GET':
@@ -44,23 +52,23 @@ def construct_blueprint(media_server):
         elif request.method == 'PATCH':
             if requester_id != video['user_id']:
                 return error_response(403, 'Forbidden')
-            return service.editVideo(video_id, request.get_json())
+            return video_service.editVideo(video_id, request.get_json())
         elif request.method == 'DELETE':
             if requester_id != video['user_id']:
                 return error_response(403, 'Forbidden')
-            return service.deleteVideo(video_id)
+            return video_service.deleteVideo(video_id)
 
     @bp_videos.route('/videos/<int:video_id>/comments', methods=['GET', 'POST'])
     @token_required
     @body_validation(required_post_comment_fields)
     def video_comments(user_info, video_id):
         if request.method == 'POST':
-            result, err = service.addCommentToVideo(int(user_info["id"]), video_id, request.json)
+            result, err = video_service.addCommentToVideo(int(user_info["id"]), video_id, request.json)
             if err:
                 return err
             return success_response(201, result)
         else:
-            result, err = service.getCommentsFromVideo(video_id)
+            result, err = video_service.getCommentsFromVideo(video_id)
             if err:
                 return err
             return success_response(200, result)
@@ -69,7 +77,7 @@ def construct_blueprint(media_server):
     @token_required
     @body_validation(required_put_likes_field)
     def video_likes(user_info, video_id):
-        err = service.addLikeToVideo(int(user_info['id']), video_id, request.json['liked'])
+        err = video_service.addLikeToVideo(int(user_info['id']), video_id, request.json['liked'])
         if err:
             return err
         return success_response(200, {'result':'Like updated'})

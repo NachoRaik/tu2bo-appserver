@@ -39,7 +39,7 @@ def create_app(config=DevelopmentConfig()):
     app.register_blueprint(auth.bp_auth)
     app.register_blueprint(monitoring.bp_monitor)
     app.register_blueprint(users.construct_blueprint(app.config['AUTH_SERVER']))
-    app.register_blueprint(videos.construct_blueprint(app.config['MEDIA_SERVER']))
+    app.register_blueprint(videos.construct_blueprint(app.config['MEDIA_SERVER'], app.config['AUTH_SERVER']))
     setup_swaggerui(app)
 
     # -- Unassigned endpoints
