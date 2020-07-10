@@ -107,6 +107,10 @@ class TestUsersProfile:
         res = delete_user_profile(client, token, USER_1)
         assert res.status_code == 204
 
+        other_token = login_and_token_user(client, USER_2)
+        res = get_user_profile(client, other_token, USER_1)
+        assert res.status_code == 404
+
     def test_delete_unauthorized_user_profile(self, client):
         """ DELETE /users/user_id
         Should: return 401 """
@@ -121,3 +125,5 @@ class TestUsersProfile:
         token = login_and_token_user(client, USER_1)
         res = delete_user_profile(client, token, USER_2)
         assert res.status_code == 403
+
+

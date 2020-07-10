@@ -110,5 +110,5 @@ class MockAuthServer(AuthServer):
         if not any(int(user['id']) == user_id for user in self.db.values()):
             return error_response(404, 'User not found')
                 
-        self.db = {email:user for email, user in self.db.items() if user['id'] != user_id}
+        self.db = {email:user for email, user in self.db.items() if int(user['id']) != user_id}
         return flask.Response('', status=204)
