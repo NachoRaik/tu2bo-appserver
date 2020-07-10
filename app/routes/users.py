@@ -55,7 +55,7 @@ def construct_blueprint(auth_server):
         app.logger.debug("/users/my_requests || Fetched %d user profiles", len(response_data))
         return success_response(200, response_data)
 
-    @bp_users.route('/users/<int:user_id>', methods=['GET', 'PUT'])
+    @bp_users.route('/users/<int:user_id>', methods=['GET', 'PUT', 'DELETE'])
     @token_required
     def user_profile(user_info, user_id):
         requester_id = int(user_info["id"])
@@ -68,9 +68,13 @@ def construct_blueprint(auth_server):
             profile_data = json.loads(response.get_data())
             profile_data['friendship_status'] = service.getFriendshipStatus(requester_id, user_id)
             return success_response(200, profile_data)
-        else:
+        if request.method == 'PUT':
             if requester_id != user_id:
                 return error_response(403, 'Forbidden')
             return service.editUserProfile(user_id, request.get_json())
+        else:
+            if requester_id != user_id:
+                return error_response(403, 'Forbidden')
+            return service.deleteUserProfile(user_id)
 
     return bp_users

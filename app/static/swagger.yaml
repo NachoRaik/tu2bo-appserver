@@ -179,7 +179,7 @@ paths:
         - $ref: '#/components/parameters/requiredPathUserId'
         - $ref: '#/components/parameters/accessTokenHeader'
       responses:
-        '200':
+        '204':
           description: User deleted successfully
         '404':
           $ref: '#/components/responses/NotFoundResponse'

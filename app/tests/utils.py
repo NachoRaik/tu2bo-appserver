@@ -87,6 +87,9 @@ def edit_user_profile(client, token, user_id, profile_pic):
         'picture': profile_pic
     })
 
+def delete_user_profile(client, token, user_id_request):
+    return client.delete('/users/{}'.format(user_id_request), headers={"access-token":token})
+
 def get_stats(client, timestamp=None, num=None):
     query_string = {}
     if timestamp != None:
