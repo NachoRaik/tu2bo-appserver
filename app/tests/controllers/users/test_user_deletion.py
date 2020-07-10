@@ -100,6 +100,40 @@ class TestUserDeletion:
         comment_ids = [comment['comment_id'] for comment in res_json]
         assert len(comment_ids) == 0
 
+    def test_video_likes_deleted_from_user_profile_successfully(self, client):
+        """ DELETE /users/user_id
+        Should: return 204 """
+
+        token_user_1 = login_and_token_user(client, USER_1)
+        token_user_2 = login_and_token_user(client, USER_2)
+        token_user_3 = login_and_token_user(client, USER_3)
+
+        # Adding video with like
+        res = add_video(client, token_user_2, USER_2, 'url', 'someAuthor', 'someTitle', 'public', '06/14/20 16:39:33')
+        assert res.status_code == 201
+        res_json = json.loads(res.get_data())
+        video_id = res_json['id']
+        res = like_video(client, token_user_1, video_id, True)
+        assert res.status_code == 200
+        res = like_video(client, token_user_3, video_id, True)
+        assert res.status_code == 200
+
+        # Check that videos were added correctly with its like
+        res = get_video(client, token_user_2, video_id)
+        res_json = json.loads(res.get_data())
+        likes = res_json['likes']
+        assert likes == 2
+
+        # Delete user and its likes
+        res = delete_user_profile(client, token_user_1, USER_1)
+        assert res.status_code == 204
+
+        # Likes no longer exist
+        res = get_video(client, token_user_2, video_id)
+        res_json = json.loads(res.get_data())
+        likes = res_json['likes']
+        assert likes == 1
+
     def test_friends_deleted_from_user_profile_successfully(self, client):
         """ DELETE /users/user_id
         Should: return 204 """
@@ -206,5 +240,3 @@ class TestUserDeletion:
         token = login_and_token_user(client, USER_1)
         res = delete_user_profile(client, token, USER_2)
         assert res.status_code == 403
-
-

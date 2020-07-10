@@ -107,3 +107,10 @@ class VideoService(object):
             return error_response(404, 'Video not found')
 
         return None
+
+    def removeLikesFromUser(self, user_id):
+        has_liked = False
+        videos = self.listVideos()
+        for video in videos:
+            video_id = video['id']
+            likes = self.db_handler.change_user_like_on_video(video_id, user_id, has_liked)

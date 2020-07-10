@@ -79,6 +79,7 @@ def construct_blueprint(auth_server, media_server):
                 return error_response(403, 'Forbidden')
 
             # Delete videos
+            video_service.removeLikesFromUser(user_id)
             video_service.deleteCommentsFromUser(user_id)
             response = video_service.deleteVideos(user_id) 
             return response if response.status_code != 204 else users_service.deleteUserProfile(user_id)
