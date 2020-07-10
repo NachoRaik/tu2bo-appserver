@@ -143,6 +143,37 @@ class TestUsersProfile:
         video_ids = [video['id'] for video in res_json]
         assert len(video_ids) == 0
 
+    def test_video_comments_deleted_from_user_profile_successfully(self, client):
+        """ DELETE /users/user_id
+        Should: return 204 """
+
+        token = login_and_token_user(client, USER_1)
+        other_token = login_and_token_user(client, USER_2)
+
+        # Adding video with comment
+        res = add_video(client, other_token, USER_2, 'url', 'someAuthor', 'someTitle', 'public', '06/14/20 16:39:33')
+        assert res.status_code == 201
+        res_json = json.loads(res.get_data())
+        video_id = res_json['id']
+        res = add_comment_to_video(client, token, video_id, author='author', content='aComment', timestamp='06/14/20 16:39:33')
+        assert res.status_code == 201
+
+        # Check that videos were added correctly with its comment
+        res = get_comments_from_video(client, token, video_id)
+        res_json = json.loads(res.get_data())
+        comment_ids = [comment['comment_id'] for comment in res_json]
+        assert len(comment_ids) == 1
+
+        # Delete user and its comments
+        res = delete_user_profile(client, token, USER_1)
+        assert res.status_code == 204
+
+        # Comments no longer exist
+        res = get_comments_from_video(client, other_token, video_id)
+        res_json = json.loads(res.get_data())
+        comment_ids = [comment['comment_id'] for comment in res_json]
+        assert len(comment_ids) == 0
+
     def test_friends_deleted_from_user_profile_successfully(self, client):
         """ DELETE /users/user_id
         Should: return 204 """

@@ -84,6 +84,7 @@ def construct_blueprint(auth_server, media_server):
                 return response
             videos_data = json.loads(response.get_data())
             video_ids = [video['id'] for video in videos_data]
+            video_service.deleteCommentsFromUser(user_id)
             response = video_service.deleteVideos(video_ids) 
             return response if response.status_code != 204 else users_service.deleteUserProfile(user_id)
 
