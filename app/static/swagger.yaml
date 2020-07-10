@@ -169,6 +169,24 @@ paths:
           $ref: '#/components/responses/Forbidden'
         '401':
           $ref: '#/components/responses/UnauthorizedResponse'
+          
+    delete:
+      tags:
+        - users
+      summary: Delete user by id
+      operationId: deleteUserById
+      parameters:
+        - $ref: '#/components/parameters/requiredPathUserId'
+        - $ref: '#/components/parameters/accessTokenHeader'
+      responses:
+        '200':
+          description: User deleted successfully
+        '404':
+          $ref: '#/components/responses/NotFoundResponse'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '401':
+          $ref: '#/components/responses/UnauthorizedResponse'
 
   /users/{id}/videos:
     get:
@@ -278,7 +296,7 @@ paths:
                     type: string
                     example: Request sent successfully
         '400':
-          $ref: '#/components/responses/ConflictFriends'
+          $ref: '#/components/responses/ConflictResponse'
         '404':
           $ref: '#/components/responses/NotFoundResponse'
 
