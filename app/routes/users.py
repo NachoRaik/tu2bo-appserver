@@ -10,11 +10,13 @@ from database.models.pending_request import PendingRequest
 from database.models.friends import Friends
 
 from services.UsersService import UsersService
+from services.VideoService import VideoService
 
-def construct_blueprint(auth_server):
+def construct_blueprint(auth_server, media_server):
     bp_users = Blueprint("bp_users", __name__)
     
-    service = UsersService(auth_server)
+    users_service = UsersService(auth_server)
+    video_service = VideoService(media_server)
 
     # -- Endpoints
 
@@ -22,14 +24,14 @@ def construct_blueprint(auth_server):
     @token_required
     def user_friends(user_info, user_id):
         if request.method == 'POST':
-            err = service.acceptFriendRequest(int(user_info["id"]), user_id)
+            err = users_service.acceptFriendRequest(int(user_info["id"]), user_id)
             if err:
                 return error_response(400, err)
             return success_response(200, {"message": "Friend accepted successfully"})
         else:
-            friends_ids = service.getFriends(user_id)
+            friends_ids = users_service.getFriends(user_id)
             app.logger.debug("/users/%d/friends || %d user profiles to fetch from Auth Server", user_id, len(friends_ids))
-            response_data = service.fetchUsersNames(friends_ids)
+            response_data = users_service.fetchUsersNames(friends_ids)
             app.logger.debug("/users/%d/friends || Fetched %d user profiles", user_id, len(response_data))
             return success_response(200, response_data)
 
@@ -37,11 +39,11 @@ def construct_blueprint(auth_server):
     @token_required
     def user_friend_request(user_info, user_id):
         app.logger.debug("/users/%s/friend_request || Requesting AuthServer for user profile", user_id)
-        response = service.getUserProfile(user_id)
+        response = users_service.getUserProfile(user_id)
         if response.status_code != 200:
             return error_response(404, "Can't send friend request to inexistent user")
 
-        err = service.sendFriendRequest(int(user_info['id']), user_id)
+        err = users_service.sendFriendRequest(int(user_info['id']), user_id)
         if err:
             return error_response(400, err)
         return success_response(200, {"message": "Friendship request sent successfully"})
@@ -49,9 +51,9 @@ def construct_blueprint(auth_server):
     @bp_users.route('/users/my_requests', methods=['GET'])
     @token_required
     def user_pending_requests(user_info):
-        pending_ids = service.getPendingRequests(int(user_info["id"]))
+        pending_ids = users_service.getPendingRequests(int(user_info["id"]))
         app.logger.debug("/users/my_requests || %d user profiles to fetch from Auth Server", len(pending_ids))
-        response_data = service.fetchUsersNames(pending_ids)
+        response_data = users_service.fetchUsersNames(pending_ids)
         app.logger.debug("/users/my_requests || Fetched %d user profiles", len(response_data))
         return success_response(200, response_data)
 
@@ -61,20 +63,20 @@ def construct_blueprint(auth_server):
         requester_id = int(user_info["id"])
         if request.method == 'GET':
             app.logger.debug("/users/%s || Requesting AuthServer for user profile", user_id)
-            response = service.getUserProfile(user_id)
+            response = users_service.getUserProfile(user_id)
             if response.status_code != 200 or requester_id == user_id:
                 return response
             
             profile_data = json.loads(response.get_data())
-            profile_data['friendship_status'] = service.getFriendshipStatus(requester_id, user_id)
+            profile_data['friendship_status'] = users_service.getFriendshipStatus(requester_id, user_id)
             return success_response(200, profile_data)
         if request.method == 'PUT':
             if requester_id != user_id:
                 return error_response(403, 'Forbidden')
-            return service.editUserProfile(user_id, request.get_json())
+            return users_service.editUserProfile(user_id, request.get_json())
         else:
             if requester_id != user_id:
                 return error_response(403, 'Forbidden')
-            return service.deleteUserProfile(user_id)
+            return users_service.deleteUserProfile(user_id)
 
     return bp_users

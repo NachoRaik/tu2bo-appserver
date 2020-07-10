@@ -22,7 +22,6 @@ class UsersService(object):
         return self.auth_server.edit_user_profile(user_id, data)
 
     def deleteUserProfile(self, user_id):
-        # TODO: add delete videos, friendships and comments
         return self.auth_server.delete_user_profile(user_id)
 
     def fetchUsersNames(self, users):
