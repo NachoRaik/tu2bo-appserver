@@ -74,9 +74,17 @@ def construct_blueprint(auth_server, media_server):
             if requester_id != user_id:
                 return error_response(403, 'Forbidden')
             return users_service.editUserProfile(user_id, request.get_json())
-        else:
+        if request.method == 'DELETE':
             if requester_id != user_id:
                 return error_response(403, 'Forbidden')
-            return users_service.deleteUserProfile(user_id)
+
+            # Delete videos
+            response = video_service.listVideosFromUser(user_id)
+            if response.status_code != 200:
+                return response
+            videos_data = json.loads(response.get_data())
+            video_ids = [video['id'] for video in videos_data]
+            response = video_service.deleteVideos(video_ids) 
+            return response if response.status_code != 204 else users_service.deleteUserProfile(user_id)
 
     return bp_users

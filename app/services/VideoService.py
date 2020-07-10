@@ -1,7 +1,7 @@
 import json
 from datetime import datetime
 from database.daos.VideoInfoDAO import VideoInfoDAO
-from utils.flask_utils import error_response
+from utils.flask_utils import error_response, success_response
 
 class VideoService(object):
     def __init__(self, media_server, db_handler=VideoInfoDAO()):
@@ -23,10 +23,17 @@ class VideoService(object):
             self.db_handler.delete_video_info(video_id)
         return res
     
+    def deleteVideos(self, video_ids):
+        for video_id in video_ids:
+            response = self.deleteVideo(video_id)
+            if response.status_code != 204:
+                return response
+        return success_response(204, 'Videos deleted successfully')
+
     def editVideo(self, video_id, data):
         return self.media_server.edit_video(video_id, data)
 
-    def listVideosFromUser(self, user_id, are_friends):
+    def listVideosFromUser(self, user_id, are_friends=True):
         video_searching = {}
         if not are_friends: 
             video_searching['visibility'] = 'public'

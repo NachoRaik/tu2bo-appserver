@@ -99,7 +99,7 @@ class TestUsersProfile:
         res = edit_user_profile(client, 'invalid', USER_1, new_profile_pic)
         assert res.status_code == 401
 
-    def test_delete_user_profile_successfully(self, client):
+    def test_user_deleted_from_user_profile_successfully(self, client):
         """ DELETE /users/user_id
         Should: return 204 """
 
@@ -110,6 +110,37 @@ class TestUsersProfile:
         other_token = login_and_token_user(client, USER_2)
         res = get_user_profile(client, other_token, USER_1)
         assert res.status_code == 404
+
+    def test_videos_deleted_from_user_profile_successfully(self, client):
+        """ DELETE /users/user_id
+        Should: return 204 """
+
+        token = login_and_token_user(client, USER_1)
+        other_token = login_and_token_user(client, USER_2)
+
+        # Adding videos
+        res = add_video(client, token, USER_1, 'url', 'someAuthor', 'someTitle', 'public', '06/14/20 16:39:33')
+        assert res.status_code == 201
+        res = add_video(client, token, USER_1, 'otherUrl', 'someAuthor', 'someTitle', 'public', '06/14/20 16:39:33')
+        assert res.status_code == 201
+
+        # Check that videos were added correctly
+        res = get_videos_from_user_id(client, other_token, USER_1)
+        res_json = json.loads(res.get_data())
+        assert res.status_code == 200
+        video_ids = [video['id'] for video in res_json]
+        assert len(video_ids) == 2
+
+        # Delete user and its videos
+        res = delete_user_profile(client, token, USER_1)
+        assert res.status_code == 204
+
+        # Videos no longer exist
+        res = get_videos_from_user_id(client, other_token, USER_1)
+        res_json = json.loads(res.get_data())
+        assert res.status_code == 200
+        video_ids = [video['id'] for video in res_json]
+        assert len(video_ids) == 0
 
     def test_delete_unauthorized_user_profile(self, client):
         """ DELETE /users/user_id
