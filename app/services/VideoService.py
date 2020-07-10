@@ -23,8 +23,13 @@ class VideoService(object):
             self.db_handler.delete_video_info(video_id)
         return res
     
-    def deleteVideos(self, video_ids):
-        for video_id in video_ids:
+    def deleteVideos(self, user_id):
+        response = self.listVideosFromUser(user_id)
+        if response.status_code != 200:
+            return response
+        videos_data = json.loads(response.get_data())
+        for video in videos_data:
+            video_id = video['id']
             response = self.deleteVideo(video_id)
             if response.status_code != 204:
                 return response
