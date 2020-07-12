@@ -96,10 +96,7 @@ class VideoService(object):
         video_ids = [video['id'] for video in videos]
 
         for video_id in video_ids:
-            comments = self.getCommentsFromVideo(video_id)[0]
-            for comment in comments:
-                if int(comment['user_id']) == user_id:
-                    self.db_handler.delete_comment(video_id, int(comment['comment_id']))
+            self.db_handler.delete_comments_from_user(video_id, user_id)
     
     def addLikeToVideo(self, user_id, video_id, has_liked):
         likes = self.db_handler.change_user_like_on_video(video_id, user_id, has_liked)

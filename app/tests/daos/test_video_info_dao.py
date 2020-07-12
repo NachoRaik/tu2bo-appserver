@@ -39,6 +39,6 @@ class TestVideoInfoDAO:
         assert len(comments) == 1
         comment_id = comments[0].comment_id
 
-        handler.delete_comment(video_id, comment_id)        
+        handler.delete_comments_from_user(video_id, user_id)        
         comments = handler.get_video_comments(video_id)
         assert len(comments) == 0
