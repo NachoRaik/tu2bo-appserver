@@ -75,7 +75,7 @@ def construct_blueprint(auth_server, media_server):
                 return error_response(403, 'Forbidden')
             return users_service.editUserProfile(user_id, request.get_json())
         if request.method == 'DELETE':
-            if requester_id != user_id:
+            if user_info != {} and not app.config['TESTING']: #It is only allowed to the webadmin to use
                 return error_response(403, 'Forbidden')
 
             # Delete videos

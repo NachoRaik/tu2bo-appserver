@@ -233,10 +233,3 @@ class TestUserDeletion:
         res = delete_user_profile(client, 'invalidToken', USER_1)
         assert res.status_code == 401
 
-    def test_delete_forbidden_user_profile(self, client):
-        """ DELETE /users/user_id
-        Should: return 403 """
-
-        token = login_and_token_user(client, USER_1)
-        res = delete_user_profile(client, token, USER_2)
-        assert res.status_code == 403
