@@ -60,8 +60,8 @@ def construct_blueprint(auth_server, media_server):
     @bp_users.route('/users/<int:user_id>', methods=['GET', 'PUT', 'DELETE'])
     @token_required
     def user_profile(user_info, user_id):
-        requester_id = int(user_info["id"])
         if request.method == 'GET':
+            requester_id = int(user_info["id"])
             app.logger.debug("/users/%s || Requesting AuthServer for user profile", user_id)
             response = users_service.getUserProfile(user_id)
             if response.status_code != 200 or requester_id == user_id:
@@ -71,6 +71,7 @@ def construct_blueprint(auth_server, media_server):
             profile_data['friendship_status'] = users_service.getFriendshipStatus(requester_id, user_id)
             return success_response(200, profile_data)
         if request.method == 'PUT':
+            requester_id = int(user_info["id"])
             if requester_id != user_id:
                 return error_response(403, 'Forbidden')
             return users_service.editUserProfile(user_id, request.get_json())
