@@ -33,7 +33,7 @@ def construct_blueprint(video_service,user_service):
     @bp_videos.route('/videos', methods=['GET'])
     @token_required
     def home_videos(user_info):
-        return success_response(200, rule_engine.listVideos(user_info))
+        return success_response(200, rule_engine.prioritize_videos(user_info,video_service.listVideos()))
 
     @bp_videos.route('/videos/<int:video_id>', methods=['GET', 'PATCH', 'DELETE'])
     @token_required
