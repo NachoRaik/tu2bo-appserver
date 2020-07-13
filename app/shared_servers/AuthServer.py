@@ -35,6 +35,10 @@ class AuthServer():
         response = requests.put(self.url + '/users/{}'.format(user_id), json=body)    
         return make_flask_response(response)
 
+    def delete_user_profile(self, user_id):
+        response = requests.delete(self.url + '/users/' + str(user_id))
+        return make_flask_response(response)
+
     def __str__(self):
         return "url => {}".format(self.url)
 
@@ -89,11 +93,11 @@ class MockAuthServer(AuthServer):
         response_data = {'user': get_fields(user)}
         return success_response(200, response_data)
 
-    def get_user_profile(self,user_id_request):
+    def get_user_profile(self, user_id_request):
         for v in self.db.values():
             if v['id'] == str(user_id_request):
                 return success_response(200,get_fields(v))
-        return error_response(404,"User not found")
+        return error_response(404, "User not found")
 
     def edit_user_profile(self, user_id, body):
         for v in self.db.values():
@@ -101,3 +105,10 @@ class MockAuthServer(AuthServer):
                 v['profile'] = body
                 return success_response(200, get_fields(v))
         return error_response(404, "User not found")
+
+    def delete_user_profile(self, user_id):
+        if not any(int(user['id']) == user_id for user in self.db.values()):
+            return error_response(404, 'User not found')
+                
+        self.db = {email:user for email, user in self.db.items() if int(user['id']) != user_id}
+        return flask.Response('', status=204)

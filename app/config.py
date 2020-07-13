@@ -14,6 +14,7 @@ class Config(object):
 	        'db': 'appserver-db',
 	        'host': 'mongodb://appserver-db:27017/appserver-db'
         }
+        self.WEB_INTERFACE_KEY = 'LCCJ5bMh9DzCYJjnD2Q4TWo0l5FiQnibjM4iQcTO7Bl7faMRkJXDuOxa8zugSByW'
 
     def __repr__(self):
         printable_fields = ['DEBUG', 'AUTH_SERVER', 'MEDIA_SERVER']
@@ -33,6 +34,7 @@ class ProductionConfig(Config):
             'retryWrites': False
         }
         self.DELAY = timedelta(days=1)
+        self.WEB_INTERFACE_KEY = os.getenv('WEB_INTERFACE_KEY', '')
 
 class DevelopmentConfig(Config):
     def __init__(self):
@@ -54,3 +56,4 @@ class TestingConfig(Config):
             'connect': False
         }
         self.DELAY = timedelta(milliseconds=1)
+

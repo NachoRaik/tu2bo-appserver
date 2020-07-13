@@ -19,16 +19,14 @@ class TestUsersProfile:
         call.
         """
         db = _get_db()
-        db.drop_collection('friends')
-        db.drop_collection('pending_request')
         disconnect(alias='test')
-
 
     # -- Users management
 
     def test_get_existent_user(self, client):
         """ GET /users/user_id
         Should: return 200"""
+
         token = login_and_token_user(client, USER_1)
         res = get_user_profile(client, token, USER_2)
         res_json = json.loads(res.get_data())
@@ -41,6 +39,7 @@ class TestUsersProfile:
     def test_get_inexistent_user(self, client):
         """ GET /users/user_id
         Should: return 404"""
+
         token = login_and_token_user(client, USER_1)
         res = get_user_profile(client, token, 100)
         assert res.status_code == 404
@@ -48,6 +47,7 @@ class TestUsersProfile:
     def test_check_no_friends(self, client):
         """ GET /users/<user_id_request>
         Should: return 200"""
+
         token = login_and_token_user(client)
         res = get_user_profile(client, token, USER_2)
 
@@ -58,6 +58,7 @@ class TestUsersProfile:
     def test_check_same_user_d(self, client):
         """ GET /users/<user_id_request>
         Should: return 200"""
+
         token = login_and_token_user(client)
         res = get_user_profile(client, token, USER_1)
 
@@ -68,6 +69,7 @@ class TestUsersProfile:
     def test_edit_user_profile_successully(self, client):
         """ PUT /users/user_id
         Should: return 200 """
+
         new_profile_pic = 'myNewProfilePic'
         token = login_and_token_user(client, USER_1)
 
@@ -79,6 +81,7 @@ class TestUsersProfile:
     def test_edit_forbidden_user_profile(self, client):
         """ PUT /users/user_id
         Should: return 403 """
+
         new_profile_pic = 'myNewProfilePic'
         token = login_and_token_user(client, USER_1)
 
@@ -88,7 +91,7 @@ class TestUsersProfile:
     def test_edit_bad_credentials_user_profile(self, client):
         """ PUT /users/user_id
         Should: return 401 """
+
         new_profile_pic = 'myNewProfilePic'
         res = edit_user_profile(client, 'invalid', USER_1, new_profile_pic)
         assert res.status_code == 401
-
