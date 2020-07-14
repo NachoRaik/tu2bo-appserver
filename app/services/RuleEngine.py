@@ -49,7 +49,7 @@ class RuleEngine(object):
             return MIDDLE_PONDERATED
 
     def first_five_ponderator(self):
-        return -1*BIG_VALUE_OF_FRIENDS if self.first_five <= 4 else BIG_VALUE_OF_FRIENDS
+        return BIG_VALUE_OF_FRIENDS if self.first_five <= 4 else 0
 
     def prioritize_videos(self, user_info, videos):
         self.first_five = 0
