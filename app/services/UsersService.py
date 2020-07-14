@@ -21,6 +21,27 @@ class UsersService(object):
     def editUserProfile(self, user_id, data):
         return self.auth_server.edit_user_profile(user_id, data)
 
+    def deleteUserProfile(self, user_id):
+        user_id_friends = self.getFriends(user_id)
+        for user_id_friend in user_id_friends:
+            friends = Friends.objects.with_id(user_id_friend)
+            friends.friends.remove(user_id)
+            friends.save()
+
+        user_id_friends_requests = self.getPendingRequests(user_id)
+        for user_id_friend_request in user_id_friends_requests:
+            friend_request = PendingRequest.objects.with_id(user_id_friend)
+            friend_request.requests.remove(user_id)
+            friend_request.save()
+
+        if Friends.objects.with_id(user_id) != None:
+            Friends.objects.with_id(user_id).delete()
+
+        if PendingRequest.objects.with_id(user_id) != None:    
+            PendingRequest.objects.with_id(user_id).delete()
+
+        return self.auth_server.delete_user_profile(user_id)
+
     def fetchUsersNames(self, users):
         response_data = []
         for u_id in users:

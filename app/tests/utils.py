@@ -33,6 +33,9 @@ def add_video(client, token, user_id, url, author, title, visibility, date):
         'date': date
     })
 
+def get_videos_from_user_id(client, token, user_id):
+    return client.get('/users/{}/videos'.format(user_id), headers={"access-token":token})
+
 def delete_video(client, token, video_id):
     return client.delete('/videos/{}'.format(video_id), headers={"access-token":token})
 
@@ -58,7 +61,7 @@ def like_video(client, token, video_id, liked):
         'liked': liked
     })
 
-def get_videos(client,token):
+def get_videos(client, token):
     return client.get('/videos', headers={"access-token":token})
 
 def get_video(client, token, video_id):
@@ -67,7 +70,7 @@ def get_video(client, token, video_id):
 def get_user_profile(client, token, user_id_request):
     return client.get('/users/{}'.format(user_id_request), headers={"access-token":token})
 
-def my_requests(client,token):
+def my_requests(client, token):
     return client.get('/users/my_requests', headers={"access-token":token})
 
 def send_friend_request(client, token, user_id_request):
@@ -83,3 +86,15 @@ def edit_user_profile(client, token, user_id, profile_pic):
     return client.put('users/{}'.format(user_id), headers={"access-token":token}, json={
         'picture': profile_pic
     })
+  
+def delete_user_profile(client, token, user_id_request):
+    return client.delete('/users/{}'.format(user_id_request), headers={"access-token":token})
+
+def get_stats(client, timestamp=None, num=None):
+    query_string = {}
+    if timestamp != None:
+        query_string['timestamp'] = timestamp
+    if num != None:
+        query_string['num'] = num
+    return client.get('/stats', query_string=query_string)
+

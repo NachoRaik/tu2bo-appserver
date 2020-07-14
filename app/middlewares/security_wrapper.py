@@ -12,8 +12,12 @@ def token_required(f):
         if HEADER_ACCESS_TOKEN not in request.headers:
             app.logger.debug("/token_required || No token header present")
             return Response(json.dumps({ 'reason':'Token not found' }), status=401, mimetype='application/json')
-        
+
         token = request.headers[HEADER_ACCESS_TOKEN]
+
+        if token == app.config['WEB_INTERFACE_KEY']:
+            return f({}, *args, **kwargs)
+
         auth_server = app.config['AUTH_SERVER']
         app.logger.debug("[%s] Sending request to AuthServer /authorize", f.__name__)
         response = auth_server.authorize_user(token)

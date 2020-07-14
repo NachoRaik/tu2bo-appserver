@@ -1,7 +1,7 @@
 import json
 from datetime import datetime
 from database.daos.VideoInfoDAO import VideoInfoDAO
-from utils.flask_utils import error_response
+from utils.flask_utils import error_response, success_response
 
 class VideoService(object):
     def __init__(self, media_server, db_handler=VideoInfoDAO()):
@@ -23,17 +23,38 @@ class VideoService(object):
             self.db_handler.delete_video_info(video_id)
         return res
     
+    def deleteVideos(self, user_id):
+        response = self.listVideosFromUser(user_id)
+        if response.status_code != 200:
+            return response
+        videos_data = json.loads(response.get_data())
+        for video in videos_data:
+            video_id = video['id']
+            response = self.deleteVideo(video_id)
+            if response.status_code != 204:
+                return response
+        return success_response(204, 'Videos deleted successfully')
+
     def editVideo(self, video_id, data):
         return self.media_server.edit_video(video_id, data)
 
-    def listVideosfromUser(self, user_id):
-        return self.media_server.get_user_videos(user_id)
-    
-    def listVideos(self):
+    def listVideosFromUser(self, user_id, are_friends=True):
+        video_searching = {}
+        if not are_friends: 
+            video_searching['visibility'] = 'public'
+        return self.media_server.get_user_videos(user_id, video_searching)
+
+    def listVideos(self, friends_ids=None):
         res = self.media_server.get_videos()
         videos = json.loads(res.get_data())
         for video in videos:
             video['likes'] = len(self.db_handler.get_video_likes(video['id']))
+        videos_to_delete = [video for video in videos 
+                            if friends_ids != None and video['user_id'] not in friends_ids 
+                            and video['visibility'] == 'private'
+                        ] 
+        for video in videos_to_delete: 
+            videos.remove(video)
         return videos
     
     def getVideo(self, user_id, video_id):
@@ -53,6 +74,7 @@ class VideoService(object):
             return None, error_response(404, 'Video not found')
 
         result = comment.to_mongo().to_dict()
+        result['comment_id'] = result['_id']
         del result['_id']
         return result, None
 
@@ -68,9 +90,24 @@ class VideoService(object):
         result.sort(key=lambda d: datetime.strptime(d['timestamp'], '%m/%d/%y %H:%M:%S'))
         return result, None
 
+    def deleteCommentsFromUser(self, user_id):
+        res = self.media_server.get_videos()
+        videos = json.loads(res.get_data())
+        video_ids = [video['id'] for video in videos]
+
+        for video_id in video_ids:
+            self.db_handler.delete_comments_from_user(video_id, user_id)
+    
     def addLikeToVideo(self, user_id, video_id, has_liked):
         likes = self.db_handler.change_user_like_on_video(video_id, user_id, has_liked)
         if likes is None:
             return error_response(404, 'Video not found')
 
         return None
+
+    def removeLikesFromUser(self, user_id):
+        has_liked = False
+        videos = self.listVideos()
+        for video in videos:
+            video_id = video['id']
+            likes = self.db_handler.change_user_like_on_video(video_id, user_id, has_liked)

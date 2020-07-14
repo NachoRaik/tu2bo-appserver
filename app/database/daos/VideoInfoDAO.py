@@ -42,3 +42,13 @@ class VideoInfoDAO(object):
     def delete_video_info(self, video_id):
         video_info = VideoInfo.objects.with_id(video_id)
         video_info.delete()
+
+    def delete_comments_from_user(self, video_id, user_id):
+        video_info = VideoInfo.objects.with_id(video_id)
+        comments = video_info.comments
+        comments_to_remove = []
+        for comment in comments:
+            if comment.user_id == user_id:
+                comments_to_remove.append(comment)
+        for comment in comments_to_remove: comments.remove(comment)        
+        video_info.save()

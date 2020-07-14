@@ -2,6 +2,7 @@ import os
 
 from shared_servers.AuthServer import AuthServer, MockAuthServer
 from shared_servers.MediaServer import MediaServer, MockMediaServer
+from datetime import timedelta
 
 class Config(object):
     def __init__(self):
@@ -13,6 +14,7 @@ class Config(object):
 	        'db': 'appserver-db',
 	        'host': 'mongodb://appserver-db:27017/appserver-db'
         }
+        self.WEB_INTERFACE_KEY = 'LCCJ5bMh9DzCYJjnD2Q4TWo0l5FiQnibjM4iQcTO7Bl7faMRkJXDuOxa8zugSByW'
 
     def __repr__(self):
         printable_fields = ['DEBUG', 'AUTH_SERVER', 'MEDIA_SERVER']
@@ -31,6 +33,8 @@ class ProductionConfig(Config):
             'host': os.getenv('MONGODB_URI'),
             'retryWrites': False
         }
+        self.DELAY = timedelta(days=1)
+        self.WEB_INTERFACE_KEY = os.getenv('WEB_INTERFACE_KEY', '')
 
 class DevelopmentConfig(Config):
     def __init__(self):
@@ -38,6 +42,7 @@ class DevelopmentConfig(Config):
         self.TESTING = True
         self.AUTH_SERVER = MockAuthServer()
         self.MEDIA_SERVER = MockMediaServer()
+        self.DELAY = timedelta(minutes=1)
 
 class TestingConfig(Config):
     def __init__(self):
@@ -50,4 +55,5 @@ class TestingConfig(Config):
             'host': 'mongomock://localhost',
             'connect': False
         }
+        self.DELAY = timedelta(milliseconds=1)
 

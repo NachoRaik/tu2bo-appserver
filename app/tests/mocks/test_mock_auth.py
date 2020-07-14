@@ -118,3 +118,15 @@ class TestMockAuthServer:
         response = self.mock_auth_server.edit_user_profile(100, profile_data)
         json = loads(response.get_data())
         assert response.status_code == 404
+
+    def test_delete_user_success(self):
+        """ Delete user should return 200 with user data """
+
+        response = self.mock_auth_server.delete_user_profile(1)
+        assert response.status_code == 204
+
+    def test_delete_user_inexistent(self):
+        """ Delete user should return 404 with user data """
+
+        response = self.mock_auth_server.delete_user_profile(100)
+        assert response.status_code == 404
