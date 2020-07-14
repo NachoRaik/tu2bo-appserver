@@ -31,14 +31,14 @@ def construct_blueprint(video_service,users_service):
         else:
             are_friends = (requester_id == user_id) or (users_service.getFriendshipStatus(requester_id, user_id) == 'friends')
             return video_service.listVideosFromUser(user_id, are_friends)
-            
+
     @bp_videos.route('/videos', methods=['GET'])
     @token_required
     def home_videos(user_info):
-        requester_id = int(user_info["id"])        
+        requester_id = int(user_info["id"])
         friends_ids = users_service.getFriends(requester_id)[:]
         friends_ids.append(requester_id)
-        return success_response(200, rule_engine.prioritize_videos(user_info,video_service.listVideos()))
+        return success_response(200, rule_engine.prioritize_videos(user_info,video_service.listVideos(friends_ids)))
 
     @bp_videos.route('/videos/<int:video_id>', methods=['GET', 'PATCH', 'DELETE'])
     @token_required
