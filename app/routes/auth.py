@@ -20,6 +20,19 @@ def login():
     return response
 
 
+@bp_auth.route('/oauth2login', methods=['POST'], strict_slashes=False)
+def oauth_login():
+    body = request.get_json()
+    if 'idToken' not in body:
+        return error_response(400, 'Oauth data is missing')
+
+    auth_server = app.config['AUTH_SERVER']
+    app.logger.debug("/oauth2login || Sending request to AuthServer %s ", str(body))
+    response = auth_server.oauth_login(body)
+    app.logger.debug("/oauth2login || Auth Server response %d %s ", response.status_code, response.data)
+    return response
+
+
 @bp_auth.route('/register', methods=['POST'], strict_slashes=False)
 def register():
     body = request.get_json()

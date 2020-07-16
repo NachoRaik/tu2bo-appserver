@@ -14,6 +14,10 @@ class AuthServer():
         response = requests.post(self.url + '/users/login', json=body)
         return make_flask_response(response)
 
+    def oauth_login(self, body):
+        response = requests.post(self.url + '/users/oauth2login', json=body)
+        return make_flask_response(response)
+
     def register(self, body):
         response = requests.post(self.url + '/users/register', json=body)
         return make_flask_response(response)
