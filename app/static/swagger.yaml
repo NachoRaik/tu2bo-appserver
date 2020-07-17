@@ -399,7 +399,7 @@ paths:
           description: Valid code
         '401':
           description: Invalid code or email  
-    put:
+    post:
       tags:
         - users
       summary: Change password
