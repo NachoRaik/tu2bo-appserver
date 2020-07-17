@@ -2,6 +2,8 @@ import pytest
 from json import loads
 from shared_servers.AuthServer import MockAuthServer
 
+CODE = 1111
+
 class TestMockAuthServer:
     def setup_method(self, method):
         """ setup any state tied to the execution of the given method in a
@@ -150,4 +152,32 @@ class TestMockAuthServer:
 
         response = self.mock_auth_server.send_mail({})
         assert response.status_code == 400
+
+    def test_validate_code_success(self):
+        """ Validate code should return 200 """
+
+        email = "email1"
+        request = {"email": email}
+        response = self.mock_auth_server.send_mail(request)
+        assert response.status_code == 200
+
+        response = self.mock_auth_server.validate_code(CODE, email)
+        assert response.status_code == 200
+
+    def test_validate_code_wrong_email(self):
+        """ Validate code should return 401 """
+
+        response = self.mock_auth_server.validate_code(CODE, 'wrongEmail')
+        assert response.status_code == 401
+
+    def test_validate_code_wrong_code(self):
+        """ Validate code should return 401 """
+
+        email = "email1"
+        request = {"email": email}
+        response = self.mock_auth_server.send_mail(request)
+        assert response.status_code == 200
+
+        response = self.mock_auth_server.validate_code(1234, email)
+        assert response.status_code == 401
         

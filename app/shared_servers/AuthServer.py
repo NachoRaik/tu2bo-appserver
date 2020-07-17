@@ -120,3 +120,8 @@ class MockAuthServer(AuthServer):
         if email in self.db:
             generate_code(email, self.db)
         return flask.Response('Email sent', status=200)
+
+    def validate_code(self, code, email):
+        if not email in self.db or self.db[email]['code'] != code:
+            return error_response(401, 'Invalid code or email')
+        return flask.Response('Valid code', status=200)
