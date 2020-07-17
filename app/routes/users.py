@@ -12,12 +12,10 @@ from database.models.friends import Friends
 from services.UsersService import UsersService
 from services.VideoService import VideoService
 
-def construct_blueprint(auth_server, media_server):
+
+def construct_blueprint(users_service,video_service):
     bp_users = Blueprint("bp_users", __name__)
     
-    users_service = UsersService(auth_server)
-    video_service = VideoService(media_server)
-
     # -- Endpoints
 
     @bp_users.route('/users/<int:user_id>/friends', methods=['GET','POST'])
@@ -66,7 +64,7 @@ def construct_blueprint(auth_server, media_server):
             response = users_service.getUserProfile(user_id)
             if response.status_code != 200 or requester_id == user_id:
                 return response
-            
+
             profile_data = json.loads(response.get_data())
             profile_data['friendship_status'] = users_service.getFriendshipStatus(requester_id, user_id)
             return success_response(200, profile_data)
