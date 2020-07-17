@@ -90,6 +90,15 @@ def construct_blueprint(auth_server, media_server):
     def reset_password(user_info):
         return users_service.resetPassword(request.get_json())
 
+    @bp_users.route('/users/password', methods=['POST', 'GET'])
+    @token_required
+    def password(user_info):
+        code = int(request.args.get('code'))
+        email = request.args.get('email')
+
+        if request.method == 'GET':
+            return users_service.validateCode(code, email)
+
     return bp_users
 
 

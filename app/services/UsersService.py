@@ -108,3 +108,6 @@ class UsersService(object):
     def resetPassword(self, data):
         return self.auth_server.send_mail(data)
         
+    def validateCode(self, code, email):
+        return self.auth_server.validate_code(code, email)
+        

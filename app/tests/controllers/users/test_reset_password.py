@@ -5,6 +5,7 @@ from tests.utils import *
 import json
 
 USER_1 = 1
+CODE = 1111
 
 class TestResetPassword:
  
@@ -50,5 +51,49 @@ class TestResetPassword:
         Should: return 401"""
 
         res = reset_password(client, 'wrongToken')
+        assert res.status_code == 401
+
+    def test_validate_code_success(self, client):
+        """ GET /users/password
+        Should: return 200"""
+
+        email = "email1"
+        token = login_and_token_user(client, USER_1)
+        res = reset_password(client, token, email)
+        assert res.status_code == 200
+
+        res = validate_code(client, token, CODE, email)
+        assert res.status_code == 200
+
+    def test_validate_code_wrong_email(self, client):
+        """ GET /users/password
+        Should: return 401"""
+
+        token = login_and_token_user(client, USER_1)
+        res = validate_code(client, token, CODE, 'wrongEmail')
+        assert res.status_code == 401
+
+    def test_validate_code_wrong_code(self, client):
+        """ GET /users/password
+        Should: return 401"""
+
+        email = "email1"
+        token = login_and_token_user(client, USER_1)
+        res = reset_password(client, token, email)
+        assert res.status_code == 200
+
+        res = validate_code(client, token, 1234, email)
+        assert res.status_code == 401
+    
+    def test_validate_code_should_return_401(self, client):
+        """ GET /users/password
+        Should: return 401"""
+
+        email = "email1"
+        token = login_and_token_user(client, USER_1)
+        res = reset_password(client, token, email)
+        assert res.status_code == 200
+
+        res = validate_code(client, 'wrongToken', CODE, email)
         assert res.status_code == 401
         
