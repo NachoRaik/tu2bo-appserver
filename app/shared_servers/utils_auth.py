@@ -1,5 +1,6 @@
 from flask import Response
 import json
+import random
 
 def init_db(db):
     db['email1'] = {'id': '1', 'email': 'email1', 'password': 'hash_password1', 'username': 'user1', 'profile': {'picture': 'picture1'}}
@@ -25,3 +26,6 @@ def get_fields(user):
     
 def validate(email):
     return '@' in email and '.' in email
+
+def generate_code(email, db):
+    db[email]['code'] = 1111

@@ -130,3 +130,24 @@ class TestMockAuthServer:
 
         response = self.mock_auth_server.delete_user_profile(100)
         assert response.status_code == 404
+
+    def test_send_mail_success(self):
+        """ Send mail should return 200 """
+
+        request = {"email": "email1"}
+        response = self.mock_auth_server.send_mail(request)
+        assert response.status_code == 200
+
+    def test_send_wrong_mail_should_return_200(self):
+        """ Send wrong mail should return 200 """
+
+        request = {"email": "wrongemail"}
+        response = self.mock_auth_server.send_mail(request)
+        assert response.status_code == 200
+
+    def test_send_mail_should_return_400(self):
+        """ Send mail should return 400 """
+
+        response = self.mock_auth_server.send_mail({})
+        assert response.status_code == 400
+        

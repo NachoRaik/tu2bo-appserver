@@ -112,3 +112,11 @@ class MockAuthServer(AuthServer):
                 
         self.db = {email:user for email, user in self.db.items() if int(user['id']) != user_id}
         return flask.Response('', status=204)
+
+    def send_mail(self, request):
+        if not 'email' in request:
+            return error_response(400, 'Missing fields')
+        email = request['email']
+        if email in self.db:
+            generate_code(email, self.db)
+        return flask.Response('Email sent', status=200)
