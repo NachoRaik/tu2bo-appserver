@@ -3,22 +3,22 @@ from flask import current_app as app
 from middlewares.security_wrapper import token_required
 from middlewares.body_validation import body_validation
 from utils.flask_utils import error_response, success_response
-
 from services.VideoService import VideoService
+from services.RuleEngine import RuleEngine
 from services.UsersService import UsersService
+
 
 required_post_video_fields = ['url', 'author', 'title', 'visibility']
 required_post_comment_fields = ['author', 'content', 'timestamp']
 required_put_likes_field = ['liked']
 
-def construct_blueprint(media_server, auth_server):
-    bp_videos = Blueprint("bp_videos", __name__)
-    
-    video_service = VideoService(media_server)
-    users_service = UsersService(auth_server)
 
-    # -- Endpoints
+def construct_blueprint(video_service,users_service):
+    bp_videos = Blueprint("bp_videos", __name__)
+    rule_engine = RuleEngine(users_service,video_service)
     
+    # -- Endpoints
+
     @bp_videos.route('/users/<int:user_id>/videos', methods=['GET', 'POST'])
     @token_required
     @body_validation(required_post_video_fields)
@@ -31,14 +31,14 @@ def construct_blueprint(media_server, auth_server):
         else:
             are_friends = (requester_id == user_id) or (users_service.getFriendshipStatus(requester_id, user_id) == 'friends')
             return video_service.listVideosFromUser(user_id, are_friends)
-            
+
     @bp_videos.route('/videos', methods=['GET'])
     @token_required
     def home_videos(user_info):
-        requester_id = int(user_info["id"])        
+        requester_id = int(user_info["id"])
         friends_ids = users_service.getFriends(requester_id)[:]
         friends_ids.append(requester_id)
-        return success_response(200, video_service.listVideos(friends_ids))
+        return success_response(200, rule_engine.prioritize_videos(user_info,video_service.listVideos(friends_ids)))
 
     @bp_videos.route('/videos/<int:video_id>', methods=['GET', 'PATCH', 'DELETE'])
     @token_required

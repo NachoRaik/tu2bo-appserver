@@ -86,7 +86,7 @@ def edit_user_profile(client, token, user_id, profile_pic):
     return client.put('users/{}'.format(user_id), headers={"access-token":token}, json={
         'picture': profile_pic
     })
-
+  
 def delete_user_profile(client, token, user_id_request):
     return client.delete('/users/{}'.format(user_id_request), headers={"access-token":token})
 

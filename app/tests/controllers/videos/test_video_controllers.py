@@ -20,7 +20,7 @@ class TestVideoController:
         db.drop_collection('friends')
         disconnect(alias='test')
 
-    # -- Video management
+# -- Video management
 
     def test_add_video_successfully(self, client):
         """ POST /users/user_id/videos
@@ -412,7 +412,7 @@ class TestVideoController:
         res = delete_video(client, token, 1)
 
         assert res.status_code == 404
-    
+
     def test_edit_video_invalid_values(self, client):
         """ PATCH /videos/video_id
         Should: return 400 """
@@ -437,7 +437,7 @@ class TestVideoController:
         assert res.status_code == 400
         assert res_json['reason'] == 'Invalid visibility'
 
-    
+
     # -- Video Info logic
 
     def test_add_comment_to_video_succesful(self, client):
