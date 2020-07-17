@@ -39,6 +39,18 @@ class AuthServer():
         response = requests.delete(self.url + '/users/' + str(user_id))
         return make_flask_response(response)
 
+    def send_mail(self, body):
+        response = requests.post(self.url + '/reset_password', json=body)
+        return make_flask_response(response)
+
+    def validate_code(self, code, email):
+        response = requests.get(self.url + f'/password?code={code}&email={email}')
+        return make_flask_response(response)
+
+    def change_password(self, body, code, email):
+        response = requests.post(self.url + f'/password?code={code}&email={email}', json=body)
+        return make_flask_response(response)
+
     def __str__(self):
         return "url => {}".format(self.url)
 
@@ -112,3 +124,26 @@ class MockAuthServer(AuthServer):
                 
         self.db = {email:user for email, user in self.db.items() if int(user['id']) != user_id}
         return flask.Response('', status=204)
+
+    def send_mail(self, request):
+        if not 'email' in request:
+            return error_response(400, 'Missing fields')
+        email = request['email']
+        if email in self.db:
+            generate_code(email, self.db)
+        return flask.Response('Email sent', status=200)
+
+    def validate_code(self, code, email):
+        if not email in self.db or self.db[email]['code'] != code:
+            return error_response(401, 'Invalid code or email')
+        return flask.Response('Valid code', status=200)
+
+    def change_password(self, request, code, email):
+        if not 'password' in request:
+            return error_response(400, 'Missing fields')
+
+        if not email in self.db or self.db[email]['code'] != code:
+            return error_response(401, 'Invalid code or email')
+
+        save_password(get_hash(request['password']), email, self.db)
+        return flask.Response('Password changed', status=204)

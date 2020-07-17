@@ -105,3 +105,12 @@ class UsersService(object):
         pending.save()
         return None
         
+    def resetPassword(self, data):
+        return self.auth_server.send_mail(data)
+        
+    def validateCode(self, code, email):
+        return self.auth_server.validate_code(code, email)
+
+    def changePassword(self, code, email, data):
+        return self.auth_server.change_password(data, code, email)
+        
