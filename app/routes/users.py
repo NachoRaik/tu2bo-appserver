@@ -85,4 +85,11 @@ def construct_blueprint(auth_server, media_server):
             response = video_service.deleteVideos(user_id) 
             return response if response.status_code != 204 else users_service.deleteUserProfile(user_id)
 
+    @bp_users.route('/users/reset_password', methods=['POST'])
+    @token_required
+    def reset_password(user_info):
+        return users_service.resetPassword(request.get_json())
+
     return bp_users
+
+

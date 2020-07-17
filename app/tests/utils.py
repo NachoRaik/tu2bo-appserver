@@ -97,3 +97,9 @@ def get_stats(client, timestamp=None, num=None):
     if num != None:
         query_string['num'] = num
     return client.get('/stats', query_string=query_string)
+
+def reset_password(client, token, email=None):
+    request = {}
+    if email:
+        request['email'] = email
+    return client.post('/users/reset_password', headers={"access-token":token}, json=request)
