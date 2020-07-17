@@ -110,4 +110,7 @@ class UsersService(object):
         
     def validateCode(self, code, email):
         return self.auth_server.validate_code(code, email)
+
+    def changePassword(self, code, email, data):
+        return self.auth_server.change_password(data, code, email)
         

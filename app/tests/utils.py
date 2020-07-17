@@ -106,3 +106,9 @@ def reset_password(client, token, email=None):
 
 def validate_code(client, token, code, email):
     return client.get('/users/password?code={}&email={}'.format(code, email), headers={"access-token":token})
+
+def change_password(client, token, code, email, password=None):
+    request = {}
+    if password:
+        request['password'] = password
+    return client.post('/users/password?code={}&email={}'.format(code, email), headers={"access-token":token}, json=request)

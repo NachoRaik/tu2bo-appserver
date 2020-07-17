@@ -97,6 +97,8 @@ def construct_blueprint(users_service,video_service):
         if request.method == 'GET':
             return users_service.validateCode(code, email)
 
+        return users_service.changePassword(code, email, request.get_json())
+
     return bp_users
 
 

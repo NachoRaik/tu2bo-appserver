@@ -96,4 +96,64 @@ class TestResetPassword:
 
         res = validate_code(client, 'wrongToken', CODE, email)
         assert res.status_code == 401
+
+    def test_change_password_success(self, client):
+        """ POST /users/password
+        Should: return 204"""
+
+        email = "email1"
+        token = login_and_token_user(client, USER_1)
+        res = reset_password(client, token, email)
+        assert res.status_code == 200
+
+        res = change_password(client, token, CODE, email, 'aPassword')
+        assert res.status_code == 204
+
+    def test_change_password_missing_fields(self, client):
+        """ POST /users/password
+        Should: return 400"""
+
+        email = "email1"
+        token = login_and_token_user(client, USER_1)
+        res = reset_password(client, token, email)
+        assert res.status_code == 200
+
+        res = change_password(client, token, CODE, email)
+        assert res.status_code == 400
+
+    def test_change_password_wrong_email(self, client):
+        """ POST /users/password
+        Should: return 401"""
+
+        email = "email1"
+        token = login_and_token_user(client, USER_1)
+        res = reset_password(client, token, email)
+        assert res.status_code == 200
+
+        res = change_password(client, token, CODE, 'wrongEmail', 'aPassword')
+        assert res.status_code == 401
+   
+    def test_change_password_wrong_code(self, client):
+        """ POST /users/password
+        Should: return 401"""
+
+        email = "email1"
+        token = login_and_token_user(client, USER_1)
+        res = reset_password(client, token, email)
+        assert res.status_code == 200
+
+        res = change_password(client, token, 1234, email, 'aPassword')
+        assert res.status_code == 401
+    
+    def test_change_password_wrong_token(self, client):
+        """ POST /users/password
+        Should: return 401"""
+
+        email = "email1"
+        token = login_and_token_user(client, USER_1)
+        res = reset_password(client, token, email)
+        assert res.status_code == 200
+
+        res = change_password(client, 'wrongToken', CODE, email, 'aPassword')
+        assert res.status_code == 401
         
