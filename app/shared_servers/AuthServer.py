@@ -125,3 +125,13 @@ class MockAuthServer(AuthServer):
         if not email in self.db or self.db[email]['code'] != code:
             return error_response(401, 'Invalid code or email')
         return flask.Response('Valid code', status=200)
+
+    def change_password(self, request, code, email):
+        if not 'password' in request:
+            return error_response(400, 'Missing fields')
+
+        if not email in self.db or self.db[email]['code'] != code:
+            return error_response(401, 'Invalid code or email')
+
+        save_password(get_hash(request['password']), email, self.db)
+        return flask.Response('Password changed', status=204)

@@ -29,3 +29,6 @@ def validate(email):
 
 def generate_code(email, db):
     db[email]['code'] = 1111
+
+def save_password(password, email, db):
+    db[email]['password'] = password
