@@ -24,6 +24,9 @@ def login_and_token_user(client, id = 1):
     token, user = parse_login(response)
     return token
 
+def oauth2_login(client, googleToken):
+    return client.post('/oauth2login', json={'idToken':googleToken})
+
 def add_video(client, token, user_id, url, author, title, visibility, date):
     return client.post('/users/{}/videos'.format(user_id), headers={"access-token":token}, json={
         'url': url,
@@ -86,7 +89,7 @@ def edit_user_profile(client, token, user_id, profile_pic):
     return client.put('users/{}'.format(user_id), headers={"access-token":token}, json={
         'picture': profile_pic
     })
-  
+
 def delete_user_profile(client, token, user_id_request):
     return client.delete('/users/{}'.format(user_id_request), headers={"access-token":token})
 
@@ -97,4 +100,3 @@ def get_stats(client, timestamp=None, num=None):
     if num != None:
         query_string['num'] = num
     return client.get('/stats', query_string=query_string)
-
