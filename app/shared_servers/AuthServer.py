@@ -39,6 +39,18 @@ class AuthServer():
         response = requests.delete(self.url + '/users/' + str(user_id))
         return make_flask_response(response)
 
+    def send_mail(self, body):
+        response = requests.post(self.url + '/reset_password', json=body)
+        return make_flask_response(response)
+
+    def validate_code(self, code, email):
+        response = requests.get(self.url + f'/password?code={code}&email={email}')
+        return make_flask_response(response)
+
+    def change_password(self, body, code, email):
+        response = requests.post(self.url + f'/password?code={code}&email={email}', json=body)
+        return make_flask_response(response)
+
     def __str__(self):
         return "url => {}".format(self.url)
 
