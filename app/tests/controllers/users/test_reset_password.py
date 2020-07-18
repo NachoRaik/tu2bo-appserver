@@ -26,51 +26,39 @@ class TestResetPassword:
         """ POST /users/reset_password
         Should: return 200"""
 
-        token = login_and_token_user(client, USER_1)
-        res = reset_password(client, token, 'email1')
+        res = reset_password(client, 'email1')
         assert res.status_code == 200
 
     def test_reset_password_wrong_mail_should_return_200(self, client):
         """ POST /users/reset_password
         Should: return 200"""
 
-        token = login_and_token_user(client, USER_1)
-        res = reset_password(client, token, 'wrongEmail')
+        res = reset_password(client, 'wrongEmail')
         assert res.status_code == 200
 
     def test_reset_password_should_return_400(self, client):
         """ POST /users/reset_password
         Should: return 400"""
 
-        token = login_and_token_user(client, USER_1)
-        res = reset_password(client, token)
+        res = reset_password(client)
         assert res.status_code == 400
-
-    def test_reset_password_should_return_401(self, client):
-        """ POST /users/reset_password
-        Should: return 401"""
-
-        res = reset_password(client, 'wrongToken')
-        assert res.status_code == 401
 
     def test_validate_code_success(self, client):
         """ GET /users/password
         Should: return 200"""
 
         email = "email1"
-        token = login_and_token_user(client, USER_1)
-        res = reset_password(client, token, email)
+        res = reset_password(client, email)
         assert res.status_code == 200
 
-        res = validate_code(client, token, CODE, email)
+        res = validate_code(client, CODE, email)
         assert res.status_code == 200
 
     def test_validate_code_wrong_email(self, client):
         """ GET /users/password
         Should: return 401"""
 
-        token = login_and_token_user(client, USER_1)
-        res = validate_code(client, token, CODE, 'wrongEmail')
+        res = validate_code(client, CODE, 'wrongEmail')
         assert res.status_code == 401
 
     def test_validate_code_wrong_code(self, client):
@@ -78,23 +66,10 @@ class TestResetPassword:
         Should: return 401"""
 
         email = "email1"
-        token = login_and_token_user(client, USER_1)
-        res = reset_password(client, token, email)
+        res = reset_password(client, email)
         assert res.status_code == 200
 
-        res = validate_code(client, token, 1234, email)
-        assert res.status_code == 401
-    
-    def test_validate_code_should_return_401(self, client):
-        """ GET /users/password
-        Should: return 401"""
-
-        email = "email1"
-        token = login_and_token_user(client, USER_1)
-        res = reset_password(client, token, email)
-        assert res.status_code == 200
-
-        res = validate_code(client, 'wrongToken', CODE, email)
+        res = validate_code(client, 1234, email)
         assert res.status_code == 401
 
     def test_change_password_success(self, client):
@@ -102,11 +77,10 @@ class TestResetPassword:
         Should: return 204"""
 
         email = "email1"
-        token = login_and_token_user(client, USER_1)
-        res = reset_password(client, token, email)
+        res = reset_password(client, email)
         assert res.status_code == 200
 
-        res = change_password(client, token, CODE, email, 'aPassword')
+        res = change_password(client, CODE, email, 'aPassword')
         assert res.status_code == 204
 
     def test_change_password_missing_fields(self, client):
@@ -114,11 +88,10 @@ class TestResetPassword:
         Should: return 400"""
 
         email = "email1"
-        token = login_and_token_user(client, USER_1)
-        res = reset_password(client, token, email)
+        res = reset_password(client, email)
         assert res.status_code == 200
 
-        res = change_password(client, token, CODE, email)
+        res = change_password(client, CODE, email)
         assert res.status_code == 400
 
     def test_change_password_wrong_email(self, client):
@@ -126,11 +99,10 @@ class TestResetPassword:
         Should: return 401"""
 
         email = "email1"
-        token = login_and_token_user(client, USER_1)
-        res = reset_password(client, token, email)
+        res = reset_password(client, email)
         assert res.status_code == 200
 
-        res = change_password(client, token, CODE, 'wrongEmail', 'aPassword')
+        res = change_password(client, CODE, 'wrongEmail', 'aPassword')
         assert res.status_code == 401
    
     def test_change_password_wrong_code(self, client):
@@ -138,22 +110,9 @@ class TestResetPassword:
         Should: return 401"""
 
         email = "email1"
-        token = login_and_token_user(client, USER_1)
-        res = reset_password(client, token, email)
+        res = reset_password(client, email)
         assert res.status_code == 200
 
-        res = change_password(client, token, 1234, email, 'aPassword')
+        res = change_password(client, 1234, email, 'aPassword')
         assert res.status_code == 401
     
-    def test_change_password_wrong_token(self, client):
-        """ POST /users/password
-        Should: return 401"""
-
-        email = "email1"
-        token = login_and_token_user(client, USER_1)
-        res = reset_password(client, token, email)
-        assert res.status_code == 200
-
-        res = change_password(client, 'wrongToken', CODE, email, 'aPassword')
-        assert res.status_code == 401
-        
