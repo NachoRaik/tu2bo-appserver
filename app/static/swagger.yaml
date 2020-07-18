@@ -357,15 +357,13 @@ paths:
                     type: string
                     example: Can't accept friendship without request
 
-  /users/reset_password:
+  /reset_password:
     post:
       tags:
-        - users
+        - auth
       summary: Send email to reset password
       description: ''
       operationId: 'resetPass'
-      parameters:
-        - $ref: '#/components/parameters/accessTokenHeader'
       requestBody:
         description: Email to send code
         required: true
@@ -383,17 +381,16 @@ paths:
         '400':
           description: Missing fields
           
-  /users/password:
+  /password:
     get:
       tags:
-        - users
+        - auth
       summary: Validate code
       description: ''
       operationId: 'validateCode'
       parameters:
         - $ref: '#/components/parameters/email'
         - $ref: '#/components/parameters/code'
-        - $ref: '#/components/parameters/accessTokenHeader'
       responses:
         '200':
           description: Valid code
@@ -401,12 +398,10 @@ paths:
           description: Invalid code or email  
     post:
       tags:
-        - users
+        - auth
       summary: Change password
       description: ''
       operationId: 'changePassword'
-      parameters:
-        - $ref: '#/components/parameters/accessTokenHeader'
       requestBody:
         description: New password 
         required: true

@@ -102,13 +102,13 @@ def reset_password(client, email=None):
     request = {}
     if email:
         request['email'] = email
-    return client.post('/users/reset_password', json=request)
+    return client.post('/reset_password', json=request)
 
 def validate_code(client, code, email):
-    return client.get('/users/password?code={}&email={}'.format(code, email))
+    return client.get('/password?code={}&email={}'.format(code, email))
 
 def change_password(client, code, email, password=None):
     request = {}
     if password:
         request['password'] = password
-    return client.post('/users/password?code={}&email={}'.format(code, email), json=request)
+    return client.post('/password?code={}&email={}'.format(code, email), json=request)
