@@ -42,10 +42,10 @@ def create_app(config=DevelopmentConfig()):
     # -- Routes registration
     from routes import auth, monitoring, users, videos
 
-    app.register_blueprint(auth.bp_auth)
     app.register_blueprint(monitoring.bp_monitor)
-    app.register_blueprint(users.construct_blueprint(user_service,video_service))
-    app.register_blueprint(videos.construct_blueprint(video_service,user_service))
+    app.register_blueprint(auth.construct_blueprint(user_service))
+    app.register_blueprint(users.construct_blueprint(user_service, video_service))
+    app.register_blueprint(videos.construct_blueprint(video_service, user_service))
 
     setup_swaggerui(app)
 
