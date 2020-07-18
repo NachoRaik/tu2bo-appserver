@@ -11,44 +11,44 @@ class AuthServer():
         self.url = url
 
     def login(self, body):
-        response = requests.post(self.url + '/users/login', json=body)
+        response = requests.post(f'{self.url}/users/login', json=body)
         return make_flask_response(response)
 
     def register(self, body):
-        response = requests.post(self.url + '/users/register', json=body)
+        response = requests.post(f'{self.url}/users/register', json=body)
         return make_flask_response(response)
 
     def get_users(self):
-        response = requests.get(self.url + '/users')
+        response = requests.get(f'{self.url}/users')
         return make_flask_response(response)
 
     def authorize_user(self, token):
         headers = {'access-token': token}
-        response = requests.post(self.url + '/users/authorize', headers=headers)
+        response = requests.post(f'{self.url}/users/authorize', headers=headers)
         return make_flask_response(response)
 
     def get_user_profile(self,user_id_request):
-        response = requests.get(self.url + '/users/' + str(user_id_request))
+        response = requests.get(f'{self.url}/users/{user_id_request}')
         return make_flask_response(response)
 
     def edit_user_profile(self, user_id, body):
-        response = requests.put(self.url + '/users/{}'.format(user_id), json=body)    
+        response = requests.put(f'{self.url}/users/{user_id}', json=body)    
         return make_flask_response(response)
 
     def delete_user_profile(self, user_id):
-        response = requests.delete(self.url + '/users/' + str(user_id))
+        response = requests.delete(f'{self.url}/users/{user_id}')
         return make_flask_response(response)
 
     def send_mail(self, body):
-        response = requests.post(self.url + '/reset_password', json=body)
+        response = requests.post(f'{self.url}/users/reset_password', json=body)
         return make_flask_response(response)
 
     def validate_code(self, code, email):
-        response = requests.get(self.url + f'/password?code={code}&email={email}')
+        response = requests.get(f'{self.url}/users/password?code={code}&email={email}')
         return make_flask_response(response)
 
     def change_password(self, body, code, email):
-        response = requests.post(self.url + f'/password?code={code}&email={email}', json=body)
+        response = requests.post(f'{self.url}/users/password?code={code}&email={email}', json=body)
         return make_flask_response(response)
 
     def __str__(self):

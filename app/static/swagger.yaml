@@ -402,6 +402,9 @@ paths:
       summary: Change password
       description: ''
       operationId: 'changePassword'
+      parameters:
+        - $ref: '#/components/parameters/email'
+        - $ref: '#/components/parameters/code'
       requestBody:
         description: New password 
         required: true
