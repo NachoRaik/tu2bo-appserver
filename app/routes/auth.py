@@ -32,11 +32,11 @@ def construct_blueprint(users_service):
         app.logger.debug("/register || Auth Server response %d %s ", response.status_code, response.data)
         return response
 
-    @bp_auth.route('/reset_password', methods=['POST'])
+    @bp_auth.route('/reset_password', methods=['POST'], strict_slashes=False)
     def reset_password():
         return users_service.resetPassword(request.get_json())
 
-    @bp_auth.route('/password', methods=['POST', 'GET'])
+    @bp_auth.route('/password', methods=['POST', 'GET'], strict_slashes=False)
     def password():
         code = int(request.args.get('code'))
         email = request.args.get('email')
