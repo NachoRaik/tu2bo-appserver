@@ -2,6 +2,8 @@ import pytest
 from json import loads
 from shared_servers.AuthServer import MockAuthServer
 
+CODE = 1111
+
 class TestMockAuthServer:
     def setup_method(self, method):
         """ setup any state tied to the execution of the given method in a
@@ -130,3 +132,99 @@ class TestMockAuthServer:
 
         response = self.mock_auth_server.delete_user_profile(100)
         assert response.status_code == 404
+
+    def test_send_mail_success(self):
+        """ Send mail should return 200 """
+
+        request = {"email": "email1"}
+        response = self.mock_auth_server.send_mail(request)
+        assert response.status_code == 200
+
+    def test_send_wrong_mail_should_return_200(self):
+        """ Send wrong mail should return 200 """
+
+        request = {"email": "wrongemail"}
+        response = self.mock_auth_server.send_mail(request)
+        assert response.status_code == 200
+
+    def test_send_mail_should_return_400(self):
+        """ Send mail should return 400 """
+
+        response = self.mock_auth_server.send_mail({})
+        assert response.status_code == 400
+
+    def test_validate_code_success(self):
+        """ Validate code should return 200 """
+
+        email = "email1"
+        request = {"email": email}
+        response = self.mock_auth_server.send_mail(request)
+        assert response.status_code == 200
+
+        response = self.mock_auth_server.validate_code(CODE, email)
+        assert response.status_code == 200
+
+    def test_validate_code_wrong_email(self):
+        """ Validate code should return 401 """
+
+        response = self.mock_auth_server.validate_code(CODE, 'wrongEmail')
+        assert response.status_code == 401
+
+    def test_validate_code_wrong_code(self):
+        """ Validate code should return 401 """
+
+        email = "email1"
+        request = {"email": email}
+        response = self.mock_auth_server.send_mail(request)
+        assert response.status_code == 200
+
+        response = self.mock_auth_server.validate_code(1234, email)
+        assert response.status_code == 401
+
+    def test_change_password_success(self):
+        """ Change password should return 204 """
+
+        email = "email1"
+        request = {"email": email}
+        response = self.mock_auth_server.send_mail(request)
+        assert response.status_code == 200
+
+        request = {"password": "aPassword"}
+        response = self.mock_auth_server.change_password(request, CODE, email)
+        assert response.status_code == 204
+
+    def test_change_password_missing_fields(self):
+        """ Change password should return 400 """
+
+        email = "email1"
+        request = {"email": email}
+        response = self.mock_auth_server.send_mail(request)
+        assert response.status_code == 200
+
+        response = self.mock_auth_server.change_password({}, CODE, email)
+        assert response.status_code == 400
+
+    def test_change_password_wrong_email(self):
+        """ Change password should return 401 """
+
+        email = "email1"
+        request = {"email": email}
+        response = self.mock_auth_server.send_mail(request)
+        assert response.status_code == 200
+
+        request = {"password": "aPassword"}
+        response = self.mock_auth_server.change_password(request, CODE, "wrongEmail")
+        assert response.status_code == 401
+   
+    def test_change_password_wrong_code(self):
+        """ Change password should return 401 """
+
+        email = "email1"
+        request = {"email": email}
+        response = self.mock_auth_server.send_mail(request)
+        assert response.status_code == 200
+
+        request = {"password": "aPassword"}
+        response = self.mock_auth_server.change_password(request, 1234, email)
+        assert response.status_code == 401
+        

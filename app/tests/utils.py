@@ -101,3 +101,17 @@ def get_stats(client, timestamp=None, num=None):
         query_string['num'] = num
     return client.get('/stats', query_string=query_string)
 
+def reset_password(client, email=None):
+    request = {}
+    if email:
+        request['email'] = email
+    return client.post('/reset_password', json=request)
+
+def validate_code(client, code, email):
+    return client.get('/password?code={}&email={}'.format(code, email))
+
+def change_password(client, code, email, password=None):
+    request = {}
+    if password:
+        request['password'] = password
+    return client.post('/password?code={}&email={}'.format(code, email), json=request)

@@ -12,7 +12,6 @@ from database.models.friends import Friends
 from services.UsersService import UsersService
 from services.VideoService import VideoService
 
-
 def construct_blueprint(users_service,video_service):
     bp_users = Blueprint("bp_users", __name__)
     

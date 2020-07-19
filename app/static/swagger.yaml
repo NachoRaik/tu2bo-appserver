@@ -404,6 +404,71 @@ paths:
                     type: string
                     example: Can't accept friendship without request
 
+  /reset_password:
+    post:
+      tags:
+        - auth
+      summary: Send email to reset password
+      description: ''
+      operationId: 'resetPass'
+      requestBody:
+        description: Email to send code
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                email:
+                  type: string
+                  example: mail@mail.com
+      responses:
+        '200':
+          description: Email sent
+        '400':
+          description: Missing fields
+          
+  /password:
+    get:
+      tags:
+        - auth
+      summary: Validate code
+      description: ''
+      operationId: 'validateCode'
+      parameters:
+        - $ref: '#/components/parameters/email'
+        - $ref: '#/components/parameters/code'
+      responses:
+        '200':
+          description: Valid code
+        '401':
+          description: Invalid code or email  
+    post:
+      tags:
+        - auth
+      summary: Change password
+      description: ''
+      operationId: 'changePassword'
+      parameters:
+        - $ref: '#/components/parameters/email'
+        - $ref: '#/components/parameters/code'
+      requestBody:
+        description: New password 
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                password:
+                  type: string
+                  example: newPassword
+      responses:
+        '204':
+          description: Password changed
+        '401':
+          description: Invalid code
+
 
   /videos:
     get:
@@ -649,7 +714,19 @@ components:
       schema:
         type: integer
         minimum: 1
-
+    email:
+      in: query
+      name: email
+      required: true
+      schema:
+        type: string
+    code:
+      in: query
+      name: code
+      required: true
+      schema:
+        type: string
+        
   schemas:
     VideoUpload:
       type: object

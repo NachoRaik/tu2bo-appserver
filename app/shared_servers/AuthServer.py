@@ -11,7 +11,7 @@ class AuthServer():
         self.url = url
 
     def login(self, body):
-        response = requests.post(self.url + '/users/login', json=body)
+        response = requests.post(f'{self.url}/users/login', json=body)
         return make_flask_response(response)
 
     def oauth_login(self, body):
@@ -19,28 +19,40 @@ class AuthServer():
         return make_flask_response(response)
 
     def register(self, body):
-        response = requests.post(self.url + '/users/register', json=body)
+        response = requests.post(f'{self.url}/users/register', json=body)
         return make_flask_response(response)
 
     def get_users(self):
-        response = requests.get(self.url + '/users')
+        response = requests.get(f'{self.url}/users')
         return make_flask_response(response)
 
     def authorize_user(self, token):
         headers = {'access-token': token}
-        response = requests.post(self.url + '/users/authorize', headers=headers)
+        response = requests.post(f'{self.url}/users/authorize', headers=headers)
         return make_flask_response(response)
 
     def get_user_profile(self,user_id_request):
-        response = requests.get(self.url + '/users/' + str(user_id_request))
+        response = requests.get(f'{self.url}/users/{user_id_request}')
         return make_flask_response(response)
 
     def edit_user_profile(self, user_id, body):
-        response = requests.put(self.url + '/users/{}'.format(user_id), json=body)
+        response = requests.put(f'{self.url}/users/{user_id}', json=body)    
         return make_flask_response(response)
 
     def delete_user_profile(self, user_id):
-        response = requests.delete(self.url + '/users/' + str(user_id))
+        response = requests.delete(f'{self.url}/users/{user_id}')
+        return make_flask_response(response)
+
+    def send_mail(self, body):
+        response = requests.post(f'{self.url}/users/reset_password', json=body)
+        return make_flask_response(response)
+
+    def validate_code(self, code, email):
+        response = requests.get(f'{self.url}/users/password?code={code}&email={email}')
+        return make_flask_response(response)
+
+    def change_password(self, body, code, email):
+        response = requests.post(f'{self.url}/users/password?code={code}&email={email}', json=body)
         return make_flask_response(response)
 
     def __str__(self):
@@ -128,3 +140,26 @@ class MockAuthServer(AuthServer):
         user = self.db[email]
         response_data = {'token': get_token(email), 'user': get_fields(user)}
         return success_response(200, response_data)
+      
+    def send_mail(self, request):
+        if not 'email' in request:
+            return error_response(400, 'Missing fields')
+        email = request['email']
+        if email in self.db:
+            generate_code(email, self.db)
+        return flask.Response('Email sent', status=200)
+
+    def validate_code(self, code, email):
+        if not email in self.db or self.db[email]['code'] != code:
+            return error_response(401, 'Invalid code or email')
+        return flask.Response('Valid code', status=200)
+
+    def change_password(self, request, code, email):
+        if not 'password' in request:
+            return error_response(400, 'Missing fields')
+
+        if not email in self.db or self.db[email]['code'] != code:
+            return error_response(401, 'Invalid code or email')
+
+        save_password(get_hash(request['password']), email, self.db)
+        return flask.Response('Password changed', status=204)
