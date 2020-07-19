@@ -142,3 +142,11 @@ class TestAuthController:
         res_json = res.get_json()
         assert res.status_code == 200
         assert res_json['user']['id'] == NEXT_ID
+
+    def test_register_oauth(self, client):
+        """ POST /oauth2login
+        Should: return 400 """
+
+        res = oauth2_login(client, "invalidToken")
+        res_json = res.get_json()
+        assert res.status_code == 400

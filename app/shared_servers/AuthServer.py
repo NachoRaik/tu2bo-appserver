@@ -118,6 +118,7 @@ class MockAuthServer(AuthServer):
         return flask.Response('', status=204)
 
     def oauth_login(self, data):
+        if not "_" in data["idToken"]: return error_response(400, "Cant verify google credentials")
         email = data["idToken"].split("_")[1]
         if email not in self.db:
             id = self.generate_id()
