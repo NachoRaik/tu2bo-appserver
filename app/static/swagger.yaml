@@ -43,7 +43,7 @@ paths:
                 properties:
                   token:
                     type: string
-                    example: n21IvyUVYTVyt76VuvYNIA0iababZWQsff
+                    example: someToken
                   user:
                     type: object
                     properties:
@@ -98,7 +98,54 @@ paths:
           $ref: '#/components/responses/BadRequestResponse'
         '409':
           $ref: '#/components/responses/ConflictResponse'
-
+  /oauth2login:
+    post:
+      tags:
+        - auth
+      summary: Logs user into the system by external service
+      description: ''
+      operationId: oauthLogin
+      requestBody:
+        description: Login credentials
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                idToken:
+                  type: string
+                  example: someGoogleToken
+                photoURL:
+                  type: string
+                  example: someURL
+      responses:
+        '200':
+          description: User logged in
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  token:
+                    type: string
+                    example: aToken
+                  user:
+                    type: object
+                    properties:
+                      id:
+                        type: integer
+                        example: 1
+                      username:
+                        type: string
+                        example: olifer97
+                      email:
+                        type: string
+                        example: olifer97@address.com
+        '400':
+          $ref: '#/components/responses/BadRequestResponse'
+        '401':
+          $ref: '#/components/responses/UnauthorizedResponse'
   /users/{id}:
     get:
       tags:
@@ -131,12 +178,12 @@ paths:
                   profile:
                     type: object
                     example:
-                      picture: images.com/myProfilePic 
+                      picture: images.com/myProfilePic
         '401':
           $ref: '#/components/responses/UnauthorizedResponse'
         '404':
           $ref: '#/components/responses/NotFoundResponse'
-        
+
     put:
       tags:
         - users
@@ -169,7 +216,7 @@ paths:
           $ref: '#/components/responses/Forbidden'
         '401':
           $ref: '#/components/responses/UnauthorizedResponse'
-          
+
     delete:
       tags:
         - users
@@ -326,7 +373,7 @@ paths:
                     username:
                       type: string
                       example: username1
-    
+
     post:
       tags:
         - users
@@ -462,7 +509,7 @@ paths:
           $ref: '#/components/responses/UnauthorizedResponse'
         '404':
           $ref: '#/components/responses/NotFoundResponse'
-    
+
     patch:
       tags:
         - videos
@@ -494,7 +541,7 @@ paths:
           description: Invalid values / Invalid visibility
         '404':
           description: Video not found
-    
+
     delete:
       tags:
         - videos
@@ -741,7 +788,7 @@ components:
         likes:
           type: integer
           example: 100000
-    
+
     EditVideo:
       type: object
       properties:
@@ -843,4 +890,3 @@ components:
           type: object
           example:
             picture: images.com/myProfilePic        
-            

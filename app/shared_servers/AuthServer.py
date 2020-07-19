@@ -14,6 +14,10 @@ class AuthServer():
         response = requests.post(f'{self.url}/users/login', json=body)
         return make_flask_response(response)
 
+    def oauth_login(self, body):
+        response = requests.post(self.url + '/users/oauth2login', json=body)
+        return make_flask_response(response)
+
     def register(self, body):
         response = requests.post(f'{self.url}/users/register', json=body)
         return make_flask_response(response)
@@ -121,10 +125,22 @@ class MockAuthServer(AuthServer):
     def delete_user_profile(self, user_id):
         if not any(int(user['id']) == user_id for user in self.db.values()):
             return error_response(404, 'User not found')
-                
+
         self.db = {email:user for email, user in self.db.items() if int(user['id']) != user_id}
         return flask.Response('', status=204)
 
+    def oauth_login(self, data):
+        if not "_" in data["idToken"]: return error_response(400, "Cant verify google credentials")
+        email = data["idToken"].split("_")[1]
+        if email not in self.db:
+            id = self.generate_id()
+            username = email.split('@')[0]
+            username = "o_" + username
+            self.db[email] = {'id': id, 'email': email, 'username': username, 'profile':{}}
+        user = self.db[email]
+        response_data = {'token': get_token(email), 'user': get_fields(user)}
+        return success_response(200, response_data)
+      
     def send_mail(self, request):
         if not 'email' in request:
             return error_response(400, 'Missing fields')
