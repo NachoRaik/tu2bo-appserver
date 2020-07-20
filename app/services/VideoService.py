@@ -51,7 +51,7 @@ class VideoService(object):
             video['likes'] = len(self.db_handler.get_video_likes(video['id']))
         videos_to_delete = [video for video in videos 
                             if friends_ids != None and video['user_id'] not in friends_ids 
-                            and video['visibility'] == 'private'
+                            and video['visibility'] != 'public'
                         ] 
         for video in videos_to_delete: 
             videos.remove(video)

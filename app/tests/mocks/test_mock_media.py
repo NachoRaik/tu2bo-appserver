@@ -181,6 +181,19 @@ class TestMockMediaServer:
         assert len(json) == 1
         assert response.status_code == 200
 
+    def test_get_blocked_videos_from_user(self):
+        """ Get all videos from an existent user should return 200 """
+
+        user_id = '4'
+        video_data = {'author': 'anAuthor', 'title': 'aTitle', 'date': '09/19/18 13:55:26', 'visibility': 'blocked', 
+        'url': 'anUrl', 'thumb': 'aThumb', 'user_id': user_id}
+        self.mock_media_server.add_video(video_data)
+
+        response = self.mock_media_server.get_user_videos(user_id, {'visibility': 'public'})
+        json = loads(response.get_data())
+        assert len(json) == 0
+        assert response.status_code == 200
+
     def test_get_videos_from_inexistent_user(self):
         """ Get all videos from an unexistent user should return 200 and empty list """
 
@@ -279,6 +292,35 @@ class TestMockMediaServer:
         response = self.mock_media_server.edit_video(video_id, request_data)
         assert response.status_code == 400
         assert b'Invalid visibility' in response.get_data()
+
+    def test_edit_video_to_blocked_success(self):
+        """ Edit video should return 200 """
+
+        video_data = {'author': 'anAuthor', 'title': 'aTitle', 'date': '09/19/18 13:55:26', 'visibility': 'public', 
+        'url': 'anUrl', 'thumb': 'aThumb', 'user_id': '4'}
+        response = self.mock_media_server.add_video(video_data)
+        video_id = loads(response.get_data())['id']
+
+        request_data = { 'visibility': 'blocked', 'title': 'aNewTitle' }
+        response = self.mock_media_server.edit_video(video_id, request_data)
+        video = loads(response.get_data())
+        assert response.status_code == 200
+        assert video['id'] == video_id
+        assert video['url'] == 'anUrl'
+        assert video['author'] == 'anAuthor'
+        assert video['title'] == 'aNewTitle'
+        assert video['visibility'] == 'blocked'
+
+        # Check persistency
+        response = self.mock_media_server.get_video(video_id)
+        video = loads(response.get_data())
+        assert response.status_code == 200
+        assert response.status_code == 200
+        assert video['id'] == video_id
+        assert video['url'] == 'anUrl'
+        assert video['author'] == 'anAuthor'
+        assert video['title'] == 'aNewTitle'
+        assert video['visibility'] == 'blocked'
 
     def test_edit_unexistent_video(self):
         """" Edit unexistent video should return 404 """
