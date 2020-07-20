@@ -224,10 +224,15 @@ class TestVideoController:
         send_friend_request(client, token_user_video, user_id_viewer)
         accept_friend_request(client, token_user_viewer, user_id_video)
 
+        # Adding private video
         res = add_video(client, token_user_video, user_id_video, 'url', 'someAuthor', 'someTitle', 'private', '06/14/20 16:39:33')
         assert res.status_code == 201
         res_json = json.loads(res.get_data())
         video_id = res_json['id']
+
+        # Adding blocked video
+        res = add_video(client, token_user_video, user_id_video, 'url3', 'someAuthor', 'someTitle', 'blocked', '06/14/20 16:39:33')
+        assert res.status_code == 201
 
         res = get_videos_from_user_id(client, token_user_viewer, user_id_video)
         assert res.status_code == 200
