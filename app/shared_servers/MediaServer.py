@@ -89,7 +89,9 @@ class MockMediaServer(MediaServer):
     def get_user_videos(self, user_id, video_searching):
         response_data = []
         for video_id, video in self.db.items():
-            is_not_public = (video['visibility'] != 'public' and len(video_searching) != 0)
+            is_blocked = video['visibility'] == 'blocked'
+            is_private = (video['visibility'] == 'private' and len(video_searching) != 0)
+            is_not_public = is_blocked or is_private
             if video['user_id'] == user_id and not is_not_public:
                 response_data.append(get_fields(video_id, video))
         return success_response(200, response_data)
