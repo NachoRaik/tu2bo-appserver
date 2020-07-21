@@ -12,7 +12,7 @@ from database.models.friends import Friends
 from services.UsersService import UsersService
 from services.VideoService import VideoService
 
-def construct_blueprint(users_service,video_service):
+def construct_blueprint(users_service, video_service, notification_service):
     bp_users = Blueprint("bp_users", __name__)
     
     # -- Endpoints
@@ -21,9 +21,15 @@ def construct_blueprint(users_service,video_service):
     @token_required
     def user_friends(user_info, user_id):
         if request.method == 'POST':
+            response = users_service.getUserProfile(user_id)
+            if response.status_code != 200:
+                return error_response(404, "Can't befriend inexistent user")
+
             err = users_service.acceptFriendRequest(int(user_info["id"]), user_id)
             if err:
                 return error_response(400, err)
+
+            notification_service.friendRequestAccepted(user_info, response.get_json())
             return success_response(200, {"message": "Friend accepted successfully"})
         else:
             friends_ids = users_service.getFriends(user_id)
@@ -43,6 +49,8 @@ def construct_blueprint(users_service,video_service):
         err = users_service.sendFriendRequest(int(user_info['id']), user_id)
         if err:
             return error_response(400, err)
+        
+        notification_service.newFriendRequest(user_info, response.get_json())
         return success_response(200, {"message": "Friendship request sent successfully"})
 
     @bp_users.route('/users/my_requests', methods=['GET'])

@@ -86,6 +86,15 @@ class TestFriends:
         assert res.status_code == 200
         assert len(res_json) == 0
 
+    def test_accept_inexistent_user(self, client):
+        """ POST /users/<user_id_request>/friends
+        Should: return 404"""
+        token = login_and_token_user(client, USER_1)
+        res = accept_friend_request(client, token, 999)
+        res_json = json.loads(res.get_data())
+        assert res.status_code == 404
+        assert res_json["reason"] == "Can't befriend inexistent user"
+
     def test_accept_inexistent_request(self, client):
         """ POST /users/<user_id_request>/friends
         Should: return 400"""
