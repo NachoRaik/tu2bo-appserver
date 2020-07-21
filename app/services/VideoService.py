@@ -3,6 +3,9 @@ from datetime import datetime
 from database.daos.VideoInfoDAO import VideoInfoDAO
 from utils.flask_utils import error_response, success_response
 
+def should_keep(video, friends_ids):
+    return friends_ids == None or (video['user_id'] in friends_ids and video['visibility'] == 'private') or (video['visibility'] == 'public')
+
 class VideoService(object):
     def __init__(self, media_server, db_handler=VideoInfoDAO()):
         self.media_server = media_server
@@ -49,14 +52,7 @@ class VideoService(object):
         videos = json.loads(res.get_data())
         for video in videos:
             video['likes'] = len(self.db_handler.get_video_likes(video['id']))
-        videos_to_delete = [video for video in videos 
-                            if friends_ids != None and ((video['user_id'] not in friends_ids 
-                            and video['visibility'] == 'private') or 
-                            (video['visibility'] == 'blocked'))
-                        ] 
-        for video in videos_to_delete: 
-            videos.remove(video)
-        return videos
+        return [video for video in videos if should_keep(video, friends_ids)]
     
     def getVideo(self, user_id, video_id):
         res = self.media_server.get_video(video_id)
