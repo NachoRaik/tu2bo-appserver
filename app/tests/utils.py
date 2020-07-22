@@ -27,13 +27,14 @@ def login_and_token_user(client, id = 1):
 def oauth2_login(client, googleToken):
     return client.post('/oauth2login', json={'idToken':googleToken})
 
-def add_video(client, token, user_id, url, author, title, visibility, date):
+def add_video(client, token, user_id, url, author, title, visibility, date, is_blocked=False):
     return client.post('/users/{}/videos'.format(user_id), headers={"access-token":token}, json={
         'url': url,
         'author': author,
         'title': title,
         'visibility': visibility,
-        'date': date
+        'date': date,
+        'is_blocked': is_blocked
     })
 
 def get_videos_from_user_id(client, token, user_id):

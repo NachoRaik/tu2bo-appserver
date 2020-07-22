@@ -91,7 +91,7 @@ class TestVideoController:
 
         token = login_and_token_user(client)
         user_id = 1
-        res = add_video(client, token, user_id, 'url', 'someAuthor', 'someTitle', 'blocked', '06/14/20 16:39:33')
+        res = add_video(client, token, user_id, 'url', 'someAuthor', 'someTitle', 'public', '06/14/20 16:39:33', True)
         assert res.status_code == 201
         res_json = json.loads(res.get_data())
         video_id = res_json['id']
@@ -150,7 +150,7 @@ class TestVideoController:
         public_video_id = res_json['id']
         
         # Adding blocked video
-        res = add_video(client, token_user_video, user_id_video, 'url3', 'someAuthor', 'someTitle', 'blocked', '06/14/20 16:39:33')
+        res = add_video(client, token_user_video, user_id_video, 'url3', 'someAuthor', 'someTitle', 'public', '06/14/20 16:39:33', True)
         assert res.status_code == 201
 
         res = get_videos_from_user_id(client, token_user_viewer, user_id_video)
@@ -173,7 +173,7 @@ class TestVideoController:
         video_id = res_json['id']
 
         # Adding blocked video
-        res = add_video(client, token, user_id, 'url3', 'someAuthor', 'someTitle', 'blocked', '06/14/20 16:39:33')
+        res = add_video(client, token, user_id, 'url3', 'someAuthor', 'someTitle', 'public', '06/14/20 16:39:33', True)
         assert res.status_code == 201
 
         res = get_videos_from_user_id(client, token, user_id)
@@ -202,7 +202,7 @@ class TestVideoController:
         public_video_id = res_json['id']
 
         # Adding blocked video
-        res = add_video(client, token, user_id, 'url3', 'someAuthor', 'someTitle', 'blocked', '06/14/20 16:39:33')
+        res = add_video(client, token, user_id, 'url3', 'someAuthor', 'someTitle', 'public', '06/14/20 16:39:33', True)
         assert res.status_code == 201
 
         res = get_videos_from_user_id(client, token, user_id)
@@ -231,7 +231,7 @@ class TestVideoController:
         video_id = res_json['id']
 
         # Adding blocked video
-        res = add_video(client, token_user_video, user_id_video, 'url3', 'someAuthor', 'someTitle', 'blocked', '06/14/20 16:39:33')
+        res = add_video(client, token_user_video, user_id_video, 'url3', 'someAuthor', 'someTitle', 'public', '06/14/20 16:39:33', True)
         assert res.status_code == 201
 
         res = get_videos_from_user_id(client, token_user_viewer, user_id_video)
@@ -265,7 +265,7 @@ class TestVideoController:
         public_video_id = res_json['id']        
 
         # Adding blocked video
-        res = add_video(client, token_user_video, user_id_video, 'url3', 'someAuthor', 'someTitle', 'blocked', '06/14/20 16:39:33')
+        res = add_video(client, token_user_video, user_id_video, 'url3', 'someAuthor', 'someTitle', 'public', '06/14/20 16:39:33', True)
         assert res.status_code == 201
 
         res = get_videos_from_user_id(client, token_user_viewer, user_id_video)
@@ -297,7 +297,7 @@ class TestVideoController:
         public_video_id = res_json['id']
 
         # Adding blocked video
-        res = add_video(client, token_user_video, user_id_video, 'url3', 'someAuthor', 'someTitle', 'blocked', '06/14/20 16:39:33')
+        res = add_video(client, token_user_video, user_id_video, 'url3', 'someAuthor', 'someTitle', 'public', '06/14/20 16:39:33', True)
         assert res.status_code == 201
 
         res = get_videos(client, token_user_viewer)
@@ -326,7 +326,7 @@ class TestVideoController:
         public_video_id = res_json['id']
 
         # Adding blocked video
-        res = add_video(client, token, user_id, 'url3', 'someAuthor', 'someTitle', 'blocked', '06/14/20 16:39:33')
+        res = add_video(client, token, user_id, 'url3', 'someAuthor', 'someTitle', 'public', '06/14/20 16:39:33', True)
         assert res.status_code == 201
         
         res = get_videos(client, token)
@@ -361,7 +361,7 @@ class TestVideoController:
         public_video_id = res_json['id']        
 
         # Adding blocked video
-        res = add_video(client, token_user_video, user_id_video, 'url3', 'someAuthor', 'someTitle', 'blocked', '06/14/20 16:39:33')
+        res = add_video(client, token_user_video, user_id_video, 'url3', 'someAuthor', 'someTitle', 'public', '06/14/20 16:39:33', True)
         assert res.status_code == 201
 
         res = get_videos(client, token_user_viewer)
@@ -490,20 +490,6 @@ class TestVideoController:
         res_json = json.loads(res.get_data())
         assert res.status_code == 400
         assert res_json['reason'] == 'Invalid visibility'
-
-    def test_edit_video_to_block(self, client):
-        """ PATCH /videos/video_id
-        Should: return 400 """
-
-        token = login_and_token_user(client)
-        add_video(client, token, 1, 'url', 'someAuthor', 'someTitle', 'public', '06/14/20 16:39:33')
-
-        res = edit_video(client, token, 1 , {'title': 'anotherTitle', 'visibility': 'blocked', 'description': 'newDescription'})
-        res_json = json.loads(res.get_data())
-        assert res.status_code == 200
-        assert res_json['title'] == 'anotherTitle'
-        assert res_json['visibility'] == 'blocked'
-        assert res_json['description'] == 'newDescription'
 
     # -- Video Info logic
 

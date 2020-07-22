@@ -23,8 +23,7 @@ class MediaServer():
 
     def get_user_videos(self, user_id, search):
         query = "?user_id={}?visibility=public".format(user_id)
-        if len(search) == 0:
-            query+= "&visibility=private"
+        for k,v in search.items(): query+= "&{}={}".format(k,v)
         response = requests.get('{}/videos{}'.format(self.url, query))
         return make_flask_response(response)
 
@@ -60,7 +59,8 @@ class MockMediaServer(MediaServer):
         user_id = data['user_id']
         description = data['description'] if 'description' in data else ''
         thumb = data['thumb'] if 'thumb' in data else ''
-
+        is_blocked = data['is_blocked'] if 'is_blocked' in data else False
+ 
         if any(video['url'] == url for video in self.db.values()):
             return error_response(409, 'Video already uploaded')
 
@@ -72,12 +72,15 @@ class MockMediaServer(MediaServer):
 
         id = self.generate_id()
         self.db[id] = {'author': author, 'title': title, 'description': description, 'date': date, 'visibility': visibility, 
-        'url': url, 'thumb': thumb, 'user_id': user_id}
+        'url': url, 'thumb': thumb, 'user_id': user_id, 'is_blocked': is_blocked}
         response_data = {'id': id}
         return success_response(201, response_data)
 
     def get_videos(self):
-        response_data = [get_fields(video_id, video) for video_id, video in self.db.items()]
+        response_data = []
+        for video_id, video in self.db.items():
+            if not video['is_blocked']:
+                response_data.append(get_fields(video_id, video))
         return success_response(200, response_data)
 
     def get_video(self, video_id):
@@ -90,10 +93,9 @@ class MockMediaServer(MediaServer):
     def get_user_videos(self, user_id, video_searching):
         response_data = []
         for video_id, video in self.db.items():
-            is_blocked = video['visibility'] == 'blocked'
-            is_private = (video['visibility'] == 'private' and len(video_searching) != 0)
-            is_not_public = is_blocked or is_private
-            if video['user_id'] == user_id and not is_not_public:
+            is_blocked = video['is_blocked']
+            is_private = (video['visibility'] == 'private' and len(video_searching) == 0)
+            if video['user_id'] == user_id and not (is_private or is_blocked):
                 response_data.append(get_fields(video_id, video))
         return success_response(200, response_data)
 

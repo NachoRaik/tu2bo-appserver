@@ -43,8 +43,8 @@ class VideoService(object):
 
     def listVideosFromUser(self, user_id, are_friends=True):
         video_searching = {}
-        if not are_friends: 
-            video_searching['visibility'] = 'public'
+        if are_friends: 
+            video_searching['visibility'] = 'private'
         return self.media_server.get_user_videos(user_id, video_searching)
 
     def listVideos(self, friends_ids=None):
