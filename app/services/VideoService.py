@@ -42,7 +42,7 @@ class VideoService(object):
         return self.media_server.edit_video(video_id, data)
 
     def listVideosFromUser(self, user_id, are_friends=True):
-        video_searching = {}
+        video_searching = {'is_blocked': 'false'}
         if are_friends: 
             video_searching['visibility'] = 'private'
         return self.media_server.get_user_videos(user_id, video_searching)

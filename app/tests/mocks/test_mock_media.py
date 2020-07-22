@@ -181,19 +181,6 @@ class TestMockMediaServer:
         assert len(json) == 1
         assert response.status_code == 200
 
-    def test_get_blocked_videos_from_user(self):
-        """ Get all videos from an existent user should return 200 """
-
-        user_id = '4'
-        video_data = {'author': 'anAuthor', 'title': 'aTitle', 'date': '09/19/18 13:55:26', 
-        'is_blocked': True, 'visibility': 'public', 'url': 'anUrl', 'thumb': 'aThumb', 'user_id': user_id}
-        self.mock_media_server.add_video(video_data)
-
-        response = self.mock_media_server.get_user_videos(user_id, {})
-        json = loads(response.get_data())
-        assert len(json) == 0
-        assert response.status_code == 200
-
     def test_get_videos_from_inexistent_user(self):
         """ Get all videos from an unexistent user should return 200 and empty list """
 
