@@ -14,7 +14,7 @@ class MediaServer():
         return make_flask_response(response)
 
     def get_videos(self):
-        response = requests.get(self.url + '/videos')
+        response = requests.get(self.url + '/videos?is_blocked=false')
         return make_flask_response(response)
 
     def get_video(self, video_id):
@@ -22,7 +22,7 @@ class MediaServer():
         return make_flask_response(response)
 
     def get_user_videos(self, user_id, search):
-        query = "?user_id={}".format(user_id)
+        query = "?user_id={}&visibility=public".format(user_id)
         for k,v in search.items(): query+= "&{}={}".format(k,v)
         response = requests.get('{}/videos{}'.format(self.url, query))
         return make_flask_response(response)
@@ -59,7 +59,7 @@ class MockMediaServer(MediaServer):
         user_id = data['user_id']
         description = data['description'] if 'description' in data else ''
         thumb = data['thumb'] if 'thumb' in data else ''
-
+ 
         if any(video['url'] == url for video in self.db.values()):
             return error_response(409, 'Video already uploaded')
 
@@ -76,7 +76,9 @@ class MockMediaServer(MediaServer):
         return success_response(201, response_data)
 
     def get_videos(self):
-        response_data = [get_fields(video_id, video) for video_id, video in self.db.items()]
+        response_data = []
+        for video_id, video in self.db.items():
+            response_data.append(get_fields(video_id, video))
         return success_response(200, response_data)
 
     def get_video(self, video_id):
@@ -89,7 +91,7 @@ class MockMediaServer(MediaServer):
     def get_user_videos(self, user_id, video_searching):
         response_data = []
         for video_id, video in self.db.items():
-            is_private = (video['visibility'] == 'private' and len(video_searching) != 0)
+            is_private = (video['visibility'] == 'private' and 'visibility' not in video_searching)
             if video['user_id'] == user_id and not is_private:
                 response_data.append(get_fields(video_id, video))
         return success_response(200, response_data)

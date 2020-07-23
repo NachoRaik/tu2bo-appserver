@@ -468,14 +468,14 @@ paths:
           description: Password changed
         '401':
           description: Invalid code
-
-
   /videos:
     get:
       tags:
         - videos
       summary: Get home videos
       operationId: homeVideos
+      parameters:
+        - $ref: '#/components/parameters/accessTokenHeader'
       responses:
         '200':
           description: Home videos

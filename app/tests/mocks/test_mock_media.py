@@ -150,7 +150,7 @@ class TestMockMediaServer:
         'url': 'anUrl', 'thumb': 'aThumb', 'user_id': user_id}
         self.mock_media_server.add_video(video_data)
 
-        response = self.mock_media_server.get_user_videos(user_id, {'visibility': 'public'})
+        response = self.mock_media_server.get_user_videos(user_id, {})
         json = loads(response.get_data())
         assert len(json) == 0
         assert response.status_code == 200

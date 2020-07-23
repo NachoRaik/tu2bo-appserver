@@ -33,7 +33,7 @@ def add_video(client, token, user_id, url, author, title, visibility, date):
         'author': author,
         'title': title,
         'visibility': visibility,
-        'date': date
+        'date': date,
     })
 
 def get_videos_from_user_id(client, token, user_id):

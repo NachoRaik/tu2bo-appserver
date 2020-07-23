@@ -146,6 +146,7 @@ class TestVideoController:
         token = login_and_token_user(client)
         user_id = 1
 
+        # Adding private video
         res = add_video(client, token, user_id, 'url', 'someAuthor', 'someTitle', 'private', '06/14/20 16:39:33')
         assert res.status_code == 201
         res_json = json.loads(res.get_data())
@@ -195,6 +196,7 @@ class TestVideoController:
         send_friend_request(client, token_user_video, user_id_viewer)
         accept_friend_request(client, token_user_viewer, user_id_video)
 
+        # Adding private video
         res = add_video(client, token_user_video, user_id_video, 'url', 'someAuthor', 'someTitle', 'private', '06/14/20 16:39:33')
         assert res.status_code == 201
         res_json = json.loads(res.get_data())
@@ -218,11 +220,13 @@ class TestVideoController:
         send_friend_request(client, token_user_video, user_id_viewer)
         accept_friend_request(client, token_user_viewer, user_id_video)
 
+        # Adding private video
         res = add_video(client, token_user_video, user_id_video, 'url', 'someAuthor', 'someTitle', 'private', '06/14/20 16:39:33')
         assert res.status_code == 201
         res_json = json.loads(res.get_data())
         private_video_id = res_json['id']
 
+        # Adding public video
         res = add_video(client, token_user_video, user_id_video, 'url2', 'someAuthor', 'someTitle', 'public', '06/14/20 16:39:33')
         assert res.status_code == 201
         res_json = json.loads(res.get_data())
@@ -280,7 +284,7 @@ class TestVideoController:
         assert res.status_code == 201
         res_json = json.loads(res.get_data())
         public_video_id = res_json['id']
-
+        
         res = get_videos(client, token)
         assert res.status_code == 200
         res_json = json.loads(res.get_data())
@@ -300,11 +304,13 @@ class TestVideoController:
         send_friend_request(client, token_user_video, user_id_viewer)
         accept_friend_request(client, token_user_viewer, user_id_video)
 
+        # Adding private video
         res = add_video(client, token_user_video, user_id_video, 'url', 'someAuthor', 'someTitle', 'private', '06/14/20 16:39:33')
         assert res.status_code == 201
         res_json = json.loads(res.get_data())
         private_video_id = res_json['id']
 
+        # Adding public video
         res = add_video(client, token_user_video, user_id_video, 'url2', 'someAuthor', 'someTitle', 'public', '06/14/20 16:39:33')
         assert res.status_code == 201
         res_json = json.loads(res.get_data())
@@ -436,7 +442,6 @@ class TestVideoController:
         res_json = json.loads(res.get_data())
         assert res.status_code == 400
         assert res_json['reason'] == 'Invalid visibility'
-
 
     # -- Video Info logic
 
