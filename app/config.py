@@ -32,7 +32,7 @@ class ProductionConfig(Config):
         self.AUTH_SERVER = AuthServer(url = os.getenv('AUTH_URI', 'localhost:3000'))
         self.MEDIA_SERVER = MediaServer(url = os.getenv('MEDIA_URI', 'localhost:5005'))
         # self.NOTIF_SERVER = NotificationServer(url = os.getenv('NOTIF_URI', 'localhost:5008'))
-        self.NOTIF_SERVER = MockNotificationServer()
+        self.NOTIF_SERVER = NotificationServer(url = os.getenv('NOTIF_URI', 'localhost:5008'))
         self.MONGODB_SETTINGS = {
             'host': os.getenv('MONGODB_URI'),
             'retryWrites': False

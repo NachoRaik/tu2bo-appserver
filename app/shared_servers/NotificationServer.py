@@ -1,6 +1,7 @@
 from flask import Response
 import json
 import requests
+from utils.flask_utils import make_flask_response
 
 class NotificationServer():
 

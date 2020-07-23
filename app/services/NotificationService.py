@@ -10,7 +10,7 @@ class NotificationService(object):
     
     def newFriendRequest(self, sender, receiver):
         title = 'Nueva solicitud de amistad'
-        body = '{} quiere añadirte como amigo! Ve a ver tus solicitudes para aceptarlo!'.format(sender['username'])
+        body = '{} quiere añadirte como amigx! Ve a ver tus solicitudes para aceptarlo!'.format(sender['username'])
         data = {
             'type': TYPE_FRIEND_REQ
         }
@@ -18,7 +18,7 @@ class NotificationService(object):
     
     def friendRequestAccepted(self, accepter, receiver):
         title = 'Amistad aceptada'
-        body = '{} y tu ahora son amigos! Ve a ver su perfil!'.format(accepter['username'])
+        body = '{} y tu ahora son amigxs! Ve a ver su perfil!'.format(accepter['username'])
         data = {
             'type': TYPE_ACCEPT_FRIEND,
             'user_id': accepter['id']
