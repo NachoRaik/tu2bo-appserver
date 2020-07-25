@@ -403,6 +403,15 @@ paths:
                   reason:
                     type: string
                     example: Can't accept friendship without request
+        '404':
+          description: Can't befriend inexistent user
+          content:
+            application/json:
+              schema:
+                properties:
+                  reason:
+                    type: string
+                    example: Can't befriend inexistent user
 
   /reset_password:
     post:

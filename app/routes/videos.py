@@ -13,9 +13,10 @@ required_post_comment_fields = ['author', 'content', 'timestamp']
 required_put_likes_field = ['liked']
 
 
-def construct_blueprint(video_service,users_service):
+def construct_blueprint(video_service, users_service):
     bp_videos = Blueprint("bp_videos", __name__)
-    rule_engine = RuleEngine(users_service,video_service)
+    
+    rule_engine = RuleEngine(users_service, video_service)
     
     # -- Endpoints
 

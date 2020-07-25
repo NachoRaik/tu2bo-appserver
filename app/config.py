@@ -2,6 +2,7 @@ import os
 
 from shared_servers.AuthServer import AuthServer, MockAuthServer
 from shared_servers.MediaServer import MediaServer, MockMediaServer
+from shared_servers.NotificationServer import NotificationServer, MockNotificationServer
 from datetime import timedelta
 
 class Config(object):
@@ -10,6 +11,7 @@ class Config(object):
         self.TESTING = False
         self.AUTH_SERVER = AuthServer()
         self.MEDIA_SERVER = MediaServer()
+        self.NOTIF_SERVER = NotificationServer()
         self.MONGODB_SETTINGS = {
 	        'db': 'appserver-db',
 	        'host': 'mongodb://appserver-db:27017/appserver-db'
@@ -29,6 +31,7 @@ class ProductionConfig(Config):
         super().__init__()
         self.AUTH_SERVER = AuthServer(url = os.getenv('AUTH_URI', 'localhost:3000'))
         self.MEDIA_SERVER = MediaServer(url = os.getenv('MEDIA_URI', 'localhost:5005'))
+        self.NOTIF_SERVER = NotificationServer(url = os.getenv('NOTIF_URI', 'localhost:5008'))
         self.MONGODB_SETTINGS = {
             'host': os.getenv('MONGODB_URI'),
             'retryWrites': False
@@ -42,6 +45,7 @@ class DevelopmentConfig(Config):
         self.TESTING = True
         self.AUTH_SERVER = MockAuthServer()
         self.MEDIA_SERVER = MockMediaServer()
+        self.NOTIF_SERVER = MockNotificationServer()
         self.DELAY = timedelta(minutes=1)
 
 class TestingConfig(Config):
@@ -50,6 +54,7 @@ class TestingConfig(Config):
         self.TESTING = True
         self.AUTH_SERVER = MockAuthServer()
         self.MEDIA_SERVER = MockMediaServer()
+        self.NOTIF_SERVER = MockNotificationServer()
         self.MONGODB_SETTINGS = {
             'db': 'appserver-db-test',
             'host': 'mongomock://localhost',
