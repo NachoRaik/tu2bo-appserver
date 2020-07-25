@@ -5,58 +5,66 @@ import requests
 from shared_servers.utils_auth import *
 from utils.flask_utils import error_response, success_response, make_flask_response
 
+HEADER_API_KEY = 'x-api-key'
+
 class AuthServer():
 
-    def __init__(self, url = 'no-host'):
+    def __init__(self, url='no-host', api_key_value='no-api-key'):
         self.url = url
+        self.api_key_value = api_key_value
 
     def login(self, body):
-        response = requests.post(f'{self.url}/users/login', json=body)
+        response = requests.post(f'{self.url}/users/login', json=body, headers=self._headers())
         return make_flask_response(response)
 
     def oauth_login(self, body):
-        response = requests.post(self.url + '/users/oauth2login', json=body)
+        response = requests.post(self.url + '/users/oauth2login', json=body, headers=self._headers())
         return make_flask_response(response)
 
     def register(self, body):
-        response = requests.post(f'{self.url}/users/register', json=body)
+        response = requests.post(f'{self.url}/users/register', json=body, headers=self._headers())
         return make_flask_response(response)
 
     def get_users(self):
-        response = requests.get(f'{self.url}/users')
+        response = requests.get(f'{self.url}/users', headers=self._headers())
         return make_flask_response(response)
 
     def authorize_user(self, token):
         headers = {'access-token': token}
-        response = requests.post(f'{self.url}/users/authorize', headers=headers)
+        response = requests.post(f'{self.url}/users/authorize', headers=self._headers(headers))
         return make_flask_response(response)
 
     def get_user_profile(self,user_id_request):
-        response = requests.get(f'{self.url}/users/{user_id_request}')
+        response = requests.get(f'{self.url}/users/{user_id_request}', headers=self._headers())
         return make_flask_response(response)
 
     def edit_user_profile(self, user_id, body):
-        response = requests.put(f'{self.url}/users/{user_id}', json=body)    
+        response = requests.put(f'{self.url}/users/{user_id}', json=body, headers=self._headers())    
         return make_flask_response(response)
 
     def delete_user_profile(self, user_id):
-        response = requests.delete(f'{self.url}/users/{user_id}')
+        response = requests.delete(f'{self.url}/users/{user_id}', headers=self._headers())
         return make_flask_response(response)
 
     def send_mail(self, body):
-        response = requests.post(f'{self.url}/users/reset_password', json=body)
+        response = requests.post(f'{self.url}/users/reset_password', json=body, headers=self._headers())
         return make_flask_response(response)
 
     def validate_code(self, code, email):
-        response = requests.get(f'{self.url}/users/password?code={code}&email={email}')
+        response = requests.get(f'{self.url}/users/password?code={code}&email={email}', headers=self._headers())
         return make_flask_response(response)
 
     def change_password(self, body, code, email):
-        response = requests.post(f'{self.url}/users/password?code={code}&email={email}', json=body)
+        response = requests.post(f'{self.url}/users/password?code={code}&email={email}', json=body, headers=self._headers())
         return make_flask_response(response)
 
     def __str__(self):
         return "url => {}".format(self.url)
+
+    def _headers(self, headers={}):
+        f_headers = { HEADER_API_KEY: self.api_key_value }
+        for k,v in headers.items(): f_headers[k] = v
+        return f_headers
 
 # --- Mocks
 

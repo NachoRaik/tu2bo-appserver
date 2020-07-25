@@ -17,6 +17,7 @@ class Config(object):
 	        'host': 'mongodb://appserver-db:27017/appserver-db'
         }
         self.WEB_INTERFACE_KEY = 'LCCJ5bMh9DzCYJjnD2Q4TWo0l5FiQnibjM4iQcTO7Bl7faMRkJXDuOxa8zugSByW'
+        self.AUTH_API_KEY = 'asdf'
 
     def __repr__(self):
         printable_fields = ['DEBUG', 'AUTH_SERVER', 'MEDIA_SERVER']
@@ -29,7 +30,8 @@ class Config(object):
 class ProductionConfig(Config):
     def __init__(self):
         super().__init__()
-        self.AUTH_SERVER = AuthServer(url = os.getenv('AUTH_URI', 'localhost:3000'))
+        self.AUTH_API_KEY = os.getenv('AUTH_API_KEY', '')
+        self.AUTH_SERVER = AuthServer(url = os.getenv('AUTH_URI', 'localhost:3000'), api_key_value = self.AUTH_API_KEY)
         self.MEDIA_SERVER = MediaServer(url = os.getenv('MEDIA_URI', 'localhost:5005'))
         self.NOTIF_SERVER = NotificationServer(url = os.getenv('NOTIF_URI', 'localhost:5008'))
         self.MONGODB_SETTINGS = {
