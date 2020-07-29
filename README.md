@@ -1,38 +1,51 @@
 # tu2bo-appserver
 TúTubo - Application Server
 
-### Setup
+## About
+Tutubo Application Server es el gateway de acceso a la plataforma, que se encarga de recibir las conexiones de los clientes mobile. Es el puente de conexión con los otros servidores, y también alberga la lógica de unión de vinculación de usuarios con videos, de usuarios con otros usuarios, y de información de negocio sobre los videos.
 
+
+## Development
+
+### Setup
 Para abstraernos de la version y librerias que podemos tener instalados de manera global, la resolución de dependencias la mantendremos autocontenida con `docker`. Entonces es requisito tener instalado `docker` y `docker-compose`.
 
 ### Run
+Para correr el server en modo desarrollo, hay que buildear las imagenes y correr el container, lo cual se puede hacer con el siguiente comando:
 
-Para correr el server, hay que buildear las imagenes y correr el container:
+	docker-compose up --build
 
-```
-docker-compose build
-docker-compose up
-```
+o simplemente:
 
-o simplemente
+	./run.sh
 
-```
-./run.sh
-```
 
 Para verificar que el server este levantado, en otra consola podemos hacer:
 
-	curl -vvv "127.0.0.1:5000"
+	curl -v "127.0.0.1:5000"
 
 O simplemente:
 
 	make ping
 
-### Tests
+Una vez levantado, se puede observar e interactuar con sus endpoints en el endpoint `GET /swagger`.
+
+
+Para detener la corrida, en la terminal donde se levantó cortar la ejecución (`Ctrl+C`), o bien abriendo otra terminal en el directorio root del proyecto y correr `docker-compose down`.
+
+### Tests & Coverage
 
 Los tests se corren haciendo:
 
 	make test
 
-Tener en cuenta que puede que requiera tener el `mongo service` starteado. \
-El comando llama a `pytest`, sin calculo de coverage. 
+El comando llama a `pytest`, y se incluye el reporte de coverage junto a la salida de la corrida.
+
+### Deployment
+
+Para deployar a Heroku, seguir los siguientes pasos:
+
+1. Loguearse a Heroku (prompt en browser): `heroku login`
+2. Loguearse al registry de Heroku: `heroku container:login`
+3. Buildear y pushear nueva imagen a Heroku: `make heroku-push`
+4. Cambiar instancia para usar la nueva imagen: `make heroku-release`
