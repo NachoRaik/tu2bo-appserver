@@ -40,3 +40,12 @@ Los tests se corren haciendo:
 	make test
 
 El comando llama a `pytest`, y se incluye el reporte de coverage junto a la salida de la corrida.
+
+### Deployment
+
+Para deployar a Heroku, seguir los siguientes pasos:
+
+1. Loguearse a Heroku (prompt en browser): `heroku login`
+2. Loguearse al registry de Heroku: `heroku container:login`
+3. Buildear y pushear nueva imagen a Heroku: `make heroku-push`
+4. Cambiar instancia para usar la nueva imagen: `make heroku-release`
